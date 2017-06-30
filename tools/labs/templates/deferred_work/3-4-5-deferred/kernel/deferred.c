@@ -61,13 +61,11 @@ static struct mon_proc *get_proc(pid_t pid)
 	struct task_struct *task;
 	struct mon_proc *p;
 
-	rcu_read_lock();
 	task = pid_task(find_vpid(pid), PIDTYPE_PID);
-	rcu_read_unlock();
 	if (!task)
 		return ERR_PTR(-ESRCH);
 
-	p = kmalloc(sizeof(*p), GFP_ATOMIC);
+	p = kmalloc(sizeof(p), GFP_ATOMIC);
 	if (!p)
 		return ERR_PTR(-ENOMEM);
 
@@ -88,10 +86,10 @@ static void work_handler(struct work_struct *work)
 /* TODO 3: undef ALLOC_IO_DIRECT*/
 #undef ALLOC_IO_DIRECT
 
-static void timer_handler(struct timer_list *tl)
+static void timer_handler(unsigned long var)
 {
 	/* TODO 1/44: implement timer handler */
-	struct my_device_data *my_data = from_timer(my_data, tl, timer);
+	struct my_device_data *my_data = (struct my_device_data *) var;
 
 	pr_info("[timer_handler] pid = %d, comm = %s\n",
 		current->pid, current->comm);
@@ -228,7 +226,7 @@ static int deferred_init(void)
 	cdev_add(&dev.cdev, MKDEV(MY_MAJOR, MY_MINOR), 1);
 
 	/* TODO 1: Initialize timer. */
-	timer_setup(&dev.timer, timer_handler, 0);
+	setup_timer(&dev.timer, timer_handler, (unsigned long) &dev);
 
 	return 0;
 }
