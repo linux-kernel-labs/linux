@@ -19,7 +19,7 @@ MODULE_DESCRIPTION("SO2 character device");
 MODULE_AUTHOR("SO2");
 MODULE_LICENSE("GPL");
 
-#define LOG_LEVEL	KERN_INFO
+#define LOG_LEVEL	KERN_DEBUG
 
 #define MY_MAJOR		42
 #define MY_MINOR		0
@@ -39,7 +39,7 @@ struct so2_device_data {
 	/* TODO 4/2: add buffer with BUFSIZ elements */
 	char buffer[BUFSIZ];
 	size_t size;
-	/* TODO 7/2: extra members for home */
+	/* TODO 6/2: extra members for home */
 	wait_queue_head_t wq;
 	int flag;
 	/* TODO 3/1: add atomic_t access variable to keep track if file is opened */
@@ -52,9 +52,6 @@ static int so2_cdev_open(struct inode *inode, struct file *file)
 {
 	struct so2_device_data *data;
 
-	/* TODO 2/1: print message when the device file is open. */
-	printk(LOG_LEVEL "open called!\n");
-
 	/* TODO 3/1: inode->i_cdev contains our cdev struct, use container_of to obtain a pointer to so2_device_data */
 	data = container_of(inode->i_cdev, struct so2_device_data, cdev);
 
@@ -65,7 +62,7 @@ static int so2_cdev_open(struct inode *inode, struct file *file)
 		return -EBUSY;
 
 	set_current_state(TASK_INTERRUPTIBLE);
-	schedule_timeout(10 * HZ);
+	schedule_timeout(10);
 
 	return 0;
 }
@@ -73,15 +70,12 @@ static int so2_cdev_open(struct inode *inode, struct file *file)
 static int
 so2_cdev_release(struct inode *inode, struct file *file)
 {
-	/* TODO 2/1: print message when the device file is closed. */
-	printk(LOG_LEVEL "close called!\n");
-
 #ifndef EXTRA
 	struct so2_device_data *data =
 		(struct so2_device_data *) file->private_data;
 
 	/* TODO 3/1: reset access variable to 0, use atomic_set */
-	atomic_set(&data->access, 0);
+	atomic_inc(&data->access);
 #endif
 	return 0;
 }
@@ -96,7 +90,7 @@ so2_cdev_read(struct file *file,
 	size_t to_read;
 
 #ifdef EXTRA
-	/* TODO 7/6: extra tasks for home */
+	/* TODO 6/6: extra tasks for home */
 	if (!data->size) {
 		if (file->f_flags & O_NONBLOCK)
 			return -EAGAIN;
@@ -129,7 +123,7 @@ so2_cdev_write(struct file *file,
 		return -EFAULT;
 	*offset += size;
 	data->size = *offset;
-	/* TODO 7/3: extra tasks for home */
+	/* TODO 6/3: extra tasks for home */
 #ifdef EXTRA
 	wake_up_interruptible(&data->wq);
 #endif
@@ -146,11 +140,11 @@ so2_cdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	int remains;
 
 	switch (cmd) {
-	/* TODO 6/3: if cmd = MY_IOCTL_PRINT, display IOCTL_MESSAGE */
+	/* TODO 5/3: if cmd = MY_IOCTL_PRINT, display IOCTL_MESSAGE */
 	case MY_IOCTL_PRINT:
 		printk(LOG_LEVEL "%s\n", IOCTL_MESSAGE);
 		break;
-	/* TODO 7/19: extra tasks, for home */
+	/* TODO 6/19: extra tasks, for home */
 	case MY_IOCTL_DOWN:
 		data->flag = 0;
 		ret = wait_event_interruptible(data->wq, data->flag != 0);
@@ -179,14 +173,11 @@ so2_cdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 static const struct file_operations so2_fops = {
 	.owner = THIS_MODULE,
-/* TODO 2/2: add open and release functions */
+/* TODO 2/4: add open, release, read, write functions */
 	.open = so2_cdev_open,
 	.release = so2_cdev_release,
-/* TODO 4/1: add read function */
 	.read = so2_cdev_read,
-/* TODO 5/1: add write function */
 	.write = so2_cdev_write,
-/* TODO 6/1: add ioctl function */
 	.unlocked_ioctl = so2_cdev_ioctl,
 };
 
@@ -195,7 +186,7 @@ static int so2_cdev_init(void)
 	int err;
 	int i;
 
-	/* TODO 1/6: register char device region for MY_MAJOR and NUM_MINORS starting at MY_MINOR */
+        /* TODO 1/6: register char device region for MY_MAJOR and NUM_MINORS starting at MY_MINOR */
 	err = register_chrdev_region(MKDEV(MY_MAJOR, MY_MINOR),
 			NUM_MINORS, MODULE_NAME);
 	if (err != 0) {
@@ -205,7 +196,7 @@ static int so2_cdev_init(void)
 
 	for (i = 0; i < NUM_MINORS; i++) {
 #ifdef EXTRA
-		/* TODO 7/2: extra tasks, for home */
+		/* TODO 6/2: extra tasks, for home */
 		devs[i].size = 0;
 		memset(devs[i].buffer, 0, sizeof(devs[i].buffer));
 #else
@@ -213,7 +204,7 @@ static int so2_cdev_init(void)
 		memcpy(devs[i].buffer, MESSAGE, sizeof(MESSAGE));
 		devs[i].size = sizeof(MESSAGE);
 #endif
-		/* TODO 7/2: extra tasks for home */
+		/* TODO 6/2: extra tasks for home */
 		init_waitqueue_head(&devs[i].wq);
 		devs[i].flag = 0;
 		/* TODO 3/1: set access variable to 0, use atomic_set */
