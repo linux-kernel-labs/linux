@@ -8,14 +8,12 @@ fi
 
 device=$1
 
-USER=$(whoami)
-
 case "$device" in
     "tap0")
         subnet=172.213.0
         ;;
     "tap1")
-        subnet=172.30.0
+        subnet=172.214.0
         ;;
     *)
         echo "Unknown device" 1>&2

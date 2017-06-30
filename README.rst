@@ -1,1 +1,1 @@
-Documentation/teaching/index.rst
+Documentation/labs/index.rst

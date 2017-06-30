@@ -1,10 +1,7 @@
-/skels/
+skels
 vmlinux
 zImage
 serial.pts
 rootfs.img
-disk1.img
-disk2.img
-/*core-image-*.ext4
+core-image-minimal-*.ext4
 .modinst
-/out/
