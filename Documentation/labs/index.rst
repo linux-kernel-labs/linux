@@ -31,6 +31,7 @@ then point your browser at **Documentation/output/labs/index.html**.
 
    vm.rst
    exercises.rst
+   introduction.rst
    kernel_modules.rst
    kernel_api.rst
    device_drivers.rst
