@@ -24,61 +24,22 @@ Computers, University POLITEHNICA of Bucharest.
 
 You can get the latest version at http://github.com/linux-kernel-labs.
 
-To get started build the documentation from the sources after
-installing docker-compose on you host:
+To get started build the documentation from the sources:
 
 .. code-block:: c
-
-   cd tools/labs && make docker-docs
+   
+   cd tools/teaching && make docs
 
 then point your browser at **Documentation/output/labs/index.html**.
 
-Alternatively, you can build directly on the host (see
-tools/labs/docs/Dockerfile for dependencies):
-
-.. code-block:: c
-
-   cd tools/labs && make docs
-
 .. toctree::
 
-   so2/index.rst
-
-.. toctree::
-   :caption: Lectures
-
-   lectures/intro.rst
-   lectures/syscalls.rst
-   lectures/processes.rst
-   lectures/interrupts.rst
-   lectures/smp.rst
-   lectures/address-space.rst
-   lectures/memory-management.rst
-   lectures/fs.rst
-   lectures/debugging.rst
-   lectures/networking.rst
-
-.. toctree::
-   :caption: Labs
-
-   labs/infrastructure.rst
-   labs/introduction.rst
+   labs/vm.rst
+   labs/exercises.rst
    labs/kernel_modules.rst
    labs/kernel_api.rst
    labs/device_drivers.rst
    labs/interrupts.rst
    labs/deferred_work.rst
-   labs/block_device_drivers.rst
-   labs/filesystems_part1.rst
-   labs/filesystems_part2.rst
-   labs/networking.rst
    labs/memory_mapping.rst
    labs/device_model.rst
-
-.. toctree::
-   :caption: Useful info
-
-   info/vm.rst
-   info/extra-vm.rst
-   info/contributing.rst
-

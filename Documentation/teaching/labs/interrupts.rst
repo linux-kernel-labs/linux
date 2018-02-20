@@ -56,7 +56,7 @@ For IRQs to be useful device drivers must implement handlers, i.e. a
 particular sequence of code that handles the interrupt. Because in
 many situations the number of interrupts available is limited, a
 device driver must behave in an orderly fashion with interruptions:
-interrupts must be requested before being used and released when they
+interrupts must be required before being used and released when they
 are no longer needed. In addition, in some situations, device drivers
 must share an interrupt or synchronize with interrupts. All of these will be
 discussed further.
@@ -72,7 +72,7 @@ the one running (B).
 Using only a spinlock can lead to a deadlock. The classic example of
 deadlock in this case is:
 
-1. We run a process on the X processor, and we acquire the lock
+1. We run a process process on the X processor, and we acquire the lock
 2. Before releasing the lock, an interrupt is generated on the X processor
 3. The interrupt handling routine will try to acquire the lock and it
    will go into an infinite loop
@@ -131,8 +131,7 @@ Most of the time, port requests are done at the driver initialization
 or probe time and the port releasing is done at the removal of the
 device or module.
 
-All of the port requests can be seen from userspace via the
-:file:`/proc/ioports` file:
+All of the port requests can be seen from userspace via the /proc/ioports file:
 
 .. code-block:: shell
 
@@ -167,12 +166,12 @@ are different port access functions depending on their size. The
 following port access functions are defined in asm/io.h:
 
 
-* *unsigned inb(int port)*, reads one byte (8 bits) from port
-* *void outb(unsigned char byte, int port)*, writes one byte (8 bits) to port
-* *unsigned inw(int port)*, reads two bytes (16-bit) ports
-* *void outw(unsigned short word, int port)*, writes two bytes (16-bits) to port
+* *unsigned inb(int port)*, read one byte (8 bits) from port
+* *void outb(unsigned char byte, int port)*, write one byte (8 bits) to port
+* *unsigned inw(int port)*, read two bytes (16-bit) ports
+* *void outw(unsigned short word, int port)* writes two bytes (16-bits) to port
 * *unsigned inl (int port)*, reads four bytes (32-bits) from port
-* *void outl(unsigned long word, int port)*, writes four bytes (32-bits) to port
+* *void outl(unsigned long word, int port)* write four bytes (32-bits) to port
 
 The port argument specifies the address of the port where the reads or
 writes are done, and its type is platform dependent (may be unsigned
@@ -180,7 +179,7 @@ long or unsigned short).
 
 Some devices may have problems when the processor is trying to
 transfer data too fast to and from the device. To avoid this issue we
-may need to insert a delay after an I/O operation and there are functions
+may need to insert a delay after an I/O operation and there functions
 you can use that introduce this delay. Their names are similar to
 those described above, with the exception that it ends in _p: inb_p,
 outb_p, etc.
@@ -368,7 +367,7 @@ following operations will be executed:
    free_irq (MY_IRQ, my_data);
 
 
-During the initialization function (:c:func:`init_module`), or in the
+During the initialization functiom (c:func:`init_module`), or in the
 function that opens the device, interrupts must be activated for the
 device. This operation is dependent on the device, but most often
 involves setting a bit from the control register.
@@ -503,7 +502,7 @@ If we want to disable interrupts at the interrupt controller level
 (not recommended because disabling a particular interrupt is slower,
 we can not disable shared interrupts) we can do this with
 :c:func:`disable_irq`, :c:func:`disable_irq_nosync`, and
-:c:func:`enable_irq`. Using these functions will disable the interrupts on
+:c:func:`enable_irq`. Using these functions disabled the interrupts on
 all processors. Calls can be nested: if disable_irq is called twice,
 it will require as many calls enable_irq to enable it. The difference
 between disable_irq and disable_irq_nosync is that the first one will
@@ -575,7 +574,7 @@ as follows:
 
 
 The *my_access function* above runs in process context. To
-synchronize access to the shared data, we disable the interrupts and
+synchronize access to the share data, we disable the interrupts and
 use the spinlock *lock*, i.e. the :c:func:`spin_lock_irqsave` and
 :c:func:`spin_unlock_irqrestore` functions.
 
@@ -675,8 +674,13 @@ Linux device drivers
 Exercises
 =========
 
-.. include:: ../labs/exercises-summary.hrst
-.. |LAB_NAME| replace:: interrupts
+.. important::
+
+   .. include:: exercises-summary.hrst
+
+   .. |LAB_NAME| replace:: interrupts
+
+   Generate the skeleton for this lab (task name should be empty).
 
 0. Intro
 --------
@@ -704,23 +708,13 @@ device driver.
 1. Request the I/O ports
 ------------------------
 
-To start with, we aim to allocate memory in the I/O space for hardware
-devices. We will see that we cannot allocate space for the keyboard
-because the designated region is already allocated. Then we will allocate
-I/O space for unused ports.
-
 The *kbd.c* file contains a skeleton for the keyboard driver. Browse
 the source code and inspect :c:func:`kbd_init`. Notice that the I/O
 ports we need are I8042_STATUS_REG and I8042_DATA_REG.
 
-Follow the sections maked with **TODO 1** in the skeleton. Request the I/O
-ports in :c:func:`kbd_init` and make sure to check for errors and to properly
-clean-up in case of errors. When requesting, set the reserving caller's ID
-string (``name``) with ``MODULE_NAME`` macro. Also, add code to release the I/O
-ports in :c:func:`kbd_exit`.
-
-.. note:: You can review the `Request access to I/O ports`_ section before
-   proceeding.
+Request the I/O ports int :c:func:`kbd_init` and make sure to check
+for errors and to properly clean-up in case of errors. Also add code
+to release the I/O ports in :c:func:`kbd_exit`.
 
 Now build the module and copy it to the VM image:
 
@@ -734,14 +728,14 @@ Now start the VM and insert the module:
 
 .. code-block:: shell
 
-   root@qemux86:~# insmod skels/interrupts/kbd.ko
+   root@qemux86:~# skels/interrupts/kbd.ko
    kbd: loading out-of-tree module taints kernel.
    insmod: can't insert 'skels/interrupts/kbd.ko': Device or resource busy
 
 Notice that you get an error when trying to request the I/O
-ports. This is because we already have a driver that has requested the
-I/O ports. To validate check the :file:`/proc/ioports` file for the
-``STATUS_REG`` and ``DATA_REG`` values:
+ports. This is because we already have a driver that has requestedthe
+I/O ports. To validate check the /proc/ioports file for the STATUS_REG
+and DATA_REG values:
 
 .. code-block:: shell
 
@@ -766,12 +760,8 @@ It looks like the I/O ports are registered by the kernel during the
 boot and we won't be able to remove the associated module. Instead
 lets trick the kernel and register ports 0x61 and 0x65.
 
-Use the function :c:func:`request_region` (inside the :c:func:`kbd_init`
-function) to allocate the ports and the function :c:func:`release_region`
-(inside the :c:func:`kbd_exit` function) to release the allocated memory.
-
 This time we can load the module and */proc/ioports* shows that the
-owner of these ports is our module:
+owner of these ports are our module:
 
 .. code-block:: shell
 
@@ -800,12 +790,11 @@ section before proceeding.
 
 Follow the sections maked with **TODO 2** in the skeleton.
 
-First, define an empty interrupt handling routine named
-c:func:`kbd_interrupt_handler`.
+First, define an empty interrupt handling routine.
 
 .. note:: Since we already have a driver that uses this interrupt we
 	  should report the interrupt as not handled (i.e. return
-	  :c:type:`IRQ_NONE`) so that the original driver still has a
+	  :c:type:`IRQF_NONE`) so that the original driver still has a
 	  chance to process it.
 
 Then register the interrupt handler routine using
@@ -836,14 +825,14 @@ and our driver.
 .. note:: More details about the format of the */proc/interrupts* can
 	  be found in the `Interrupt statistics`_ section.
 
-Print a message inside the routine to make sure it is called. Compile
-and reload the module into the kernel. Check that the interrupt handling
-routine is called when you press the keyboard on the virtual machine,
-using :command:`dmesg`. Also note that when you use the serial port no
+Add a message in the interrupt handling routine to check if it is
+called. Compile and reload the module into the kernel. Check that the
+interrupt handling routine is called when you press the keyboard on
+the virtual machine. Also note that when you use the serial port no
 keyboard interrupt is generated.
 
 .. attention:: To get access to the keyboard on the virtual machine
-	       boot with "QEMU_DISPLAY=gtk make boot".
+	       boot with "QEMU_DISPLAY=sdl make boot".
 
 3. Store ASCII keys to buffer
 -----------------------------
@@ -857,37 +846,31 @@ following in the interrupt handling:
 * copy the ASCII characters corresponding to the keystrokes and store
   them in the buffer of the device
 
-Follow the sections marked **TODO 3** in the skeleton.
+Follow the sectios marked **TODO 3** in the skeleton.
 
 Reading the data register
 .........................
 
-First, fill in the :c:func:`i8042_read_data` function to read the
-``I8042_DATA_REG`` of the keyboard controller. The function
+First, fill in the i8042_read_data() function to read the
+I8042_DATA_REG I8042_DATA_REG of the keyboard controller. The function
 just needs to return the value of the register. The value of the
 registry is also called scancode, which is what is generated at each
 keystroke.
 
-.. hint:: Read the ``I8042_DATA_REG`` register using :c:func:`inb` and
-    store the value in the local variable :c:type:`val`.
-    Revisit the `Accessing I/O ports`_ section.
+.. hint:: Read the I8042_DATA_REG register using :c:func:`inb`.
 
-Call the :c:func:`i8042_read_data` in the
-:c:func:`kbd_interrupt_handler` and print the value read.
-
-Print information about the keystrokes in the following format:
+Then print information about the keystrokes int the following format:
 
 .. code-block:: c
 
-   pr_info("IRQ:% d, scancode = 0x%x (%u,%c)\n",
-      irq_no, scancode, scancode, scancode);
+   pr_info("IRQ:% d, scancode = 0x% x (% u,% c) \ n"
+	   irq_no, scancode, scancode, scancode);
 
 
 Where scancode is the value of the read register using the
-:c:func:`i8042_read_data` function.
+i8042_read_data() function.
 
-Notice that the scancode (reading of the read register) is not an ASCII
-character of the pressed key. We'll have to understand the scancode.
+Notice that the scancode (reading of the read register) is not an ASCII character of the pressed key. We'll have to understand the scancode.
 
 Interpreting the scancode
 .........................
@@ -978,7 +961,7 @@ character.
 
 .. hint:: To check for press / release, use :c:func:`is_key_press`.
 	   Use :c:func:`get_ascii` function to get the corresponding
-	   ASCII code. Both functions expect the scancode.
+	   ASCII code. Both functions expects the scancode.
 
 
 .. hint:: To display the received information use the following
@@ -992,72 +975,44 @@ character.
 	  Where scancode is the value of the data register, and ch is
 	  the value returned by the get_ascii() function.
 
+
 Store characters to the buffer
-...............................
+..............................
 
 We want to collect the pressed characters (not the other keys) into
-circular a buffer that can be consumed from user space.
+circular a buffer that can be consumed from user space. For this step
+follow the sections marked with **TODO 4** in the skeleton.
+
+Implement :c:func:`get_char` in a similar with  :c:func:`put_char`.
 
 Update the interrupt handler to add a pressed ASCII character to the
 end of the device buffer. If the buffer is full, the character will be
 discarded.
 
-.. hint:: The device buffer is the field :c:type:`buf` in the device's
-	  :c:type:`struct kbd`. To get the device data from the interrupt handler
-	  use the following construct:
+.. hint:: To get the device data from the interrupt handler use the
+	  following construct:
 
 	  .. code-block:: c
 
-	    struct kbd *data = (struct kbd *) dev_id;
-
-	  The buffer's dimension is located in :c:type:`struct kbd`'s field,
-	  :c:type:`count`. The :c:type:`put_idx` and :c:type:`get_idx` fields
-	  specify the next writing and reading index. Take a look at the
-	  :c:func:`put_char` function's implementation to observe how the data is
-	  added to the circular buffer.
+	     struct kbd *data = (struct kbd *) dev_id;
 
 .. attention:: Synchronize the access to the buffer and the helper
 	       indexes with a spinlock.
-	       Define the spinlock in the device struct :c:type:`struct kbd`
-	       and initialize it in :c:func:`kbd_init`.
 
-	       Use the :c:func:`spin_lock` and :c:func:`spin_unlock` functions
-	       to protect the buffer in the interrupt handler.
 
-	       Revisit the `Locking`_ section.
-
-4. Reading the buffer
-----------------------
-
-In order to have access to the keylogger's data, we have to send it to
-the user space. We will do this using the */dev/kbd* character device. When
-reading from this device, we will get the data from the buffer in the kernel
-space, where we collected the keys pressed.
-
-For this step
-follow the sections marked with **TODO 4** in the :c:func:`kbd_read` function.
-
-Implement :c:func:`get_char` in a similar way to :c:func:`put_char`. Be careful
-when implementing the circular buffer.
-
-In the :c:func:`kbd_read` function copy the data from the buffer to the
-userspace buffer.
+In the read function copy the data from the buffer to the userspace
+buffer.
 
 .. hint:: Use :c:func:`get_char` to read a character from the buffer
 	  and put_user to store it to the user buffer.
 
-.. attention:: In the read function, ue :c:func:`spin_lock_irqsave` and
+.. attention:: In the read function Use :c:func:`spin_lock_irqsave` and
 	       :c:func:`spin_unlock_irqrestore` for locking.
 
 	       Revisit the `Locking`_ section.
 
-.. attention:: We cannot use :c:func:`put_user` or :c:func:`copy_to_user`
-	       while holding the lock, as userpace access is not permitted from
-	       atomic contexts.
-
-	       For more info, read the :ref:`Access to the address space of the
-	       process section <_access_to_process_address_space>` in the
-	       previous lab.
+.. attention:: Do use :c:func:`put_user` while holding the lock, as
+	       userpace access is not permitted from atomic contexts.
 
 For testing, you will need to create the */dev/kbd* character device
 driver using the mknod before reading from it. The device master and
@@ -1066,55 +1021,13 @@ minor are defined as ``KBD_MAJOR`` and ``KBD_MINOR``:
 .. code-block:: c
 
    mknod /dev/kbd c 42 0
-
-Build, copy and boot the virtual machine and load the module. Test it
-using the command:
-
-.. code-block:: c
-
    cat /dev/kbd
 
 
-5. Reset the buffer
--------------------
+Reset the buffer
+................
 
 Reset the buffer if the device is written to. For this step follow the
 sections marked with **TODO 5** in the skeleton.
 
 Implement :c:func:`reset_buffer` and add the write operation to *kbd_fops*.
-
-.. attention:: In the write function Use :c:func:`spin_lock_irqsave` and
-         :c:func:`spin_unlock_irqrestore` for locking when resetting the
-         buffer.
-
-         Revisit the `Locking`_ section.
-
-For testing, you will need to create the */dev/kbd* character device
-driver using the mknod before reading from it. The device master and
-minor are defined as ``KBD_MAJOR`` and ``KBD_MINOR``:
-
-.. code-block:: c
-
-   mknod /dev/kbd c 42 0
-
-Build, copy and boot the virtual machine and load the module.
-Test it using the command:
-
-.. code-block:: c
-
-   cat /dev/kbd
-
-Press some keys, then run the command :command:`echo "clear" > /dev/kbd`.
-Check the buffer's content again. It should be reset.
-
-Extra Exercises
-===============
-
-1. kfifo
----------
-
-Implement a keylogger using the
-`kfifo API <https://elixir.bootlin.com/linux/v4.15/source/include/linux/kfifo.h>`_.
-
-.. hint:: Follow the `API call examples from the kernel code <https://elixir.bootlin.com/linux/v4.15/source/samples/kfifo>`_.
-  For example, the file `bytestream-examples.c <https://elixir.bootlin.com/linux/v4.15/source/samples/kfifo/bytestream-example.c>`_.

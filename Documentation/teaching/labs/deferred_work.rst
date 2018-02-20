@@ -19,7 +19,7 @@ Background information
 
 Deferred work is a class of kernel facilities that allows one to
 schedule code to be executed at a later timer. This scheduled code can
-run either in the process context or in interruption context depending
+run either in the context process or in interruption context depending
 on the type of deferred work. Deferred work is used to complement the
 interrupt handler functionality since interrupts have important
 requirements and limitations:
@@ -66,7 +66,7 @@ deferred work:
 
 The main types of deferred work are kernel threads and softirqs. Work
 queues are implemented on top of kernel threads and tasklets and
-timers on top of softirqs. Bottom-half handlers were the first
+timers on top of softirqs. Bottom-half handlers was the first
 implementation of deferred work in Linux, but in the meantime it was
 replaced by softirqs. That is why some of the functions presented
 contain *bh* in their name.
@@ -130,8 +130,8 @@ Tasklets
 --------
 
 A tasklet is a special form of deferred work that runs in interrupt
-context, just like softirqs. The main difference between sofirqs and tasklets
-is that tasklets can be allocated dynamically and thus they can be used
+context, just like softirqs. The main between sofirqs are tasklets are
+that tasklets can be allocated dynamically and thus they can be used
 by device drivers. A tasklet is represented by :c:type:`struct
 tasklet` and as many other kernel structures it needs to be
 initialized before being used. A pre-initialized tasklet can defined
@@ -193,18 +193,19 @@ A particular type of deferred work, very often used, are timers. They
 are defined by :c:type:`struct timer_list`. They run in interrupt
 context and are implemented on top of softirqs.
 
-To be used, a timer must first be initialized by calling :c:func:`timer_setup`:
+To be used, a timer must first be initialized by calling :c:func:`setup_timer`:
 
 .. code-block:: c
 
-   #include <linux/sched.h>
+   #include <linux / sched.h>
 
-   void timer_setup(struct timer_list * timer,
-		    void (*function)(struct timer_list *),
-		    unsigned int flags);
+   void setup_timer(struct timer_list * timer,
+		    void (*function)(unsigned long),
+		    unsigned long data);
 
 The above function initializes the internal fields of the structure
-and associates *function* as the timer handler. Since timers are planned
+and associates *function* as the timer handler; The data parameter
+will be passed to the treatment function. Since timers are planned
 over softirqs, blocking calls can not be used in the code associated
 with the treatment function.
 
@@ -217,7 +218,7 @@ Scheduling a timer is done with :c:func:`mod_timer`:
 Where *expires* is the time (in the future) to run the handler
 function. The function can be used to schedule or reschedule a timer.
 
-The time unit is *jiffie*. The absolute value of a jiffie
+The time unit timers is *jiffie*. The absolute value of a jiffie
 is dependent on the platform and it can be found using the
 :c:type:`HZ` macro that defines the number of jiffies for 1 second. To
 convert between jiffies (*jiffies_value*) and seconds (*seconds_value*),
@@ -269,12 +270,12 @@ timeout is:
 
    #include <linux/sched.h>
 
-   void timer_function(struct timer_list *);
+   void timer_function(unsigned long arg);
 
    struct timer_list timer ;
    unsigned long seconds = 1;
 
-   timer_setup(&timer, timer_function, 0);
+   setup_timer(&timer, timer_function, 0);
    mod_timer(&timer, jiffies + seconds * HZ);
 
 And to stop it:
@@ -333,13 +334,13 @@ calls for synchronization like :c:func:`spin_lock_bh` and
 
 
 Workqueues
-==========
+----------
 
 Workqueues are used to schedule actions to run in process context. The
 base unit with which they work is called work. There are two types of
 work:
 
-* :c:type:`struct work_struct` - it schedules a task to run at
+* :c:type:`structure work_struct` - it schedules a task to run at
   a later time
 * :c:type:`struct delayed_work` - it schedules a task to run after at
   least a given time interval
@@ -400,7 +401,7 @@ Once declared and initialized, we can schedule the task using
 :c:func:`schedule_delayed_work` can be used to plan a work item for
 execution with a given delay. The delay time unit is jiffies.
 
-Work items can not be masked but they can be canceled by calling
+Work items can not be masked by they can be canceled by calling
 :c:func:`cancel_delayed_work_sync` or :c:func:`cancel_work_sync`:
 
 .. code-block:: c
@@ -469,14 +470,14 @@ use :c:func:`container_of`:
 
    void my_work_handler(struct work_struct *work)
    {
-      struct my_device_data * my_data;
+      structure my_device_data * my_data;
 
       my_data = container_of(work, struct my_device_data,  my_work);
       // ...
    }
 
 Scheduling work items with the functions above will run the handler in
-the context of a kernel thread called *events/x*, where x is the
+the context of a thread kernel called *events/x*, where x is the
 processor number. The kernel will initialize a kernel thread (or a
 pool of workers) for each processor present in the system:
 
@@ -524,7 +525,7 @@ To add a task in the new queue, use :c:func:`queue_work` or
 :c:func:`queue_delayed_work` can be used to plan a work for execution
 with a given delay. The time unit for the delay is jiffies.
 
-To wait for all work items to finish call :c:func:`flush_workqueue`:
+To wait for all work item to finish call :c:func:`flush_workqueue`:
 
 .. code-block:: c
 
@@ -534,7 +535,7 @@ And to destroy the workqueue call :c:func:`destroy_workqueue`
 
 .. code-block:: c
 
-   void destroy_workqueue(struct workqueue_struct *queue);
+   void destroy_workqueue(structure workqueque_struct *queue);
 
 The next sequence declares and initializes an additional workqueue,
 declares and initializes a work item and adds it to the queue:
@@ -559,24 +560,24 @@ And the next code sample shows how to remove the workqueue:
    destroy_workqueue(my_workqueue);
 
 The work items planned with these functions will run in the context of
-a new kernel thread called *my_workqueue*, the name passed to
+a new thread kernel called *my_workqueue*, the name passed to
 :c:func:`create_singlethread_workqueue`.
 
 Kernel threads
-==============
+--------------
 
 Kernel threads have emerged from the need to run kernel code in
 process context. Kernel threads are the basis of the workqueue
-mechanism. Essentially, a kernel thread is a thread that only runs in
+mechanism. Essentially, a thread kernel is a thread that only runs in
 kernel mode and has no user address space or other user attributes.
 
-To create a kernel thread, use :c:func:`kthread_create`:
+To create a thread kernel, use :c:func:`kthread_create`:
 
 .. code-block:: c
 
    #include <linux/kthread.h>
 
-   struct task_struct *kthread_create(int (*threadfn)(void *data),
+   structure task_struct *kthread_create(int (*threadfn)(void *data),
 					 void *data, const char namefmt[], ...);
 
 * *threadfn* is a function that will be run by the kernel thread
@@ -591,9 +592,9 @@ For example, the following call:
 
    kthread_create (f, NULL, "%skthread%d", "my", 0);
 
-Will create a kernel thread with the name mykthread0.
+Will create a thread kernel with the name mykthread0.
 
-The kernel thread created with this function will be stopped (in the
+The kernel thread created with this function will stopped (in the
 *TASK_INTERRUPTIBLE* state). To start the kernel thread, call the
 :c:func:`wake_up_process`:
 
@@ -615,10 +616,10 @@ Even if the programming restrictions for the function running within
 the kernel thread are more relaxed and scheduling is closer to
 scheduling in userspace, there are, however, some limitations to be
 taken into account. We will list below the actions that can or can not
-be made from a kernel thread:
+be made from a thread kernel:
 
 * can't access the user address space (even with copy_from_user,
-  copy_to_user) because a kernel thread does not have a user address
+  copy_to_user) because a thread kernel does not have a user address
   space
 * can't implement busy wait code that runs for a long time; if the
   kernel is compiled without the preemptive option, that code will run
@@ -628,8 +629,8 @@ be made from a kernel thread:
 * can use spinlocks, but if the hold time of the lock is significant,
   it is recommended to use mutexes
 
-The termination of a kernel thread is done voluntarily, within the
-function running in the kernel thread, by calling :c:func:`do_exit`:
+The termination of a thread kernel is done voluntarily, within the
+function running in the thread kernel, by calling :c:func:`do_exit`:
 
 .. code-block:: c
 
@@ -646,7 +647,7 @@ common mistakes:
    DECLARE_WAIT_QUEUE_HEAD(wq);
 
    // list events to be processed by kernel thread
-   struct list_head events_list;
+   structure list_head events_list;
    struct spin_lock events_lock;
 
 
@@ -664,10 +665,8 @@ common mistakes:
        spin_lock(&events_lock);
        e = list_first_entry(&events_list, struct event*, lh);
        if (e)
-	   list_del(&e->lh);
+	   list_del(&events->lh);
        spin_unlock(&events_lock);
-
-       return e
    }
 
    int my_thread_f(void *data)
@@ -698,8 +697,8 @@ with:
    void send_event(struct event *ev)
    {
        spin_lock(&events_lock);
-       list_add(&ev->lh, &events_list);
-       spin_unlock(&events_lock);
+       list_add(&ev->lh, &list_events);
+       spin_unlock(events_lock);
        wake_up(&wq);
    }
 
@@ -715,9 +714,6 @@ Further reading
 
 Exercises
 =========
-
-.. include:: ../labs/exercises-summary.hrst
-.. |LAB_NAME| replace:: deferred_work
 
 0. Intro
 --------
@@ -788,7 +784,7 @@ You will need to implement the following ioctl operations.
 .. hint:: To use the device driver from userspace you must create the
 	  device character file */dev/deferred* using the mknod
 	  utility. Alternatively, you can run the
-	  *3-4-5-deferred/kernel/makenode* script that performs this
+	  *3-4-5-deferred/kernel/ makenode* script that performs this
 	  operation.
 
 Enable and disable the timer by calling user-space ioctl
@@ -803,7 +799,7 @@ type operation and its parameters (if any) on the command line.
 
 	  .. code-block:: c
 
-	     ./test s 3
+	     ./test with 3
 
 	  To disable the timer use:
 
@@ -856,8 +852,8 @@ section if needed.
 
 .. hint:: Add a new field with the type :c:type:`struct work_struct`
 	  in your device structure. Initialize this field. Schedule
-	  the work from the timer handler using :c:func:`schedule_work`.
-	  Schedule the timer handler aften N seconds from the ioctl.
+	  the work after N seconds from the timer's handler using
+	  :c:func:`schedule_work`.
 
 6. Kernel thread
 ----------------
@@ -876,14 +872,14 @@ TODOs from the skeleton.
 	  * :c:func:`kthread_create` to create a suspended thread and
 	    then start it running with :c:func:`wake_up_process`.
 
-	  Review the `Kernel Threads`_ section if needed.
+	  Review the `Kernel threads` section if needed.
 
 .. attention:: Synchronize the thread termination with module unloading:
 
-	       * The thread should finish when the module is unloaded
+	       * The thread should finish when the module in unloaded
 
 	       * Wait for the kernel thread to exit before continuing
-		 with unloading
+		 with with unloading
 
 
 .. hint:: For synchronization use two wait queues and two flags.
@@ -899,13 +895,13 @@ TODOs from the skeleton.
 The purpose of this task is to exercise the synchronization between a
 deferrable action (a timer) and process context. Setup a periodic
 timer that monitors a list of processes. If one of the processes
-terminate a message is printed. Processes can be dynamically added to
+terminate a message is printed. Processes can be dinamically added to
 the list. Use the *3-4-5-deferred/kernel/* skeleton as a base and
 follow the **TODO 4** markings to complete the task.
 
 When the *MY_IOCTL_TIMER_MON* command is received check that the given
-process exists and if so add to the monitored list of
-processes and then arm the timer after setting its type.
+process exists and if so added to the monitored list of
+processed and then arm the timer after setting its type.
 
 .. hint:: Use :c:func:`get_proc` which checks the pid, finds the
 	  associated :c:type:`struct task_struct` and allocates a
