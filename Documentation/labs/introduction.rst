@@ -70,7 +70,7 @@ otherwise, some architecture dependent functions will appear multiple
 times in the database.
 
 Cscope can also be used as stand-alone, but it is more useful when 
-combined with an editor. To use cscope with Vim, it is necessary to
+combined with an editor. To use cscope with :command:`vim`, it is necessary to
 install both packages and add the following lines to the file
 :file:`.vimrc` (the machine in the lab already has the settings):
 
@@ -107,14 +107,14 @@ install both packages and add the following lines to the file
     endif
 
 The script searches for a file called :file:`cscope.out` in the current directory, or
-in parent directories. If Vim finds this file, you can use the shortcut :code:`Ctrl +]`
+in parent directories. If :command:`vim` finds this file, you can use the shortcut :code:`Ctrl +]`
 or :code:`Ctrl+\ g` (the combination control-\\ followed by g) to jump directly to 
 the definition of the word under the cursor (function, variable, structure, etc.). 
 Similarly, you can use :code:`Ctrl+\ s` to go where the word under the cursor is used.
 
-You can take a cscope-enabled '.vimrc' file (also contains other goodies) from
+You can take a cscope-enabled :file:`.vimrc` file (also contains other goodies) from
 https://github.com/ddvlad/cfg/blob/master/\_vimrc.
-The following guidelines are based on this file, but also show basic vim commands 
+The following guidelines are based on this file, but also show basic :command:`vim` commands 
 that have the same effect.
 
 If there are more than one results (usually there are) you can move between them
@@ -126,8 +126,8 @@ To return to the previous location, use :code:`Ctrl+o` (o, not zero).
 The command can be used multiple times and works even if cscope changed the
 file you are currently editing.
 
-To go to a symbol definition directly when vim starts, use :code:`vim -t <symbol_name>`
-(for example :code:`vim -t task_struct`). Otherwise, if you started vim and want
+To go to a symbol definition directly when :command:`vim` starts, use :code:`vim -t <symbol_name>`
+(for example :code:`vim -t task_struct`). Otherwise, if you started :command:`vim` and want
 to search for a symbol by name, use :code:`cs find g <symbol_name>` (for example
 :code:`cs find g task_struct`).
 
@@ -139,7 +139,7 @@ the character :code:`{` (opening brace).
 .. important::
     You can get a summary of all the :command:`cscope` commands using :command:`:cs help`.
 
-    For more info, use the Vim built-in help command: :command:`:h cscope` or :command:`:h copen`.
+    For more info, use the :command:`vim` built-in help command: :command:`:h cscope` or :command:`:h copen`.
 
 If you use :command:`emacs`, install the :code:`xcscope-el` package and
 add the following lines in :file:`~/.emacs`.
@@ -174,7 +174,7 @@ referencing the symbols in the source code of a program using
 a web interface. The web interface shows links to
 locations in files where a symbol is defined or used. Development website
 for LXR is http://sourceforge.net/projects/lxr. Similar tools
-are `OpenGrok <http://www.opensolaris.org/os/project/opengrok/>`__ and
+are `OpenGrok <http://oracle.github.io/opengrok/>`__ and
 `Gonzui <http://en.wikipedia.org/wiki/Gonzui>`__.
 
 Although LXR was originally intended for the Linux kernel sources, it is
@@ -259,17 +259,32 @@ method is useful especially if the kernel was compiled using the
 debug techniques can't be used by this method, such as breakpoints
 of data modification.
 
+.. note:: Because :file:`/proc` is a virtual filesystem, :file:`/proc/kcore`
+          does not physically exist on the disk. It is generated on-the-fly
+          by the kernel when a program tries to access :file:`proc/kcore`.
+
+          It is used for debugging purposes.
+
+          From :command:`man proc`, we have:
+
+          ::
+
+              /proc/kcore
+              This file represents the physical memory of the system and is stored in the ELF core file format.  With this pseudo-file, and
+              an unstripped kernel (/usr/src/linux/vmlinux) binary, GDB can be used to examine the current state of any kernel data struc‐
+              tures.
+
 The uncompressed kernel image offers information about the data structures
 and symbols it contains.
 
 .. code-block:: bash
 
-    so2@spook$ cd /usr/src/linux
-    so2@spook$ file vmlinux
+    student@eg106$ cd ~/src/linux
+    student@eg106$ file vmlinux
     vmlinux: ELF 32-bit LSB executable, Intel 80386, ...
-    so2@spook$ nm vmlinux | grep sys_call_table
+    student@eg106$ nm vmlinux | grep sys_call_table
     c02e535c R sys_call_table
-    so2@spook$ cat System.map | grep sys_call_table
+    student@eg106$ cat System.map | grep sys_call_table
     c02e535c R sys_call_table
 
 The :command:`nm` utility is used to show the symbols in an object or
@@ -282,8 +297,8 @@ kernel image. A simple :command:`gdb` session is the following:
 
 .. code-block:: bash
 
-    so2@spook$ cd /usr/src/linux
-    so2@spook$ gdb --quiet vmlinux
+    student@eg106$ cd ~/src/linux
+    stduent@eg106$ gdb --quiet vmlinux
     Using host libthread_db library "/lib/tls/libthread_db.so.1".
     (gdb) x/x 0xc02e535c
     0xc02e535c `<sys_call_table>`:    0xc011bc58
@@ -343,7 +358,7 @@ image (in memory) of the kernel.
 
 .. code-block:: bash
 
-    so2@spook$ gdb /usr/src/linux/vmlinux /proc/kcore
+    student@eg106$ gdb ~/src/linux/vmlinux /proc/kcore
     Core was generated by `root=/dev/hda3 ro'.
     #0  0x00000000 in ?? ()
     (gdb) p sys_call_table
@@ -397,7 +412,7 @@ A few links related to the Linux kernel are shown bellow:
 - `Linux kernel - Wikibooks <http://en.wikibooks.org/wiki/Linux_kernel>`__
 
 The links are not comprehensive. Using  `The Internet <http://www.google.com>`__ and
-`surselor <http://lxr.free-electrons.com/>`__ is essential.
+`kernel source code <http://lxr.free-electrons.com/>`__ is essential.
 
 Exercices
 =========
@@ -415,7 +430,7 @@ Remarks
      -  generation of the minimal image for the virtual machine.
         This image contains the kernel, your module, busybox and
         eventually test programs.
-     -  starting the virtual machine using qemu.
+     -  starting the virtual machine using QEMU.
      -  running the tests in the virtual machine.
   
   -  When using cscope, use :file:`~/src/linux`.
@@ -438,7 +453,7 @@ A summary of the virtual machine infrastructure:
    used for navigation in the source tree.
 
 -  :file:`~/src/linux/tools/labs/qemu`- scripts and auxiliary
-   files used to generate and run the qemu VM.
+   files used to generate and run the QEMU VM.
 
 To start the VM, run :command:`QEMU_DISPLAY=sdl make boot` in the directory :file:`~/src/linux/tools/labs`:
 
@@ -453,288 +468,301 @@ To start the VM, run :command:`QEMU_DISPLAY=sdl make boot` in the directory :fil
     The virtual machine will start with the permissions of the
     root account.
 
-2. Adăugarea și utilizarea unui disc virtual
---------------------------------------------
+2. Adding and using a virtual disk
+----------------------------------
 
-.. note:: 
-    If you don't have the file :file:`mydisk.img`, you can download
-    it from the address http://elf.cs.pub.ro/so2/res/laboratoare/mydisk.img.
+.. note:: If you don't have the file :file:`mydisk.img`, you can download
+          it from the address http://elf.cs.pub.ro/so2/res/laboratoare/mydisk.img.
 
-In the directory :file:`~/src/linux/tools/labs/qemu` you have a new virtual
+In the :file:`~/src/linux/tools/labs/qemu` directory, you have a new virtual
 machine disk, in the file :file:`mydisk.img`. We want to add the disk
-to the virtual machine and used while it is running.
+to the virtual machine and use it within the virtual machine.
 
-Editați fișierul ''Makefile'' pentru a adăuga, la target-ul ''run'',
-parametrul ''-drive file=mydisk.img,format=raw''. Rulați ''make'' pentru
-a boota mașina virtuală.
+Edit the :file:`Makefile` to add the following :code:`-drive file=mydisk.img,format=raw`
+to the :command:`run` target. Run :code:`make` to boot the virtual machine.
 
-În cadrul mașinii virtuale configurați accesul la disc.
+Within the virtual machine, configure access to the virtual disk.
 
-``<note tip>`` Nu trebuie să creați manual intrarea aferentă noului disc
-în ''/dev'' pentru că mașina virtuală folosește devtmpfs. ``</note>``
+.. hint:: You do not need to manually create the entry for the new disk in :file:`/dev`
+          because the virtual machine uses :command:`devtmpfs`.
 
-Creați directorul ''/test'' și încercați să montați noul
-disc:\ ``<code>`` mkdir /test mount /dev/sda /test ``</code>``
+Create :file:`/test` directory and try to mount the new disk:
 
-Motivul pentru care nu putem monta discul este pentru că nu avem suport
-în kernel pentru sistemul de fișiere cu care este formatat discul
-''mydisk.img''. Va trebui să identificați sistemul de fișiere aferent
-discului ''mydisk.img'' și să compilați suport în kernel pentru acel
-sistem de fișiere.
+.. code-block:: bash
 
-Închideți mașina virtuală (închideți fereastra qemu, nu e nevoie să
-folosiți altă comandă). Folosiți comanda ''file'' pe mașina fizică
-pentru a afla cu ce sistem de fișiere este formatat fișierul
-''mydisk.img''. Veți identifica sistemul de fișiere ''btrfs''.
+    mkdir /test
+    mount /dev/sda /test
 
-Va trebui să activați suportul de ''btrfs'' în kernel și să îl
-recompilați.
+The reason why we can not mount the virtual disk is because we do not have support in the
+kernel for the filesystem with which the :file:`mydisk.img` is formatted. You will need
+to identify the filesystem for :file:`mydisk.img` and compile kernel support for that filesystem.
 
-``<note warning>`` Dacă în momentul executării comenzii ''make
-menuconfig'' vă apare eroare, este probabil că nu aveți instalat
-pachetul ''libncurses5-dev''. Instalați-l folosind comanda
+Close the virtual machine (close the QEMU window, you do not need to use another command).
+Use the :command:`file` command on the physical machine to find out with which filesystem
+the :file:`mydisk.img` file is formatted. You will identify the :command:`btrfs` file system.
 
-::
+You will need to enable :command:`btrfs` support in the kernel and recompile the kernel image.
 
-    sudo apt-get install libncurses5-dev
+.. warning:: If you receive an error while executing the :command:`make menuconfig`
+             command, you probably do not have the :command:`libncurses5-dev`
+             package installed. Install it using the command:
 
-``</note>``
+             ::
 
-``<note tip>`` Intrați în subdirectorul ''linux-4.9.11/''. Executați
-''make menuconfig'' și intrați în secțiunea *File systems*. Activați
-opțiunea *Btrfs file system support*. Va trebui să folosiți opțiune de
-tip ''builtin'' (**nu** modul) adică trebuie să apară ``<*>`` în dreptul
-opțiunii (**nu** ``<M>``).
+                 sudo apt-get install libncurses5-dev
 
-Salvați configurația realizată. Folosiți fișierul de configurare
-implicit ''.config''.
+.. hint:: Enter the :file:`~/src/linux/` subdirectory. Run :command:`make menuconfig`
+          and go to the *File systems* section. Enable *Btrfs filesystem support*.
+          You will need to use the builtin option (not the module), i.e. :command:`<*>` must appear
+          next to the option (**not** :command:`<M>`).
 
-În subdirectorul cu sursele nucleului (''linux-4.9.11/'') recompilați
-folosind comanda
+          Save the configuration you have made. Use the default configuration file (:file:`config`).
 
-::
+          In the kernel source subdirectory (:file:`~/src/linux/`) recompile using the command:
 
-    make
+          ::
 
-Pentru a aștepta mai puțin, puteți utiliza opțiunea ''-j'' pentru a
-folosi mai multe job-uri în paralel. În general se recomandă un număr de
-procese cu 1 mai mare decât numărul procesoarelor:
+              make
 
-::
+          To wait less, you can use the :command: `-j` option run multiple jobs in parallel.
+          Generally, it is recommended to use :command:`number of CPUs+1`:
 
-    make -j5
+          ::
 
-``</note>``
+              make -j5
 
-După ce se încheie recompilarea, **reporniți** mașina virtuală QEMU:
-adică lansați comanda ''make'' în subdirectorul ''qemu-so2/''. Nu este
-nevoie să copiați nimic, pentru că fișierul ''bzImage'' este symlink
-către imaginea kernel-ului pe care tocmai l-ați recompilat.
+After the kernel recompilation finishes, **restart** the QEMU virtual machine:
+that is, launch the :command:`make` command in the  subdirectory. You
+do not need to copy anything, because the :file:`bzImage` file is a symlink to the kernel
+image you just recompiled.
 
-În cadrul mașinii virtuale QEMU repetați operațiunile de ''mkdir'' și
-''mount''. Având suport pentru sistemul de fișiere btrfs, acum mount se
-va termina cu succes.
+Inside the QEMU virtual machine, repeat the :command:`mkdir` and :command:`mount` operations.
+With support for the :command:`btrfs` filesystem, now :command:`mount` will finish successfully.
 
-``<note>`` În elaborarea temelor nu este necesar să recompilați
-kernel-ul, veți folosi doar module. Totuși, este important să fiți
-familiari cu configurarea și recompilarea unui kernel.
+.. note:: When doing your homework, there is no need to recompile the kernel
+          because you will only use kernel modules. However, it is important
+          to be familiar with configuring and recompiling a kernel.
 
-Dacă totuși aveți de gând să recompilați kernel-ul, faceți un back-up
-fișierului ''bzImage'' (urmați link-ul din ''qemu-so2'' pentru calea
-completă). Astfel veți putea reveni la setup-ul inițial pentru a avea un
-mediu identic cu vmchecker. ``</note>``
+          If you still plan to recompile the kernel, make a backup of the bzImage
+          file (follow the link in ~/src/linux for the full path). This will allow
+          you to return to the initial setup in order to have an environment
+          identical to the one used by vmchecker.
 
-3. GDB și qemu
---------------
+3. GDB and QEMU
+---------------
 
-Putem investiga în timp real și depana mașina virtuală QEMU.
+We can investigate and troubleshoot the QEMU virtual machine in real time.
 
-Pentru aceasta pornim, în primă fază, mașina virtuală QEMU. Apoi, ne
-putem conecta cu ''gdb'' la un mașina vituală QEMU **aflată în rulare**,
-folosind comanda
+.. note:: You can also use the :command:`GDB Dashboard` plugin for a user-friendly interface.
+          :command:`gdb` must be compiled with Python support.
+
+          In order to install it, you can just run:
+          ::
+
+              wget -P ~ git.io/.gdbinit
+
+To do this, we start the QEMU virtual machine first. Then, we can connect
+with :command:`gdb` to **a running QEMU virtual machine** using the command
 
 ::
 
-    :::bash
     make gdb
 
-Am folosit comanda ''qemu'' cu parametrul ''-s'', ceea ce înseamnă că
-ascultă pe portul 1234 de la GDB. Putem face debugging folosind un
-*target remote* pentru GDB. Makefile-ul existent are grijă de detalii.
+We used the QEMU command with the :command:`-s` parameter, which means
+listening to port :code:`1234` from command:`gdb`. We can do debugging
+using a **remote target** for :command:`gdb`. The existing :file:`Makefile`
+takes care of the details.
 
-Când atașați un debugger unui proces, procesul este suspendat. Puteți
-pune breakpoints și inspecta starea curentă a procesului.
+When you attach a debugger to a process, the process is suspended.
+You can add breakpoints and inspect the current status of the process.
 
-Atașați-vă la mașina virtuală ''qemu'' (folosind comanda ''make gdb'')
-și puneți un breakpoint în funcția ''sys\_access'' folosind în consola
-GDB comanda
+Attach to the QEMU virtual machine (using the :command:`make gdb` command)
+and place a breakpoint in the :code:`sys_access` function using the
+following command in the :command:`gdb` console:
 
 ::
 
     break sys_access
 
-În acest moment mașina virtuală este suspendată. Pentru a continua
-execuția ei (până la eventualul apel al funcției ''sys\_access'')
-folosiți, în consola GDB comanda\ ``<code>`` continue ``</code>``
+At this time, the virtual machine is suspended. To continue executing it (up to the possible call
+of the :code:`sys_access` function), use the command:
 
-În acest moment mașina virtuală este activă și are consola utilizabilă.
-Pentru a genera un apel de ''sys\_access'', lansați o comandă ''ls''.
-Observați că mașina virtuală a fost din nou suspendată de GDB și a
-apărut mesajul aferent de apel al ''sys\_access'' în cadrul GDB.
+::
 
-Urmăriți execuția codului, folosind ''step instruction'', ''continue''
-sau ''next instruction''. Probabil nu o să înțelegeți tot ce se
-întâmplă, utilizați comenzi precum ''list'' și ''backtrace'' pentru a
-urmări logic execuția.
+    continue
 
-``<hidden>`` RD: Nu știu dacă ar trebui sau nu să se poată vedea codul
-sursă. Pe moment dă eroare că nu se vede. O fi ceva de la symlink-uri,
-nu m-am prins. ``</hidden>``
+in the :command:`gdb` console.
 
-``<note tip>`` La prompt-ul ''gdb'', puteți apăsa ''ENTER'' (fără
-altceva) pentru a rula ultima comandă încă o dată. ``</note>``
+At this time, the virtual machine is active and has a usable console.
+To make a :code:`sys_access` call, issue a :command:`ls` command.
+Note that the virtual machine was again suspended by :command:`gdb`
+and the corresponding :code:`sys_access` callback message appeared within the :command:`gdb` console.
+
+Trace code execution using :command:`step` instruction, :command:`continue` or :command:`next`
+instruction. You probably do not understand everything that happens, so use commands
+such as :command:`list` and :command:`backtrace` to trace the execution.
+
+.. hint:: At the :command:`gdb` prompt, you can press :command:`Enter`
+          (without anything else) to rerun the last command.
 
 4. GDB spelunking
 -----------------
 
-Folosiți ''GDB'' pentru a afișa codul sursă al funcției care creează
-thread-uri de kernel (''kernel\_thread'').
+Use :command:`gdb` to display the source code of the function that creates kernel threads
+(:code:`kernel_thread`).
 
-``<note tip>`` Puteți folosi GDB pentru analiza statică a imaginii de
-kernel folosind, în directorul cu sursele kernel-ului, o comandă de
-forma
+.. note:: You can use GDB for static kernel analysis using, in the kernel source directory,
+          a command such as:
 
-::
+          ::
 
-    gdb vmlinux
+              gdb vmlinux
 
-Parcurgeți secțiunea `gdb (Linux) <#gdb%20(Linux)>`__ din laborator.
-``</note>``
+          Go over the `gdb (Linux) <#gdb-linux>`__ section of the lab.
 
-Folosiți ''GDB'' pentru a afla adresa variabilei ''jiffies'' în memorie
-și conținutul acesteia. Variabila ''jiffies'' reține numărul de tick-uri
-(bătăi de ceas) de la pornirea sistemului,.
+Use :command:`gdb` to find the address of the :code:`jiffies` variable in memory and its contents.
+The :code:`jiffies` variable holds the number of ticks (clock beats) since the system started.
 
-``<note tip>`` Pentru a urmări valoarea variabilei ''jiffies'' folosiți
-analiza dinamică în GDB folosind comanda
+.. hint:: To track the value of the jiffies variable, use dynamic analysis in :command:`gdb`
+          by running the command:
 
-::
+          ::
 
-    make gdb
-    `</code>` la fel ca la [[#gdb_si_qemu|exercițiul anterior]].
+              make gdb
 
-    Parcurgeți secțiunea [[#gdb (Linux)|gdb (Linux)]] din laborator.
-    `</note>`
+          as in the previous exercise.
 
-    `<note tip>`
-    Variabila ''jiffies'' este pe 64 de biți. Puteți observa că adresa sa este identică cu cea a variabilei ''jiffies_64''.
+          Go over the `gdb (Linux) <#gdb-linux>`__ section of the lab.
 
-    Ca să explorați conținutul unei variabile pe 64 de biți, folosiți, în GDB, construcția
-    `<code>`
-    x/gx &jiffies
+.. hint:: The :code:`jiffies` is a 64-bit variable.
+          You can see that its address is the same as the :code:`jiffies_64` variable.
 
-Dacă doreați să afișați conținutul variabilei pe 32 de biți, ați folosi,
-în GDB, construcția
+          To explore the contents of a 64-bit variable, use in the :command:`gdb` console the command:
 
-::
+          ::
 
-    x/wx &jiffies
+              x/gx & jiffies
 
-``</note>`` ### 5. cscope spelunking
+          If you wanted to display the contents of the 32-bit variable,
+          you would use in the :command:`gdb` console the command:
 
-Folosiți LXR sau cscope în directorul ''/usr/src/linux-so2/'' pentru a
-determina locul de definire al unor structuri sau funcții.
+          ::
 
-Fișierele index cscope sunt deja generate. Folosiți direct Vim și
-comenzile aferente pentru parcurgerea codului sursă. De exemplu,
-folosiți comanda
+              x/wx & jiffies
+
+5. Cscope spelunking
+--------------------
+
+Use LXR or cscope in the :file:`~/linux/` directory to discover
+the location of certain structures or functions.
+
+Cscope index files are already generated. Use :command:`vim` and other related commands
+to scroll through the source code. For example, use the command:
 
 ::
 
     vim
 
-pentru a deschide editorul Vim. Apoi, în cadrul editorului, folosiți
-comenzi precum '':cs find g task\_struct''.
+for opening the :command:`vim` editor. Afterwards, inside the editor, use commands such as:
 
-Determinați fișierul în care sunt definite următoarele tipuri de date:
+:command:`:cs find g task\_struct`.
 
--  ''struct task\_struct''
+Find the file in which the following data types are defined:
 
--  ''struct semaphore''
+-    ``struct task_struct``
 
--  ''struct list\_head''
+-    ``struct semaphore``
 
--  ''spinlock\_t''
+-    ``struct list_head``
 
--  ''struct file\_system\_type''
+-    ``spinlock_t``
 
-``<note tip>`` Pentru o structură se caută doar numele ei. Spre exemplu,
-în cazul ''struct task\_struct'' se caută șirul ''task\_struct''.
+-    ``struct file_system_type``
 
-De obicei veți obține mai multe match-uri caz în care: 1. Listați toate
-match-urile folosind, în Vim, comanda '':copen''. Vă apare o fereastră
-secundară cu toate match-urile. 2. Căutați match-ul potrivit (în care
-este definită structura) căutând după acoladă deschisă (''{''), un
-caracter sigur pe linia de definire a structurii. Pentru căutarea
-acoladei deschise folosiți, în Vim, construcția ''/{''. 3. Pe linia
-aferentă apăsați ''Enter'' ca să vă ajungă editorul în codul sursă unde
-e definită varibila. 4. Închideți fereastra secundară folosind coamanda
-'':cclose''. ``</note>``
+.. hint:: For a certain structure, only its name needs to be searched.
 
-Determinați fișierul în care sunt declarate următoarele variabile
-globale la nivelul nucleului:
+          For instance, in the case of :command:`struct task_struct`,
+          search for the :command:`task_struct` string.
 
--  ''sys\_call\_table''
+Usually, you will get more matches. To locate the one you are interested in, do the following:
 
--  ''file\_systems''
+#.    List all matches by using, in :command:`vim`, :command:`:copen` command.
 
--  ''current''
+#.    Look for the right match (where the structure is defined) by looking for an open character
+      (:command:`{`), a single character on the structure definition line. To search for the open
+      braid you use in :command:`vim` the construction :command:`/{`.
 
--  ''chrdevs''
+#.    On the respective line, press :command:`Enter` to get into the source code where the variable
+      is defined.
 
-``<note tip>`` Pentru aceasta folosiți în Vim o comandă de forma '':cs f
-g ``<symbol>`` (unde construcția ``<symbol>`` reprezintă numele
-simbolului căutat). ``</note>``
+#.    Close the secondary window using the command: :command:`:cclose` command.
 
-Determinați fișierul în care sunt declarate următoarele funcții:
+Find the file in which the following global kernel variables are declared:
 
--  ''copy\_from\_user''
+-    ``sys_call_table``
 
--  ''vmalloc''
+-    ``file_systems``
 
--  ''schedule\_timeout''
+-    ``current``
 
--  ''add\_timer''
+-    ``chrdevs``
 
-``<note tip>`` Pentru aceasta folosiți în Vim o comandă de forma '':cs f
-g ``<symbol>`` (unde construcția ``<symbol>`` reprezintă numele
-simbolului căutat). ``</note>``
+.. hint:: To do this, use a :command:`vim` command with the syntax:
 
-Parcurgeți secvența de structuri: 1. ''struct task\_struct'' 2. ''struct
-mm\_struct'' 3. ''struct vm\_area\_struct'' 4. ''struct
-vm\_operations\_struct'' Adică parcurgeți din aproape în aproape
-structurile: accesați o structură și apoi găsiți câmpuri cu tipul de
-date al următoarei structuri, accesați-o pe aceasta etc. Rețineți în ce
-fișiere sunt definite; o să vă fie utile la alte laboratoare.
+          :command:`:cs f g <symbol>`
 
-``<note tip>`` Pentru a căuta un simbol în Vim (cu suport ''cscope'')
-atunci când sunteți plasați cu cursorul pe acesta, folosiți construcția
-''Ctrl+]''.
+          where :command:`<symbol>` is the name of the symbol being searched.
 
-Pentru a reveni în match-ul anterior (înante de căutare/salt) folosiți
-construcția ''Ctrl+o''. Pentru a avansa în căutare (pentru a reveni la
-match-urile de dinainte de ''Ctrl+o'') folosiți construcția ''Ctrl+i''.
-``</note>``
+Find the file in which the following functions are declared:
 
-La fel ca mai sus, parcurgeți secvența de apeluri de funcții: 1.
-''bio\_alloc'' 2. ''bio\_alloc\_bioset'' 3. ''bvec\_alloc'' 4.
-''kmem\_cache\_alloc'' 5. ''slab\_alloc''
+-    ``copy_from_user``
 
-``<note tip>`` Citiți secțiunile `cscope <#cscope>`__ sau `LXR
-Cross-Reference <#LXR%20Cross-Reference>`__ din laborator. ``</note>``
-### Soluții
+-    ``vmalloc``
 
-/\*
+-    ``schedule_timeout``
 
--  `Soluții exerciții laborator
-   1 <http://elf.cs.pub.ro/so2/res/laboratoare/lab01-sol.zip>`__ \*/
+-    ``add_timer``
+
+.. hint:: To do this, use a :command:`vim` command with the syntax:
+
+          :command:`:cs f g <symbol>`
+
+          where :command:`<symbol>` is the name of the symbol being searched.
+
+Scroll through the following sequence of structures:
+
+-   ``struct task_struct``
+
+-   ``struct mm_struct``
+
+-   ``struct vm_area_struct``
+
+-   ``struct vm_operations_struct``
+
+That is, you access a structure and then you find fields with the data type of the
+next structure, access the respective fields and so on.
+Note in which files these structures are defined; this will be useful to the following labs.
+
+
+.. hint:: In order to search for a symbol in :command:`vim` (with :command:`cscope` support)
+          when the cursor is placed on it, use the :command:`Ctrl+]` keyboard shortcut.
+
+          To return to the previous match (the one before search/jump), use the
+          :command:`Ctrl+o` keyboard shortcut.
+
+          To move forward with the search (to return to matches before :command:`Ctrl+o`),
+          use the :command:`Ctrl+i` keyboard shortcut.
+
+Following the above instructions, find and go through the function call sequence:
+
+-   ``bio_alloc``
+
+-   ``bio_alloc_bioset``
+
+-   ``bvec_alloc``
+
+-   ``kmem_cache_alloc``
+
+-   ``slab_alloc``
+
+.. note:: Read `cscope <#cscope>`__ or `LXR Cross-Reference <#lxr-cross-reference>`__ sections of the lab.
