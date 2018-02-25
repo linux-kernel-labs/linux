@@ -17,18 +17,15 @@ Keywords
 *  cscope, LXR
 *  gdb, /proc/kcore, addr2line, dump\_stack
 
-..
-  _[SECTION-ABOUT-BEGIN]
-
 About this laboratory
 =====================
 
-The Operating Systems 2 lab is a kernel programming and driver development lab.
+The Operating Systems 2 lab is a kernel programming and driver development lab. 
 The objectives of the laboratory are:
 
 * deepening the notions presented in the course
 * presentation of kernel programming interfaces (kernel API)
-* gaining documenting, development and debugging skills on a freestanding
+* gaining documenting, development and debugging skills on a freestanding 
   environment
 * acquiring knowledge and skills for drivers development
 
@@ -37,18 +34,12 @@ specific to a given problem. The lab will start with a presentation
 (each lab will have a set of slides) (15 minutes) and the remaining
 time will be allocated to the lab exercises (80 minutes).
 
-For best laboratory performance, we recommend that you read the related slides.
+For best laboratory performance, we recommend that you read the related slides. 
 To fully understand a laboratory, we recommend going through the lab support. For
 in-depth study, use the supporting documentation.
 
-..
-  _[SECTION-ABOUT-END]
-
-..
-  _[SECTION-REFERENCES-BEGIN]
-
-References
-==========
+Documentation
+=============
 
 -  Linux
 
@@ -64,35 +55,21 @@ References
    -  `mailing list <http://cursuri.cs.pub.ro/cgi-bin/mailman/listinfo/pso>`__
       (`searching the mailing list <http://blog.gmane.org/gmane.education.region.romania.operating-systems-design>`__)
 
-..
-  _[SECTION-REFERENCES-END]
-
-..
-  _[SECTION-CODE-NAVIGATION-BEGIN]
-
 Source code navigation
 ======================
-
-.. _cscope_intro:
 
 cscope
 ------
 
 `Cscope <http://cscope.sourceforge.net/>`__ is a tool for
-efficient navigation of C sources. To use it, a cscope database must
-be generated from the existing sources. In a Linux tree, the command
-:command:`make ARCH=x86 cscope` is sufficient. Specification of the
-architecture through the ARCH variable is optional but recommended;
-otherwise, some architecture dependent functions will appear multiple
+efficient navigation of C sources. To use it, a cscope database must 
+be geberated from the existing sources. In a Linux tree, the command
+:command:`make ARCH = x86 cscope` is sufficient. Specification of the 
+architecture through the ARCH variable is optional but recommended; 
+otherwise, some architecture dependent functions will appear multiple 
 times in the database.
 
-You can build the cscope database with the command :command:`make
-ARCH=x86 COMPILED_SOURCE=1 cscope`. This way, the cscope database will
-only contain symbols that have already been used in the compile
-process before, thus resulting in better performance when searching
-for symbols.
-
-Cscope can also be used as stand-alone, but it is more useful when
+Cscope can also be used as stand-alone, but it is more useful when 
 combined with an editor. To use cscope with :command:`vim`, it is necessary to
 install both packages and add the following lines to the file
 :file:`.vimrc` (the machine in the lab already has the settings):
@@ -124,8 +101,6 @@ install both packages and add the following lines to the file
             nmap `<C-\>`f :cs find f `<C-R>`=expand("`<cfile>`")`<CR>``<CR>`
             nmap `<C-\>`i :cs find i ^`<C-R>`=expand("`<cfile>`")`<CR>`$`<CR>`
             nmap `<C-\>`d :cs find d `<C-R>`=expand("`<cword>`")`<CR>``<CR>`
-            nmap <F6> :cnext <CR>
-            nmap <F5> :cprev <CR>
 
             " Open a quickfix window for the following queries.
             set cscopequickfix=s-,c-,d-,i-,t-,e-,g-
@@ -133,13 +108,13 @@ install both packages and add the following lines to the file
 
 The script searches for a file called :file:`cscope.out` in the current directory, or
 in parent directories. If :command:`vim` finds this file, you can use the shortcut :code:`Ctrl +]`
-or :code:`Ctrl+\ g` (the combination control-\\ followed by g) to jump directly to
-the definition of the word under the cursor (function, variable, structure, etc.).
+or :code:`Ctrl+\ g` (the combination control-\\ followed by g) to jump directly to 
+the definition of the word under the cursor (function, variable, structure, etc.). 
 Similarly, you can use :code:`Ctrl+\ s` to go where the word under the cursor is used.
 
 You can take a cscope-enabled :file:`.vimrc` file (also contains other goodies) from
 https://github.com/ddvlad/cfg/blob/master/\_vimrc.
-The following guidelines are based on this file, but also show basic :command:`vim` commands
+The following guidelines are based on this file, but also show basic :command:`vim` commands 
 that have the same effect.
 
 If there are more than one results (usually there are) you can move between them
@@ -156,7 +131,7 @@ To go to a symbol definition directly when :command:`vim` starts, use :code:`vim
 to search for a symbol by name, use :code:`cs find g <symbol_name>` (for example
 :code:`cs find g task_struct`).
 
-If you found more than one results and opened a panel showing all the matches
+If you fond more than one results and opened a panel showing all the matches
 (using :code:`:copen`) and you want to find a symbol of type structure,
 it is recommended to search in the results panel (using :code:`/` -- slash)
 the character :code:`{` (opening brace).
@@ -179,34 +154,10 @@ These commands will activate cscope for the C and C++ modes automatically.
 search for a symbol (if you call it when the cursor is over a word,
 it will use that). For more details, check `https://github.com/dkogan/xcscope.el`
 
-clangd
-------
-
-`Clangd <https://clangd.llvm.org/>`__ is a language server that provides tools
-for navigating C and C++ code. 
-`Language Server Protocol <https://microsoft.github.io/language-server-protocol/>`__
-facilitates features like go-to-definition, find-references, hover, completion, etc.,
-using semantic whole project analysis.
-
-Clangd requires a compilation database to understand the kernel source code.
-It can be generated with:
-
-.. code-block:: bash
-
-    make defconfig
-    make
-    scripts/clang-tools/gen_compile_commands.py
-
-LSP clients:
-
-- Vim/Neovim (`coc.nvim <https://github.com/neoclide/coc.nvim>`__, `nvim-lsp <https://github.com/neovim/nvim-lspconfig>`__, `vim-lsc <https://github.com/natebosch/vim-lsc>`__, `vim-lsp <https://github.com/prabirshrestha/vim-lsp>`__)
-- Emacs (`lsp-mode <https://github.com/emacs-lsp/lsp-mode>`__)
-- VSCode (`clangd extension <https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd>`__)
-
 Kscope
-------
+~~~~~~
 
-For a simpler interface, `Kscope <http://sourceforge.net/projects/kscope/>`__
+For a simpler interface, `Kscope <http://sourceforge.net/projects/kscope/>`__ 
 is a cscope frontend which uses QT. It is lightweight, very fast and very
 easy to use. It allows searching using regular expressions, call graphs, etc.
 Kscope is no longer mantained.
@@ -227,7 +178,7 @@ are `OpenGrok <http://oracle.github.io/opengrok/>`__ and
 `Gonzui <http://en.wikipedia.org/wiki/Gonzui>`__.
 
 Although LXR was originally intended for the Linux kernel sources, it is
-also used in the sources of `Mozilla <http://lxr.mozilla.org/>`__,
+also used in the sources of `Mozilla <http://lxr.mozilla.org/>`__, 
 `Apache HTTP Server <http://apache.wirebrain.de/lxr/>`__ and
 `FreeBSD <http://lxr.linux.no/freebsd/source>`__.
 
@@ -239,23 +190,23 @@ use `https://elixir.bootlin.com/ <https://elixir.bootlin.com/>`__.
 LXR allows searching for an identifier (symbol), after a free text
 or after a file name. The main feature and, at the same
 time, the main advantage provided is the ease of finding the declaration
-of any global identifier. This way, it facilitates quick access to function
-declarations, variables, macro definitions and the code can be easily
-navigated. Also, the fact that it can detect what code areas are affected
-when a variable or function is changed is a real advantage in the development
+of any global identifier. This way, it facilitates quick access to function 
+declarations, variables, macro definitions and the code can be easily 
+navigated. Also, the fact that it can detect what code areas are affected 
+when a variable or function is changed is a real advantage in the development 
 and debugging phase.
 
 SourceWeb
 ---------
 
 `SourceWeb <http://rprichard.github.io/sourceweb/>`__ is a source code indexer
-for C and C++. It uses the
+for C and C++. It uses the 
 `framework <http://clang.llvm.org/docs/IntroductionToTheClangAST.html>`__
 provided by the Clang compiler to index the code.
 
 The main difference between cscope and SourceWeb is the fact that SourceWeb
-is, in a way, a compiler pass. SourceWeb doesn't index all the code, but
-only the code that was efectively compiled by the compiler. This way, some
+is, in a way, a compiper pass. SourceWeb doesn't index all the code, but
+only the coe that was efectively compiled by the compiler. This way, some
 problems are eliminated, such as ambiguities about which variant of a function
 defined in multiple places is used. This also means that the indexing takes
 more time, because the compiled files must pass one more time through
@@ -271,11 +222,11 @@ Usage example:
     sw-clang-indexer --index-project
     sourceweb index
 
-:file:`sw-btrace` is a script that adds the :file:`libsw-btrace.so`
+:file:`sw-btrace` is a scrit that adds the :file:`libsw-btrace.so`
 library to :code:`LD_PRELOAD`. This way, the library is loaded by
 every process started by :code:`make` (basically, the compiler),
 registers the commands used to start the processes and generates
-a filed called :file:`btrace.log`. This file is then used by
+a filed called :file:`btrace.log`. This file is then used by 
 :code:`sw-btrace-to-compile-db` which converts it to a format defined
 by clang: `JSON Compilation Database <http://clang.llvm.org/docs/JSONCompilationDatabase.html>`__.
 This JSON Compilation Database resulted from the above steps is then
@@ -287,21 +238,13 @@ a copy, because SourceWeb doesn't have, at this moment, the capability
 to regenerate the index for a single file and you will have to regenerate
 the complete index.
 
-..
-  _[SECTION-CODE-NAVIGATION-END]
-
-..
-  _[SECTION-DEBUGGING-BEGIN]
-
-Kernel Debugging
-================
+Debugging
+=========
 
 Debugging a kernel is a much more difficult process than the debugging
 of a program, because there is no support from the operating system.
 This is why this process is usually done using two computers, connected
 on serial interfaces.
-
-.. _gdb_intro:
 
 gdb (Linux)
 -----------
@@ -312,7 +255,7 @@ the uncompressed kernel image (:file:`vmlinux`) and :file:`/proc/kcore`
 (the real-time kernel image). This method is usually used to inspect
 the kernel and detect certain inconsistencies while it runs. The
 method is useful especially if the kernel was compiled using the
-:code:`-g` option, which keeps debug information. Some well-known
+:code:`-g` option, which keeps debug information. Some well-known 
 debug techniques can't be used by this method, such as breakpoints
 of data modification.
 
@@ -394,12 +337,12 @@ after compilation.
 
 A few commands used for debugging using :command:`gdb` are:
 
-- :command:`x` (examine) - Used to show the contents of the memory area
+- :command:`x` (examine) -- used to show the contents of the memory area
   whose address is specified as an argument to the command (this address
   can be the value of a physical address, a symbol or the address of a
   symbol). It can take as arguments (preceded by :code:`/`): the format
   to display the data in (:code:`x` for hexadecimal, :code:`d` for
-  decimal, etc.), how many memory units to display and the size of a
+  decimal, etc), how many memory units to display and the size of a
   memory unit.
 
 - :command:`disassemble` - Used to disassemble a function.
@@ -439,19 +382,13 @@ Using the dynamic image of the kernel is useful for detecting `rootkits <http://
 Getting a stack trace
 ---------------------
 
-Sometimes, you will want information about the trace the execution
-reaches a certain point. You can determine this information using
+Somethimes, you will want information about the trace the execution
+reaches a certain point. You can determine this information using 
 :command:`cscope` or LXR, but some function are called from many
 execution paths, which makes this method difficult.
 
 In these situations, it is useful to get a stack trace, which can be
 simply done using the function :code:`dump_stack()`.
-
-..
-  _[SECTION-DEBUGGING-END]
-
-..
-  _[SECTION-DOCUMENTATION-BEGIN]
 
 Documentation
 =============
@@ -464,7 +401,7 @@ to have a more complete understanding of a certain aspect.
 
 The main advantages of the Linux kernel are the access to sources and
 the open development system. Because of this, the Internet offers a
-larger number of documentation for the kernel.
+larger number of documentation for kernel.
 
 A few links related to the Linux kernel are shown bellow:
 
@@ -477,14 +414,8 @@ A few links related to the Linux kernel are shown bellow:
 The links are not comprehensive. Using  `The Internet <http://www.google.com>`__ and
 `kernel source code <http://lxr.free-electrons.com/>`__ is essential.
 
-..
-  _[SECTION-DOCUMENTATION-END]
-
-Exercises
+Exercices
 =========
-
-..
-  _[SECTION-EXERCISES-REMARKS-BEGIN]
 
 Remarks
 -------
@@ -493,33 +424,27 @@ Remarks
 
   -  Usually, the steps used to develop a kernel module are the
      following:
-
+  
      -  editing the module source code (on the physical machine);
-     -  module compilation (on the physical machine);
-     -  generation of the minimal image for the virtual machine;
-        this image contains the kernel, your module, busybox and
-        eventually test programs;
-     -  starting the virtual machine using QEMU;
+     -  module compilation (on the physical machine)
+     -  generation of the minimal image for the virtual machine.
+        This image contains the kernel, your module, busybox and
+        eventually test programs.
+     -  starting the virtual machine using QEMU.
      -  running the tests in the virtual machine.
-
+  
   -  When using cscope, use :file:`~/src/linux`.
      If there is no :file:`cscope.out` file, you can generate it using
      the command :command:`make ARCH=x86 cscope`.
 
-  -  You can find more details about the virtual machine at
+  -  You cand find more details about the virtual machine at 
      :ref:`vm_link`.
 
 .. important::
     Before solving an exercice, **carefully** read all its bullets.
 
-..
-  _[SECTION-EXERCISES-REMARKS-END]
-
-..
-  _[EXERCISE1-BEGIN]
-
-Booting the virtual machine
----------------------------
+1. Booting the virtual machine
+------------------------------
 
 A summary of the virtual machine infrastructure:
 
@@ -530,68 +455,43 @@ A summary of the virtual machine infrastructure:
 -  :file:`~/src/linux/tools/labs/qemu`- scripts and auxiliary
    files used to generate and run the QEMU VM.
 
-To start the VM, run :command:`make boot` in the directory :file:`~/src/linux/tools/labs`:
+To start the VM, run :command:`QEMU_DISPLAY=sdl make boot` in the directory :file:`~/src/linux/tools/labs`:
 
 .. code-block:: shell
 
     student@eg106:~$ cd ~/src/linux/tools/labs
-    student@eg106:~/src/linux/tools/labs$ make boot
-
-By default, you will not get a prompt or any graphical interface, but you can connect to
-a console exposed by the virtual machine using :command:`minicom` or :command:`screen`.
-
-.. code-block:: shell
-
-    student@eg106:~/src/linux/tools/labs$ minicom -D serial.pts
-
-    <press enter>
-
-    qemux86 login:
-    Poky (Yocto Project Reference Distro) 2.3 qemux86 /dev/hvc0
-
-Alternatively, you can start the virtual machine with graphical interface support, using
-the :command:`QEMU_DISPLAY=gtk make boot`.
+    student@eg106:~/src/linux/tools/labs$ QEMU_DISPLAY=sdl make boot
 
 .. note::
-    To access the virtual machine, at the login prompt, enter the
+    To access the virtual machine, at the login prompt, enter the 
     username :code:`root`; there is no need to enter a password.
     The virtual machine will start with the permissions of the
     root account.
 
-..
-  _[EXERCISE1-END]
-
-..
-  _[EXERCISE2-BEGIN]
-
-Adding and using a virtual disk
--------------------------------
+2. Adding and using a virtual disk
+----------------------------------
 
 .. note:: If you don't have the file :file:`mydisk.img`, you can download
           it from the address http://elf.cs.pub.ro/so2/res/laboratoare/mydisk.img.
-          The file must be placed in :file:`tools/labs`.
 
-In the :file:`~/src/linux/tools/labs` directory, you have a new virtual
+In the :file:`~/src/linux/tools/labs/qemu` directory, you have a new virtual
 machine disk, in the file :file:`mydisk.img`. We want to add the disk
 to the virtual machine and use it within the virtual machine.
 
-Edit :file:`qemu/Makefile` and add :code:`-drive file=mydisk.img,if=virtio,format=raw`
-to the :code:`QEMU_OPTS` variable.
+Edit the :file:`Makefile` to add the following :code:`-drive file=mydisk.img,format=raw`
+to the :command:`run` target. Run :code:`make` to boot the virtual machine.
 
-.. note:: There are already two disks added to qemu (disk1.img and disk2.img). You will need
-          to add the new one after them. In this case, the new disk can be accessed as
-          :file:`/dev/vdd` (vda is the root partition, vdb is disk1 and vdc is disk2).
+Within the virtual machine, configure access to the virtual disk.
 
 .. hint:: You do not need to manually create the entry for the new disk in :file:`/dev`
           because the virtual machine uses :command:`devtmpfs`.
 
-Run :code:`make` in :file:`tools/labs` to boot the virtual machine.
 Create :file:`/test` directory and try to mount the new disk:
 
 .. code-block:: bash
 
     mkdir /test
-    mount /dev/vdd /test
+    mount /dev/sda /test
 
 The reason why we can not mount the virtual disk is because we do not have support in the
 kernel for the filesystem with which the :file:`mydisk.img` is formatted. You will need
@@ -648,14 +548,8 @@ With support for the :command:`btrfs` filesystem, now :command:`mount` will fini
           you to return to the initial setup in order to have an environment
           identical to the one used by vmchecker.
 
-..
-  _[EXERCISE2-END]
-
-..
-  _[EXERCISE3-BEGIN]
-
-GDB and QEMU
-------------
+3. GDB and QEMU
+---------------
 
 We can investigate and troubleshoot the QEMU virtual machine in real time.
 
@@ -711,12 +605,6 @@ such as :command:`list` and :command:`backtrace` to trace the execution.
 .. hint:: At the :command:`gdb` prompt, you can press :command:`Enter`
           (without anything else) to rerun the last command.
 
-..
-  _[EXERCISE3-END]
-
-..
-  _[EXERCISE4-BEGIN]
-
 4. GDB spelunking
 -----------------
 
@@ -762,17 +650,10 @@ The :code:`jiffies` variable holds the number of ticks (clock beats) since the s
 
               x/wx & jiffies
 
-..
-  _[EXERCISE4-END]
-
-..
-  _[EXERCISE5-BEGIN]
-
-
 5. Cscope spelunking
 --------------------
 
-Use LXR or cscope in the :file:`~/src/linux/` directory to discover
+Use LXR or cscope in the :file:`~/linux/` directory to discover
 the location of certain structures or functions.
 
 Cscope index files are already generated. Use :command:`vim` and other related commands
