@@ -24,21 +24,22 @@ class Asciicast(Directive):
         env = self.state.document.settings.env
         node = asciicast()
 
-        node['relpath'], node['path'] = env.relfn2path(self.arguments[0])
-        env.note_dependency(node['path'])
+        relpath, abspath = env.relfn2path(self.arguments[0])
+        node['body'] = '<asciinema-player src="{}"></asciinema-player>'.format(self.arguments[0])
+        node['path'] = abspath
+        node['relpath'] = relpath
+
+        env.note_dependency(abspath)
 
         return [node]
 
 def html_asciicast(self, node):
-    filename = os.path.basename(node['path'])
-    dst = os.path.join(self.builder.outdir, self.builder.imagedir, filename)
-    html_path = os.path.join(relative_uri(os.path.normpath(node['relpath']), self.builder.imagedir), filename)
-    body = '<asciinema-player src="{}"></asciinema-player>'.format(html_path)
+    dst = os.path.join(self.builder.outdir, node['relpath'])
     try:
         shutil.copy(node['path'], dst)
+        self.body.append(node['body'])
     except shutil.Error as err:
         self.builder.warn("failed to copy file: {}".format(err))
-    self.body.append(body)
     raise nodes.SkipNode
 
 def setup(app):
