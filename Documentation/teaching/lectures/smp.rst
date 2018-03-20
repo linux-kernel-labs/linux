@@ -46,8 +46,7 @@ results, free of race conditions.
 .. note:: We will use the terms core, CPU and processor as
           interchangeable for the purpose of this lecture.
 
-Race conditions can occur when the following two conditions happen
-simultaneously:
+Race conditions can occur when:
 
 .. slide:: Race conditions
    :inline-contents: True
@@ -148,22 +147,19 @@ In the example above, the minimal critical section is starting with
 the counter decrement and ending with checking the counter's value.
 
 Once the critical section has been identified race conditions can be
-avoided by using one of the following approaches:
+avoided:
 
 .. slide:: Avoiding race conditions
    :inline-contents: True
    :level: 2
 
-   * make the critical section **atomic** (e.g. use atomic
-     instructions)
+   * make the critical section **atomic** (so that preemption can not
+     occur in the critical section)
 
-   * **disable preemption** during the critical section (e.g. disable
-     interrupts, bottom-half handlers, or thread preemption)
+   * **disable preemption** while the critical section is executing
 
-   * **serialize the access** to the critical section (e.g. use spin
-     locks or mutexes to allow only one context or thread in the
-     critical section)
-
+   * **serialize the access** to the critical section (allow only one
+     running context in the critical section)
 
 
 Linux kernel concurrency sources
@@ -207,7 +203,7 @@ to access atomic operations:
    * integer based:
 
      * simple: :c:func:`atomic_inc`, :c:func:`atomic_dec`,
-       :c:func:`atomic_add`, :c:func:`atomic_sub`
+     :c:func:`atomic_add`, :c:func:`atomic_sub`
 
      * conditional: :c:func:`atomic_dec_and_test`, :c:func:`atomic_sub_and_test`
 
@@ -305,16 +301,10 @@ other exclusive operations. So, to implement atomic operations the
 programmer must retry the operation (both LDREX and STREX) until the
 exclusive monitor signals a success.
 
-Although they are often interpreted as "light" or "efficient"
-synchronization mechanisms (because they "don't require spinning or
-context switches", or because they "are implemented in hardware so
-they must be more efficient", or because they "are just instructions
-so they must have similar efficiency as other instructions"), as seen
-from the implementation details, atomic operations are actually
-expensive.
+As seen from the implementation details, atomic operations are
+expensive and they must be avoided when possible.
 
-
-Disabling preemption (interrupts)
+Preemption (interrupts) disabling
 =================================
 
 On single core systems and non preemptive kernels the only source of
@@ -339,8 +329,7 @@ architecture independent APIs to disable and enable interrupts:
 
       #define local_irq_save(flags) \
           asm volatile ("pushf ; pop %0" :"=g" (flags)
-                        : /* no input */: "memory") \
-          asm volatile("cli": : :"memory")
+                        : /* no input */: "memory")
 
       #define local_irq_restore(flags) \
           asm volatile ("push %0 ; popf"
@@ -385,13 +374,8 @@ parallelism. This is a typical spin lock implementation:
       spin_unlock:
           mov [my_lock], 0
 
-   **bts dts, src** - bit test and set; it copies the src bit from the dts
-   memory address to the carry flag and then sets it:
-
-   .. code-block:: c
-
-      CF <- dts[src]
-      dts[src] <- 1
+   **bts** - bit test and set; it copies the src bit from the dts
+   memory address to the carry flag and then sets it
 
 
 As it can be seen, the spin lock uses an atomic instruction to make
@@ -560,7 +544,7 @@ transitions, as exemplified below:
 
 
 .. note:: The most important characteristic of the MESI protocol is
-          that it is a write-invalidate cache protocol. When writing to a
+          that is a write-invalidate cache protocol. When writing to a
 	  shared location all other caches are invalidated.
 
 This has important performance impact in certain access patterns, and
@@ -581,28 +565,27 @@ critical section:
    .. ditaa::
 
       +-------+                     +-------+                  +-------+
-      | CPU 0 |<---------------+    | CPU 1 |   Invalidate     | CPU 0 |
+      | CPU 0 |<---------------+    | CPU 1 |	Invalidate     | CPU 0 |
       | cache |<-------------+ |    | cache |<---+ +---------->| cache |
-      +-------+  Invalidate  | |    +-------+    | |           +-------+
-                             | |                 | |
-                             | |                 +----------------------------+
-      spin_lock(&lock);      | |                   |                          |
-                             | |     READ lock     |                          |
-                             | +---- WRITE lock ---+                          |
-                             |                                                |
+      +-------+	 Invalidate  | |    +-------+	 | |  	       +-------+
+			     | |   		 | |
+			     | |   	         +----------------------------+
+      spin_lock(&lock);	     | |   	 	   |			      |
+                             | |     READ lock	   |			      |
+                             | +---- WRITE lock ---+			      |
+			     |        	 	       	       	       	      |
                              |                                 READ lock      |
-                             +-------------------------------- WRITE lock ----+
+			     +-------------------------------- WRITE lock ----+
 
          ...                            ...                       ...
       READ data                      READ lock                 READ lock
-          |                              |                         |
-          |                              |                         |
-          |                              |                         |
-          +------------------------------+-------------------------+
-                                         |
-                                         v
-
-                                    cache miss
+          |			     	 |			   |
+	  |			     	 |			   |
+      	  |			       	 |			   |
+	  +------------------------------+-------------------------+
+					 |
+					 v
+				     cache miss
 
 As it can be seen from the figure above due to the writes issued by
 the cores spinning on the lock we see frequent cache line invalidate
@@ -665,8 +648,7 @@ reduce power consumption.
 
 A similar implementation with support for fairness (the CPU cores are
 allowed in the critical section based on the time of arrival) is used
-in the Linux kernel (the `ticket spin lock <https://lwn.net/Articles/267968/>`_)
-for many architectures.
+in the Linux kernel (the ticket spin lock) for many architectures.
 
 However, for the x86 architecture, the current spin lock
 implementation uses a queued spin lock where the CPU cores spin on
@@ -706,8 +688,8 @@ next lock in the list, if any.
 While a read spin optimized spin lock reduces most of the cache
 invalidation operations, the lock owner can still generate cache
 invalidate operations due to writes to data structures close to the
-lock and thus part of the same cache line. This in turn generates
-memory traffic on subsequent reads on the spinning cores.
+lock. This in turn generates memory traffic on subsequent reads on the
+spinning cores.
 
 Hence, queued spin locks scale much better for large number of cores
 as is the case for NUMA systems. And since they have similar fairness
@@ -725,8 +707,8 @@ as we can have the process running on one CPU core and the interrupt
 context running on a different CPU core.
 
 Using a spin lock, which was designed for multi-processor systems,
-seems like the right solution, but doing so can cause common
-deadlock conditions, as detailed by the following scenario:
+seems like the right solution, but doing so will can cause common
+deadlock condition, as detailed by the following scenario:
 
 
 .. slide:: Process and Interrupt Handler Synchronization Deadlock
@@ -768,14 +750,15 @@ work, it is recommended to use dedicated APIs:
    :level: 2
 
    * In process context use :c:func:`spin_lock_bh` (which combines
-     :c:func:`local_bh_disable` and :c:func:`spin_lock`) and
-     :c:func:`spin_unlock_bh` (which combines :c:func:`spin_unlock` and
-     :c:func:`local_bh_enable`)
+   :c:func:`local_bh_disable` and :c:func:`spin_lock`) and
+   :c:func:`spin_unlock_bh` (which combines :c:func:`spin_unlock` and
+   :c:func:`local_bh_enable`)
+
 
    * In bottom half context use: :c:func:`spin_lock` and
-     :c:func:`spin_unlock` (or :c:func:`spin_lock_irqsave` and
-     :c:func:`spin_lock_irqrestore` if sharing data with interrupt
-     handlers)
+   :c:func:`spin_unlock` (or :c:func:`spin_lock_irqsave` and
+   :c:func:`spin_lock_irqrestore` if sharing data with interrupt
+   handlers)
 
 
 As mentioned before, another source of concurrency in the Linux kernel
@@ -844,16 +827,16 @@ the two:
    :inline-contents: True
    :level: 2
 
-   * They don't "waste" CPU cycles; system throughput is better than
-     spin locks if context switch overhead is lower than medium
+   * They don't "waste" CPU cycles; system throughput is better then
+     spin locks if context switch overhead is lower then medium
      spinning time
 
    * They can't be used in interrupt context
 
-   * They have a higher latency than spin locks
+   * They have a higher latency then spin locks
 
 Conceptually, the :c:func:`mutex_lock` operation is relatively simple:
-if the mutex is not acquired we can take the fast path via an atomic
+if the mutex is not acquired we an take the fast path via an atomic
 exchange operation:
 
 
@@ -923,7 +906,7 @@ mutex debugging for locking dependency engine debug feature.
 
 
 The :c:func:`mutex_unlock` operation is symmetric: if there are no
-waiters on the mutex then we can take the fast path via an atomic exchange
+waiters on the mutex then we an take the fast path via an atomic exchange
 operation:
 
 .. slide:: :c:func:`mutex_unlock` fast path
@@ -957,9 +940,9 @@ operation:
       ...
 
 
-.. note:: Because :c:type:`struct task_struct` is cached aligned the 7
-          lower bits of the owner field can be used for various flags,
-          such as :c:type:`MUTEX_FLAG_WAITERS`.
+.. note:: We can use up to 7 of the low bits of the owner field can be
+          used for various flags since task struct is cached
+          aligned.
 
 
 Otherwise we take the slow path where we pick up first waiter from the
@@ -993,7 +976,7 @@ Per CPU data
 
 Per CPU data avoids race conditions by avoiding to use shared
 data. Instead, an array sized to the maximum possible CPU cores is
-used and each core will use its own array entry to read and write
+used and each core will used its own array entry to read and write
 data. This approach certainly has advantages:
 
 
@@ -1001,7 +984,7 @@ data. This approach certainly has advantages:
    :inline-contents: True
    :level: 2
 
-   * No need to synchronize to access the data
+   * No need to synchronization to access the data
 
    * No contention, no performance impact
 
@@ -1036,14 +1019,14 @@ Here is an example of out of order compiler generated code:
 
 
 .. note:: When executing instructions out of order the processor makes
-          sure that data dependency is observed, i.e. it won't execute
+          sure that data dependency is kept, e.g. it won't execute
           instructions whose input depend on the output of a previous
           instruction that has not been executed.
 
 In most cases out of order execution is not an issue. However, in
 certain situations (e.g. communicating via shared memory between
-processors or between processors and hardware) we must issue some
-instructions before others even without data dependency between them.
+processors or processors and hardware) we must issue instructions
+before others even without data dependency between them.
 
 For this purpose we can use barriers to order memory operations:
 
@@ -1059,7 +1042,7 @@ For this purpose we can use barriers to order memory operations:
    * A write barrier (:c:func:`wmb()`, :c:func:`smp_wmb()`) is used to
      make sure that no write operation crosses the barrier
 
-   * A simple barrier (:c:func:`mb()`, :c:func:`smp_mb()`) is used
+   * A simple barrier (:c:func:`wmb()`, :c:func:`smp_wmb()`) is used
      to make sure that no write or read operation crosses the barrier
 
 
@@ -1067,7 +1050,7 @@ Read Copy Update (RCU)
 ======================
 
 Read Copy Update is a special synchronization mechanism similar with
-read-write locks but with significant improvements over it (and some
+read-write but with significant improvements over it (and some
 limitations):
 
 .. slide:: Read Copy Update (RCU)
@@ -1100,11 +1083,11 @@ RCU splits removal updates to the data structures in two phases:
 
    * **Elimination**: free the element. This action is postponed until
      all existing readers finish traversal (quiescent cycle). New
-     readers won't affect the quiescent cycle.
+     readers won't affect the elimination delay.
 
 
-As an example, lets take a look on how to delete an element from a
-list using RCU:
+As an example, lets take a look on how deleting an element from a list
+using RCU is done:
 
 .. slide:: RCU List Delete
    :inline-contents: True
@@ -1118,19 +1101,13 @@ list using RCU:
                                                     +-----------+
       +-----+     +-----+     +-----+      +-----+  |  +-----+  |  +-----+
       |     |     |     |     |     |      |     |  |  |     |  |  |     |
-      |  A  |---->|  B  |---->|  C  |      |  A  |--+  |  B  |--+->|  C  |
+      |  A  |---->|  B  |---->|  C  |      |  A  |--+  |  B  |  +->|  C  |
       |     |     |     |     |     |      |     |     |     |     |     |
       +-----+     +-----+     +-----+      +-----+     +-----+     +-----+
          ^           ^           ^            ^           ^           ^
          |           |           |            |           |           |
 
-
-
-
-
-
-
-         (3) Quiescent cycle over                 (4) Reclamation
+          (3) Quiescent cycle over                 (2) Reclamation
                +-----------+
       +-----+  |  +-----+  |  +-----+      +-----+                 +-----+
       |     |  |  |     |  |  |     |      |     |                 |     |
@@ -1144,7 +1121,7 @@ list using RCU:
 In the first step it can be seen that while readers traverse the list
 all elements are referenced. In step two a writer removes
 element B. Reclamation is postponed since there are still readers that
-hold references to it. In step three a quiescent cycle just expired
+holding references to it. In step three a quiescent cycle just expired
 and it can be noticed that there are no more references to
 element B. Other elements still have references from readers that
 started the list traversal after the element was removed. In step 4 we
@@ -1152,8 +1129,7 @@ finally perform reclamation (free the element).
 
 
 Now that we covered how RCU functions at the high level, lets looks at
-the APIs for traversing the list as well as adding and removing an
-element to the list:
+the APIs for read
 
 
 .. slide:: RCU list APIs cheat sheet
@@ -1164,21 +1140,17 @@ element to the list:
 
       /* list traversal */
       rcu_read_lock();
-      list_for_each_entry_rcu(i, head) {
+      list_for_each_rcu(i, head) {
         /* no sleeping, blocking calls or context switch allowed */
       }
       rcu_read_unlock();
 
 
       /* list element delete  */
-      spin_lock(&lock);
+      spin_lock();
       list_del_rcu(&node->list);
-      spin_unlock(&lock);
+      spin_unlock();
       synchronize_rcu();
       kfree(node);
 
-      /* list element add  */
-      spin_lock(&lock);
-      list_add_rcu(head, &node->list);
-      spin_unlock(&lock);
 
