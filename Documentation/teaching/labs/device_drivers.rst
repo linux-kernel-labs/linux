@@ -561,17 +561,12 @@ The structure of the write function is similar:
 		       size_t size, loff_t * offset)
    {
        struct my_device_data *my_data = (struct my_device_data *) file->private_data;
-       ssize_t len = min(my_data->size - *offset, size);
-
-       if (len <= 0)
-	   return 0;
 
        /* read data from device in my_data->buffer */
-       if (copy_to_user(user_buffer, my_data->buffer, len))
+       if (copy_from_user(my_data->buffer, user_buffer, my_data->size))
 	   return -EFAULT;
-
-       *offset += len;
-       return lent;
+	   
+       return my_data->size;
    }
 
 The write operation will respond to a write request from userspace. In
