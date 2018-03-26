@@ -1,19 +1,15 @@
-LDFLAGS = -m32
+objects = _test/tracer_test.o
 
 .PHONY: all clean
 
 all: tracer_test
 
-tracer_test: tracer_test.o
+tracer_test:
+	$(CC) -Wall -g -m32 -static -o $@ $(objects)
 
-tracer_test.o: _test/tracer_test.c
-	make -C _test
-	ln -sfn _test/tracer_test.o $@
 
 run: all
-	./_checker
+	./run_tests.bash
 
 clean:
-	-rm -f *~
-	-rm -f tracer_test.o tracer_test
-	-make -C _test clean
+	-rm -f tracer_test *~ tracer_helper.ko

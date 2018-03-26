@@ -197,10 +197,7 @@ int max_points = 100;
 
 static void init_test(void)
 {
-	int rc;
-
-	rc = system("insmod " MODULE_FILENAME);
-	DIE(rc != 0, "init_test");
+	system("insmod " MODULE_FILENAME);
 }
 
 static void init_test2(int *fd)
@@ -287,7 +284,7 @@ static void test_open_dev_tracer(void)
 	snprintf(dev_name, 63, "/dev/%s", TRACER_DEV_NAME);
 
 	rc = open(dev_name, O_RDONLY);
-	test(__func__, rc >= 0, 1);
+	test(__func__, rc > 0, 1);
 	close(rc);
 
 	cleanup_test();
