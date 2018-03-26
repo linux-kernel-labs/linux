@@ -1,30 +1,39 @@
 #include <linux/module.h>
 #include <linux/timer.h>
 
-static DEFINE_SPINLOCK(lock);
-
-static void timerfn(struct timer_list *unused)
+spinlock_t lock;
+static struct timer_list timer;
+ 
+static void foo(struct timer_list *unused)
 {
-	pr_info("%s acquiring lock\n", __func__);
-	spin_lock(&lock);   pr_info("%s acquired lock\n", __func__);
-	spin_unlock(&lock); pr_info("%s released lock\n", __func__);
+	spin_lock(&lock);
+
+	spin_unlock(&lock);
 }
 
-static DEFINE_TIMER(timer, timerfn);
-
-int init_module(void)
+static int so2_locking_init(void)
 {
+	pr_info("timer init\n");
+	timer_setup(&timer, foo, 0);
 	mod_timer(&timer, jiffies);
 
-	pr_info("%s acquiring lock\n", __func__);
-	spin_lock(&lock);   pr_info("%s acquired lock\n", __func__);
-	spin_unlock(&lock); pr_info("%s released lock\n", __func__);
+	pr_info("timer setup ok!\n");
+
+	spin_lock_init(&lock);
+	spin_lock(&lock);
+
+	/* do work */
+	while(1);
+
 	return 0;
 }
 
-void exit_module(void)
+static void so2_locking_exit(void)
 {
+	pr_info("locking exit\n");
 	del_timer_sync(&timer);
 }
 
 MODULE_LICENSE("GPL v2");
+module_init(so2_locking_init);
+module_exit(so2_locking_exit);
