@@ -1,3 +1,0 @@
-EXTRA_CFLAGS = -Wall -g -m32
-
-obj-m        = hello-world.o
