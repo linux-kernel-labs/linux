@@ -18,7 +18,7 @@ skels/Kbuild:
 
 build: $(KCONFIG) skels/Kbuild
 	$(MAKE) -C $(KDIR) M=$(PWD)/skels ARCH=$(ARCH) modules
-	for i in $(shell find skels -name Makefile | xargs dirname); do $(MAKE) -C $$i; done
+	for i in $(shell find skels -name Makefile | sort -r | xargs dirname); do $(MAKE) -C $$i; done
 
 TEMPDIR := $(shell mktemp -u)
 
