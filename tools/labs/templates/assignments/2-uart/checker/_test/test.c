@@ -24,7 +24,7 @@
 #define OPTION_BOTH		3
 
 #define MODULE_NAME		"uart16550"
-#define SOLUTION_NAME		"solution"
+#define SOLUTION_NAME		"solutie"
 
 #define PAD_CHARS		60
 
