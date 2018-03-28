@@ -2,13 +2,13 @@ CFLAGS = -Wall -g -static -m32
 
 .PHONY: all run clean
 
-all: test solution.ko
+all: test link_handler.ko
 
 test: _test/test.o
 	$(CC) $(CFLAGS) -o $@ $^
 
-solution.ko: _test/solution.ko
+link_handler.ko: _test/link_handler.ko
 	ln -s $< $@
 
 clean:
-	-rm -f *~ test _test/test.o solution.ko
+	-rm -f *~ test _test/test.o link_handler.ko
