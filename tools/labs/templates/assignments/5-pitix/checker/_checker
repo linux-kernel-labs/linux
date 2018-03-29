@@ -5,7 +5,6 @@ mkfs_cmd=./mkfs.pitix
 inode_direct_data_blocks=5
 inode_size=32
 
-test_ok=0
 test_no=0
 
 #
@@ -65,7 +64,6 @@ check_true()
         extra_string="$@"
         ret=1
     else
-        test_ok=$(($test_ok+1))
         extra_string=""
         end_string="ok"
         ret=0
@@ -90,7 +88,6 @@ check_false()
         end_string="failed"
         extra_string="$@"
     else
-        test_ok=$(($test_ok+1))
         end_string="ok"
         extra_string=""
     fi
@@ -155,7 +152,7 @@ check_statfs()
 # $5 gid
 do_create()
 {
-    verbose_comm "generating random data" dd if=/dev/urandom bs=1 count=$2 \> /tmp/pitix.rw/$1
+    verbose_comm "generating random data" head -c$2 /dev/urandom \> /tmp/pitix.rw/$1
     chmod $3 /tmp/pitix.rw/$1
     chown $4.$5 /tmp/pitix.rw/$1
     check_true "copy file to /tmp/pitix.mnt/$1" \
@@ -272,7 +269,7 @@ test_rw()
 
     rm -Rf /tmp/pitix.loop /tmp/pitix.rw /tmp/pitix.mnt > /dev/null 2>&1; mkdir /tmp/pitix.rw; mkdir /tmp/pitix.mnt
 
-    dd if=/dev/zero bs=1 count=4096 > /tmp/pitix.loop
+    head -c4096 /dev/zero > /tmp/pitix.loop
     check_false "mounting bad fs 1" mount -t pitix /tmp/pitix.loop /tmp/pitix.mnt/ -o loop
     echo > /tmp/pitix.loop
     check_false "mounting bad fs 2" mount -t pitix /tmp/pitix.loop /tmp/pitix.mnt/ -o loop
@@ -335,7 +332,7 @@ test_ro()
     rm -Rf /tmp/pitix.loop /tmp/pitix.mnt /tmp/pitix.ro > /dev/null 2>&1; mkdir /tmp/pitix.ro; mkdir /tmp/pitix.mnt
     cp pitix.loop.gz /tmp/pitix.loop.gz
     gunzip /tmp/pitix.loop.gz
-    tar xzf pitix.files.tar.gz -C /tmp/pitix.ro
+    tar xfz pitix.files.tar.gz -C /tmp/pitix.ro
 
     check_true "mounting fs" mount -t pitix /tmp/pitix.loop /tmp/pitix.mnt/ -o loop
     if [ $? -ne 0 ]; then
@@ -377,7 +374,5 @@ test_rw 512
 check_true "module unloading" rmmod pitix
 
 cleanup_world
-
-echo "Tests ok: $test_ok/$test_no" # could also display as percent
 
 # vim: set tabstop=4 shiftwidth=4:
