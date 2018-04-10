@@ -34,9 +34,11 @@ exceed the size of a page. The size of the block may vary depending on the file
 system used, the most common values being 512 bytes, 1 kilobytes and 4
 kilobytes.
 
+Block I/O devices in Linux
+==========================
 
 Register a block I/O device
-===========================
+---------------------------
 
 To register a block I/O device, function :c:func:`register_blkdev` is used.
 To deregister a block I/O device, function :c:func:`unregister_blkdev` is
@@ -46,7 +48,7 @@ Starting with version 4.9 of the Linux kernel, the call to
 :c:func:`register_blkdev` is optional. The only operations performed by this
 function are the dynamic allocation of a major (if the major argument is 0 when
 calling the function) and creating an entry in :file:`/proc/devices`. In
-future kernel versions it may be removed; however, most drivers still call it.
+future kernel versions it may be removed; however, most drivers still call it. 
 
 Usually, the call to the register function is performed in the module
 initialization function, and the call to the deregister function is performed in
@@ -56,14 +58,14 @@ the module exit function. A typical scenario is presented below:
 .. code-block:: c
 
    #include <linux/fs.h>
-
+ 
    #define MY_BLOCK_MAJOR           240
    #define MY_BLKDEV_NAME          "mybdev"
-
+ 
    static int my_block_init(void)
    {
        int status;
-
+ 
        status = register_blkdev(MY_BLOCK_MAJOR, MY_BLKDEV_NAME);
        if (status < 0) {
                 printk(KERN_ERR "unable to register mybdev block device\n");
@@ -71,7 +73,7 @@ the module exit function. A typical scenario is presented below:
         }
         //...
    }
-
+ 
    static void my_block_exit(void)
    {
         //...
@@ -80,7 +82,7 @@ the module exit function. A typical scenario is presented below:
 
 
 Register a disk
-===============
+---------------
 
 Although the :c:func:`register_blkdev` function obtains a major, it does not
 provide a device (disk) to the system. For creating and using block devices
@@ -101,34 +103,34 @@ the module exit function.
 
    #include <linux/fs.h>
    #include <linux/genhd.h>
-
+ 
    #define MY_BLOCK_MINORS	 1
-
+ 
    static struct my_block_dev {
        struct gendisk *gd;
        //...
    } dev;
-
+ 
    static int create_block_device(struct my_block_dev *dev)
    {
        dev->gd = alloc_disk(MY_BLOCK_MINORS);
        //...
        add_disk(dev->gd);
    }
-
+ 
    static int my_block_init(void)
    {
        //...
        create_block_device(&dev);
    }
-
+ 
    static void delete_block_device(struct my_block_dev *dev)
    {
        if (dev->gd)
            del_gendisk(dev->gd);
        //...
    }
-
+ 
    static void my_block_exit(void)
    {
        delete_block_device(&dev);
@@ -155,12 +157,11 @@ users of the device and call the :c:func:`del_gendisk` function only when there
 are no users left of the device.
 
 :c:type:`struct gendisk` structure
-==================================
+----------------------------------
 
 The :c:type:`struct gendisk` structure stores information about a disk. As
 stated above, such a structure is obtained from the :c:func:`alloc_disk` call
-and its fields must be filled before it is sent to the :c:func:`add_disk`
-function.
+and must be completed before it is sent to the :c:func:`add_disk` function.
 
 The :c:type:`struct gendisk` structure has the following important fields:
 
@@ -183,11 +184,11 @@ An example of filling a :c:type:`struct gendisk` structure is presented below:
    #include <linux/genhd.h>
    #include <linux/fs.h>
    #include <linux/blkdev.h>
-
+ 
    #define NR_SECTORS			1024
-
+ 
    #define KERNEL_SECTOR_SIZE		512
-
+ 
    static struct my_block_dev {
        //...
        spinlock_t lock;                /* For mutual exclusion */
@@ -195,7 +196,7 @@ An example of filling a :c:type:`struct gendisk` structure is presented below:
        struct gendisk *gd;             /* The gendisk structure */
        //...
    } dev;
-
+ 
    static int create_block_device(struct my_block_dev *dev)
    {
        ...
@@ -218,7 +219,7 @@ An example of filling a :c:type:`struct gendisk` structure is presented below:
 
        return 0;
    }
-
+ 
    static int my_block_init(void)
    {
        int status;
@@ -228,7 +229,7 @@ An example of filling a :c:type:`struct gendisk` structure is presented below:
            return status;
        //...
    }
-
+ 
    static void delete_block_device(struct my_block_dev *dev)
    {
        if (dev->gd) {
@@ -236,7 +237,7 @@ An example of filling a :c:type:`struct gendisk` structure is presented below:
        }
        //...
    }
-
+ 
    static void my_block_exit(void)
    {
        delete_block_device(&dev);
@@ -258,7 +259,7 @@ example of such conversion is when calling the :c:func:`set_capacity` function
 in the code above).
 
 :c:type:`struct block_device_operations` structure
-==================================================
+--------------------------------------------------
 
 Just as for a character device, operations in :c:type:`struct file_operations`
 should be completed, so for a block device, the operations in
@@ -285,7 +286,6 @@ are presented below:
        int (*media_changed) (struct gendisk *);
        int (*revalidate_disk) (struct gendisk *);
        int (*getgeo)(struct block_device *, struct hd_geometry *);
-       blk_qc_t (*submit_bio) (struct bio *bio);
        struct module *owner;
    }
 
@@ -303,33 +303,33 @@ An example of how to use these two functions is given below:
 
    #include <linux/fs.h>
    #include <linux/genhd.h>
-
+ 
    static struct my_block_dev {
        //...
        struct gendisk * gd;
        //...
    } dev;
-
+ 
    static int my_block_open(struct block_device *bdev, fmode_t mode)
    {
        //...
 
        return 0;
    }
-
+ 
    static int my_block_release(struct gendisk *gd, fmode_t mode)
    {
        //...
 
        return 0;
    }
-
+ 
    struct block_device_operations my_block_ops = {
        .owner = THIS_MODULE,
        .open = my_block_open,
        .release = my_block_release
    };
-
+ 
    static int create_block_device(struct my_block_dev *dev)
    {
        //....
@@ -342,108 +342,29 @@ Please notice that there are no read or write operations. These operations are
 performed by the :c:func:`request` function associated with the request queue
 of the disk.
 
-Request Queues - Multi-Queue Block Layer
-========================================
+Request queues
+--------------
 
-Drivers for block devices use queues to store the block I/O requests that will
+Drivers for block devices use queues to store the block requests I/O that will
 be processed. A request queue is represented by the
 :c:type:`struct request_queue` structure. The request queue is made up of a
 double-linked list of requests and their associated control information. The
 requests are added to the queue by higher-level kernel code (for example, file
-systems).
+systems). As long as the request queue is not empty, the queue's associated
+driver will have to retrieve the first request from the queue and pass it to the
+associated block device. Each item in the request queue is a request represented
+by the :c:type:`struct request` structure.
 
-The block device driver associates each queue with a handling function, which
-will be called for each request in the queue
-(the :c:type:`struct request` structure).
-
-In earlier version of the Linux kernel, each device driver had associated one or
-more request queues (:c:type:`struct request_queue`), where any client could add
-requests, while also being able to reorder them.
-The problem with this approach is that it requires a per-queue lock, making it
-inefficient in distributed systems.
-
-The `Multi-Queue Block Queing Mechanism <https://www.kernel.org/doc/html/latest/block/blk-mq.html>`_
-solves this issue by splitting the device driver queue in two parts:
- 1. Software staging queues
- 2. Hardware dispatch queues
-
-Software staging queues
------------------------
-
-The staging queues hold requests from the clients before sending them to the
-block device driver. To prevent the waiting for a per-queue lock, a staging
-queue is allocated for each CPU or node. A software queue is associated to
-only one hardware queue.
-
-While in this queue, the requests can be merged or reordered, according to an
-I/O Scheduler, in order to maximize performance. This means that only the
-requests coming from the same CPU or node can be optimized.
-
-Staging queues are usually not used by the block device drivers, but only
-internally by the I/O subsystem to optimize requests before sending them to the
-device drivers.
-
-Hardware dispatch queues
-------------------------
-
-The hardware queues (:c:type:`struct blk_mq_hw_ctx`) are used to send the
-requests from the staging queues to the block device driver.
-Once in this queue, the requests can't be merged or reordered.
-
-Depending on the underlying hardware, a block device driver can create multiple
-hardware queues in order to improve parallelism and maximize performance.
-
-Tag sets
---------
-
-A block device driver can accept a request before the previous one is completed.
-As a consequence, the upper layers need a way to know when a request is
-completed. For this, a "tag" is added to each request upon submission and sent
-back using a completion notification after the request is completed.
-
-The tags are part of a tag set (:c:type:`struct blk_mq_tag_set`), which is
-unique to a device.
-The tag set structure is allocated and initialized before the request queues
-and also stores some of the queues properties.
-
-.. code-block:: c
-
-    struct blk_mq_tag_set {
-      ...
-      const struct blk_mq_ops   *ops;
-      unsigned int               nr_hw_queues;
-      unsigned int               queue_depth;
-      unsigned int               cmd_size;
-      int                        numa_node;
-      void                      *driver_data;
-      struct blk_mq_tags       **tags;
-      struct list_head           tag_list;
-      ...
-    };
-
-Some of the fields in :c:type:`struct blk_mq_tag_set` are:
-
- * ``ops`` - Queue operations, most notably the request handling function.
- * ``nr_hw_queues`` - The number of hardware queues allocated for the device
- * ``queue_depth`` - Hardware queues size
- * ``cmd_size`` - Number of extra bytes allocated at the end of the device, to
-   be used by the block device driver, if needed.
- * ``numa_node`` - In NUMA systems, the index of the node the storage device is
-   connected to.
- * ``driver_data`` - Data private to the driver, if needed.
- * ``tags`` - Pointer to an array of ``nr_hw_queues`` tag sets.
- * ``tag_list`` - List of request queues using this tag set.
+Request queues implement an interface that allows the use of multiple I/O
+schedulers. A scheduler must sort the requests and present them to the driver
+in order to maximize performance. The scheduler also deals with the combination
+of adjacent requests (which refer to adjacent sectors of the disk).
 
 Create and delete a request queue
----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Request queues are created using the :c:func:`blk_mq_init_queue` function and
-are deleted using :c:func:`blk_cleanup_queue`. The first function creates both
-the hardware and the software queues and initializes their structures.
-
-Queue properties, including the number of hardware queues, their capacity and
-request handling function are configured using the :c:type:`blk_mq_tag_set`
-structure, as described above.
+A request queue is created with the :c:func:`blk_init_queue` function and is
+deleted using the :c:func:`blk_cleanup_queue` function.
 
 An example of using these functions is as follows:
 
@@ -452,54 +373,31 @@ An example of using these functions is as follows:
    #include <linux/fs.h>
    #include <linux/genhd.h>
    #include <linux/blkdev.h>
-
+ 
    static struct my_block_dev {
        //...
-       struct blk_mq_tag_set tag_set;
        struct request_queue *queue;
        //...
    } dev;
-
-   static blk_status_t my_block_request(struct blk_mq_hw_ctx *hctx,
-                                        const struct blk_mq_queue_data *bd)
+ 
+   static void my_block_request(struct request_queue *q);
    //...
-
-   static struct blk_mq_ops my_queue_ops = {
-      .queue_rq = my_block_request,
-   };
-
+ 
    static int create_block_device(struct my_block_dev *dev)
    {
-       /* Initialize tag set. */
-       dev->tag_set.ops = &my_queue_ops;
-       dev->tag_set.nr_hw_queues = 1;
-       dev->tag_set.queue_depth = 128;
-       dev->tag_set.numa_node = NUMA_NO_NODE;
-       dev->tag_set.cmd_size = 0;
-       dev->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-       err = blk_mq_alloc_tag_set(&dev->tag_set);
-       if (err) {
+       /* Initialize the I/O queue */
+       spin_lock_init(&dev->lock); 
+       dev->queue = blk_init_queue(my_block_request, &dev->lock);
+       if (dev->queue == NULL)
            goto out_err;
-       }
-
-       /* Allocate queue. */
-       dev->queue = blk_mq_init_queue(&dev->tag_set);
-       if (IS_ERR(dev->queue)) {
-           goto out_blk_init;
-       }
-
        blk_queue_logical_block_size(dev->queue, KERNEL_SECTOR_SIZE);
-
-        /* Assign private data to queue structure. */
        dev->queue->queuedata = dev;
        //...
-
-   out_blk_init:
-       blk_mq_free_tag_set(&dev->tag_set);
+ 
    out_err:
        return -ENOMEM;
    }
-
+ 
    static int my_block_init(void)
    {
        int status;
@@ -509,52 +407,62 @@ An example of using these functions is as follows:
            return status;
        //...
    }
-
+ 
    static void delete_block_device(struct block_dev *dev)
    {
        //...
-       blk_mq_free_tag_set(&dev->tag_set);
-       blk_cleanup_queue(dev->queue);
+       if (dev->queue)
+           blk_cleanup_queue(dev->queue);
    }
-
+ 
    static void my_block_exit(void)
    {
        delete_block_device(&dev);
        //...
    }
 
-After initializing the tag set structure, the tag lists are allocated using the
-:c:func:`blk_mq_alloc_tag_set` function.
-The pointer to the function which will process the requests
-(:c:func:`my_block_request`) is filled in the ``my_queue_ops`` structure and
-then the pointer to this structure is added to the tag set.
-
-The queue is created using the :c:func:`blk_mq_init_queue` function, based on
-the information added in the tag set.
+The :c:func:`blk_init_queue` function receives as first argument a pointer to
+the function which processes the requests for the device (of type
+:c:type:`request_fn_proc`). In the example above, the function is
+:c:func:`my_block_request`. The lock parameter is a spinlock (initialized by the
+driver) that the kernel holds during the :c:func:`request` function call to
+ensure exclusive access to the queue. This spinlock can also be used in other
+driver functions to protect access to shared data with the :c:func:`request`
+function.
 
 As part of the request queue initialization, you can configure the
 :c:member:`queuedata` field, which is equivalent to the :c:member:`private_data`
 field in other structures.
 
 Useful functions for processing request queues
-----------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``queue_rq`` function from :c:type:`struct blk_mq_ops` is used to handle
-requests for working with the block device.
-This function is the equivalent of read and write functions encountered on
-character devices. The function receives the requests for the device as
-arguments and can use various functions for processing them.
+The function of type :c:type:`request_fn_proc` is used to handle requests for
+working  with the block device. This function is the equivalent of read and
+write  functions encountered on character devices. The function receives the
+request queue associated with the device as an argument and can use various
+functions for processing the requests from the request queue.
 
-The functions used to process the requests in the handler are described below:
+The functions used to process the requests from the request queue are
+described below:
 
-   * :c:func:`blk_mq_start_request` - must be called before starting processing
-     a request;
-   * :c:func:`blk_mq_requeue_request` - to re-send the request in the queue;
-   * :c:func:`blk_mq_end_request` - to end request processing and notify the
-     upper layers.
+   * :c:func:`blk_peek_request` - retrieves a reference to the first request
+     from the queue; the respective request must be started using
+     :c:func:`blk_start_request`;
+   * :c:func:`blk_start_request` - extracts the request from the queue and
+     starts it for processing; in general, the function receives as a reference
+     a pointer to a request returned by :c:func:`blk_peek_request`;
+   * :c:func:`blk_fetch_request` - retrieves the first request from the queue
+     (using :c:func:`blk_peek_request`) and starts it (using
+     :c:func:`blk_start_request`);
+   * :c:func:`blk_requeue_request` - to re-enter queue.
+
+Before calling any of the functions above, the spinlock associated to the queue
+must be acquired. If the function is called from the function of type
+:c:type:`request_fn_proc`, then the spinlock is already held.
 
 Requests for block devices
-==========================
+--------------------------
 
 A request for a block device is described by :c:type:`struct request`
 structure.
@@ -578,12 +486,12 @@ The fields of :c:type:`struct request` structure include:
      macrodefinition :c:macro:`rq_for_each_segment` if there are multiple
      buffers, or by :c:macro:`bio_data` macrodefinition in case there is only
      one associated buffer;
-
-We will discuss more about the :c:type:`struct bio` structure and its
-associated operations in the :ref:`bio_structure` section.
+   * :c:member:`bio_data`: the address of the buffer associated to the request
+   * about the :c:type:`struct bio` structure and its associated operations
+     will be discussed in the ref:`bio_structure` section;
 
 Create a request
-----------------
+^^^^^^^^^^^^^^^^
 
 Read /write requests are created by code layers superior to the kernel I/O
 subsystem. Typically, the subsystem that creates requests for block devices is
@@ -593,74 +501,101 @@ under the responsibility of the I/O subsystem are adding requests to the queue
 of the specific block device and sorting and merging requests according to
 performance considerations.
 
-Process a request
------------------
+Finish a request
+^^^^^^^^^^^^^^^^
 
-The central part of a block device driver is the request handling function
-(``queue_rq``). In previous examples, the function that fulfilled this role was
+When the driver has finished transferring all the sectors of a request to /from
+the device, it must inform the I/O subsystem by calling the
+:c:func:`blk_end_request` function. If the lock associated to the request queue
+is already acquired, the :c:func:`__blk_end_request` function can be used.
+
+If the driver wants to close the request even if it did not transfer all the
+related sectors, it can call the :c:func:`blk_end_request_all` or
+:c:func:`__blk_end_request_all` function. The :c:func:`__blk_end_request_all`
+function is called if the lock associated to the request queue is already
+acquired.
+
+Process a request
+^^^^^^^^^^^^^^^^^
+
+The central part of a block device driver is the :c:type:`request_fn_proc`
+function type. In previous examples, the function that fulfilled this role was
 :c:func:`my_block_request`. As stated in the
 `Create and delete a request queue`_ section, this function is associated to the
-driver when creating the tag set structure.
+driver by calling :c:func:`blk_init_queue` function.
 
 This function is called when the kernel considers that the driver should process
 I/O requests. The function must start processing the requests from the queue,
 but it is not mandatory to finish them, as requests may be finished by other
 parts of the driver.
 
-The request function runs in an atomic context and must follow the rules for
+The :c:data:`lock` parameter, sent when creating a request queue, is a spinlock
+that the kernel holds when executing the request method. For this reason, the
+request function runs in an atomic context and must follow the rules for
 atomic code (it does not need to call functions that can cause sleep, etc.).
+This lock also ensures that no other requests for the device will be added to
+the queue while the request function is running.
 
-Calling the function that processes the requests is asynchronous relative
+Calling the function that processes the request queue is asynchronous relative
 to the actions of any userspace process and no assumptions about the process
 in which the respective function is running should be made. Also, it should not
 be assumed that the buffer provided by a request is from kernel space or user
 space, any operation that accesses the userspace being erroneous.
 
-One of the simplest request handling function is presented below:
+Below is presented one of the simplest function of type
+:c:type:`request_fn_proc`:
 
 .. code-block:: c
 
-    static blk_status_t my_block_request(struct blk_mq_hw_ctx *hctx,
-                                         const struct blk_mq_queue_data *bd)
-    {
-        struct request *rq = bd->rq;
-        struct my_block_dev *dev = q->queuedata;
+   static void my_block_request(struct request_queue *q)
+   {
+       struct request *rq;
+       struct my_block_dev *dev = q->queuedata;
 
-        blk_mq_start_request(rq);
+       while (1) {
+       	   rq = blk_fetch_request(q);
+       	   if (rq == NULL)
+               break;
 
-        if (blk_rq_is_passthrough(rq)) {
-            printk (KERN_NOTICE "Skip non-fs request\n");
-            blk_mq_end_request(rq, BLK_STS_IOERR);
-            goto out;
-        }
+       	   if (blk_rq_is_passthrough(rq)) {
+               printk (KERN_NOTICE "Skip non-fs request\n");
+               __blk_end_request_all(rq, -EIO);
+              continue;
+       	   }
 
-        /* do work */
-        ...
+           /* do work */
+           ...
 
-        blk_mq_end_request(rq, BLK_STS_OK);
+       	   __blk_end_request_all(rq, 0);
+       }
+   }
 
-    out:
-        return BLK_STS_OK;
-    }
+The :c:func:`my_block_request` function contains a :c:func:`while` loop for
+iterating through the request queue sent as argument. The operations performed
+within this loop are:
 
-The :c:func:`my_block_request` function performs the following operations:
-
-   * Get a pointer to the request structure from the ``bd`` argument and start
-     its processing using the :c:func:`blk_mq_start_request` function.
+   * Read the first request from the queue using :c:func:`blk_fetch_request`.
+     As described in `Useful functions for processing request queues`_ section,
+     the :c:func:`blk_fetch_request` function retrieves the first item from the
+     request queue and starts the request.
+   * If the function returns NULL, it has reached the end of the request queue
+     (there is no remaining request to be processed) and exits
+     :c:func:`my_block_request`.
    * A block device can receive calls which do not transfer data blocks (e.g.
      low level operations on the disk, instructions referring to special ways of
      accessing the device). Most drivers do not know how to handle these
      requests and return an error.
-   * To return an error, :c:func:`blk_mq_end_request` function is called,
-     ``BLK_STS_IOERR`` being the second argument.
+   * To return an error, :c:func:`__blk_end_request_all` function is called,
+     -EIO being the second argument.
    * The request is processed according to the needs of the associated device.
-   * The request ends. In this case, :c:func:`blk_mq_end_request` function is
-     called in order to complete the request.
+   * The request ends. In this case, :c:func:`__blk_end_request_all` function is
+     called in order to complete the request entirely. If all request sectors
+     have been processed, the :c:func:`__blk_end_request` function is used.
 
-.. bio_structure:
+.. _bio_structure:
 
 :c:type:`struct bio` structure
-==============================
+------------------------------
 
 Each :c:type:`struct request` structure is an I/O block request, but may come
 from combining more independent requests from a higher level. The sectors to be
@@ -671,7 +606,7 @@ The kernel can combine requests that refer to adjacent sectors but will not
 combine write requests with read requests into a single
 :c:type:`struct request` structure.
 
-A :c:type:`struct request` structure is implemented as a linked list of
+A :c:type:`struct request` structure is implemented as a linked list of 
 :c:type:`struct bio` structures together with information that allows the
 driver to retain its current position while processing the request.
 
@@ -682,9 +617,9 @@ a block I/O request.
 
    struct bio {
        //...
-       struct gendisk          *bi_disk;
+       struct block_device     *bi_bdev;
        unsigned int            bi_opf;         /* bottom bits req flags, top bits REQ_OP. Use accessors. */
-       //...
+       //... 
        struct bio_vec          *bi_io_vec;     /* the actual vec list */
        //...
        struct bvec_iter        bi_iter;
@@ -693,7 +628,7 @@ a block I/O request.
        //...
    };
 
-In turn, the :c:type:`struct bio` structure contains a :c:member:`bi_io_vec`
+In turn, the :c:struct:`struct bio` structure contains a :c:member:`bi_io_vec`
 vector of :c:type:`struct bio_vec` structures. It consists of the individual
 pages in the physical memory to be transferred, the offset within the page and
 the size of the buffer. To iterate through a :c:type:`struct bio` structure,
@@ -705,7 +640,7 @@ iteration. The request type is encoded in the :c:member:`bi_opf` field; to
 determine it, use the :c:func:`bio_data_dir` function.
 
 Create a :c:type:`struct bio` structure
----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Two functions can be used to create a :c:type:`struct bio` structure:
 
@@ -720,8 +655,8 @@ Two functions can be used to create a :c:type:`struct bio` structure:
 
 Both functions return a new :c:type:`struct bio` structure.
 
-Submit a :c:type:`struct bio` structure
----------------------------------------
+Transmit a :c:type:`struct bio` structure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Usually, a :c:type:`struct bio` structure is created by the higher levels of
 the kernel (usually the file system). A structure thus created is then
@@ -738,9 +673,9 @@ processed by the I/O device driver using a specialized function.
 .. _bio_completion:
 
 Wait for the completion of a :c:type:`struct bio` structure
------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Submitting a :c:type:`struct bio` structure to a driver has the effect of
+Transmitting a :c:type:`struct bio` structure to a driver has the effect of
 adding it to a request from the request queue from where it will be further
 processed. Thus, when the :c:func:`submit_bio` function returns, it is not
 guaranteed that the processing of the structure has finished. If you want to
@@ -756,7 +691,7 @@ specifies the function that will be called at the end of the
 function.
 
 Initialize a :c:type:`struct bio` structure
--------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Once a :c:type:`struct bio` structure has been allocated and before being
 transmitted, it must be initialized.
@@ -767,19 +702,20 @@ called when the processing of the structure is finished. The
 :c:member:`bi_private` field is used to store useful data that can be accessed
 in the function pointed by :c:member:`bi_end_io`.
 
-The :c:member:`bi_opf` field specifies the type of operation.
+The :c:member:`bi_opf` field specifies the type of operation. Use the
+:c:member:`bio_set_op_attrs` to initialize the type of operation.
 
 .. code-block:: c
 
-   struct bio *bio = bio_alloc(GFP_NOIO, 1);
+   struct bio *bio = bio_alloc(GFP_NOIO, 1);  
    //...
-   bio->bi_disk = bdev->bd_disk;
+   bio->bi_bdev = bdev;
    bio->bi_iter.bi_sector = sector;
-   bio->bi_opf = REQ_OP_READ;
+   bio_set_op_attrs(bio, REQ_OP_READ, 0);
    bio_add_page(bio, page, size, offset);
    //...
 
-In the code snippet above we specified the block device to which we sent the
+In the code snippet above are specified the block device to which are sent the
 following: :c:type:`struct bio` structure, startup sector, operation
 (:c:data:`REQ_OP_READ` or :c:data:`REQ_OP_WRITE`) and content. The content of a
 :c:type:`struct bio` structure is a buffer described by: a physical page,
@@ -792,7 +728,7 @@ the :c:func:`alloc_page` call.
 .. _bio_content:
 
 How to use the content of a :c:type:`struct bio` structure
-----------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To use the content of a :c:type:`struct bio` structure, the structure's
 support pages must be mapped to the kernel address space from where they can be
@@ -805,14 +741,15 @@ A typical example of use is:
 
    static void my_block_transfer(struct my_block_dev *dev, size_t start,
                                  size_t len, char *buffer, int dir);
-
-
+ 
+ 
    static int my_xfer_bio(struct my_block_dev *dev, struct bio *bio)
    {
+       int i;
        struct bio_vec bvec;
        struct bvec_iter i;
        int dir = bio_data_dir(bio);
-
+ 
        /* Do each segment independently. */
        bio_for_each_segment(bvec, bio, i) {
            sector_t sector = i.bi_sector;
@@ -825,7 +762,7 @@ A typical example of use is:
 
            kunmap_atomic(buffer);
        }
-
+ 
        return 0;
    }
 
@@ -841,9 +778,9 @@ segments, and will also update global information stored in an iterator
 internal information (segment vector index, number of bytes left to be
 processed, etc.) .
 
-You can store information in the mapped buffer, or extract information.
+It can store information in the mapped buffer, or extract information.
 
-In case request queues are used and you needed to process the requests
+In the case request queues are used and it is needed to process the requests
 at :c:type:`struct bio` level, use the :c:macro:`rq_for_each_segment`
 macrodefinition instead of the :c:macro:`bio_for_each_segment` macrodefinition.
 This macrodefinition iterates through each segment of each
@@ -872,37 +809,45 @@ A typical example of use is:
    }
 
 Free a :c:type:`struct bio` structure
--------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Once a kernel subsystem uses a :c:type:`struct bio` structure, it will have to
 release the reference to it. This is done by calling :c:func:`bio_put` function.
 
 Set up a request queue at :c:type:`struct bio` level
-----------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We have previously seen how we can specify a function to be used to process
-requests sent to the driver. The function receives as argument the requests and
-carries out processing at :c:type:`struct request` level.
+The function :c:func:`blk_init_queue` may specify a function to be used to
+process requests sent to the driver. The function receives as argument the
+request queue as queries and carries out processing at
+:c:type:`struct request` level.
 
-If, for flexibility reasons, we need to specify a function that carries
-out processing at :c:type:`struct bio` structure level, we no longer
-use request queues and we will need to fill the ``submit_bio`` field in the
-:c:type:`struct block_device_operations` associated to the driver.
+If, for flexibility reasons, it is needed to specify a function that carries
+out processing at :c:type:`struct bio` structure level, the function
+:c:func:`blk_queue_make_request` in conjunction with the
+:c:func:`blk_alloc_queue` function should be used.
 
 Below is a typical example of initializing a function that carries out
 processing at :c:type:`struct bio` structure level:
 
 .. code-block:: c
 
-    // the declaration of the function that carries out processing
-    // :c:type:`struct bio` structures
-    static blk_qc_t my_submit_bio(struct bio *bio);
-
-    struct block_device_operations my_block_ops = {
-       .owner = THIS_MODULE,
-       .submit_bio = my_submit_bio
-       ...
-    };
+   // the declaration of the function that carries out processing
+   // :c:type:`struct bio` structures
+   static void my_make_request(struct request_queue *q, struct bio *bio);
+ 
+ 
+   // ...
+   // queue creation
+   dev->queue = blk_alloc_queue (GFP_KERNEL);
+   if (dev->queue == NULL) {
+       printk(KERN_ERR "cannot allocate block device queue\n");
+       return -ENOMEM;
+   }
+   // the registration of the function that carries out processing
+   // :c:type:`struct bio` structures
+   blk_queue_make_request(dev->queue, my_make_request);
+   dev->queue->queuedata = dev;
 
 Further reading
 ===============
@@ -922,8 +867,10 @@ Further reading
 Exercises
 =========
 
-.. include:: ../labs/exercises-summary.hrst
-.. |LAB_NAME| replace:: block_device_drivers
+.. important::
+
+    .. include:: exercises-summary.hrst
+    .. |LAB_NAME| replace:: block_device_drivers
 
 0. Intro
 --------
@@ -942,7 +889,7 @@ Using |LXR|_ find the definitions of the following symbols in the Linux kernel:
 
 Create a kernel module that allows you to register or deregister a block device.
 Start from the files in the :file:`1-2-3-6-ram-disk/kernel` directory in the
-lab skeleton.
+labs task archive.
 
 Follow the comments marked with **TODO 1** in the laboratory skeleton. Use the
 existing macrodefinitions (:c:macro:`MY_BLOCK_MAJOR`,
@@ -960,7 +907,7 @@ Unload the kernel module and check that the device was unregistered.
 
 Change the :c:macro:`MY_BLOCK_MAJOR` value to 7. Compile the module, copy it to
 the virtual machine, and insert it into the kernel. Notice that the insertion
-fails because there is already another driver/device registered in the kernel
+fails because there is already another driver /device registered in the kernel
 with the major 7.
 
 Restore the 240 value for the :c:macro:`MY_BLOCK_MAJOR` macro.
@@ -977,20 +924,20 @@ Follow the comments marked with **TODO 2**. Use the
 
 .. hint:: Review the `Register a disk`_ and `Process a request`_ sections.
 
-Fill in the :c:func:`my_block_request` function to process the request
+Complete the :c:func:`my_block_request` function to process the request queue
 without actually processing your request: display the "request received" message
 and the following information: start sector, total size, data size from the
 current :c:type:`struct bio` structure, direction. To validate a request type,
 use the :c:func:`blk_rq_is_passthrough` (the function returns 0 in the case in
 which we are interested, i.e. when the request is generated by the file system).
 
-.. hint:: To find the needed info, review the `Requests for block devices`_
+.. hint:: To retrieve the needed info, review the `Requests for block devices`_
           section.
 
-Use the :c:func:`blk_mq_end_request` function to finish processing the
+Use the :c:func:`__blk_end_request_all` function to finish processing the
 request.
 
-Insert the module into the kernel and inspect the messages printed
+Insert the module into the kernel. Use :command:`dmesg` to view a message sent
 by the module. When a device is added, a request is sent to the device. Check
 the presence of :file:`/dev/myblock` and if it doesn't exist, create the device
 using the command:
@@ -1005,27 +952,27 @@ To generate writing requests, use the command:
 
    echo "abc"> /dev/myblock
 
-Notice that a write request is preceded by a read request. The request
-is done to read the block from the disk and "update" its content with the
-data provided by the user, without overwriting the rest. After reading and
+Notice that is created a write request preceded by a read request. The read
+request takes place to read the block from the disk and "update" in its content
+what it was provided by the user without overwriting the rest. After reading and
 updating, writing takes place.
 
 3. RAM disk
 -----------
 
 Modify the previous module to create a RAM disk: requests to the device will
-result in reads/writes in a memory area.
+result in read/write in a memory area.
 
 The memory area :c:data:`dev->data` is already allocated in the source code of
-the module using :c:func:`vmalloc` and deallocated using :c:func:`vfree`.
+the module using :c:func:`vmalloc`. To deallocate, use :c:func:`vfree`.
 
-.. note:: Review the `Process a request`_ section.
+..note:: Review the `Process a request`_ section.
 
 Follow the comments marked with **TODO 3** to complete the
-:c:func:`my_block_transfer` function to write/read the request information
-in/from the memory area. The function will be called for each request within
-the queue processing function: :c:func:`my_block_request`. To write/read
-to/from the memory area, use :c:func:`memcpy`. To determine the write/read
+:c:func:`my_block_transfer` function to write /read the request information
+in /from the memory area. The function will be called for each request within
+the queue processing function: :c:func:`my_block_request`. To write /read
+in /from the memory area use :c:func:`memcpy`. To determine the write /read
 information, use the fields of the :c:type:`struct request` structure.
 
 .. hint:: To find out the size of the request data, use the
@@ -1033,29 +980,31 @@ information, use the fields of the :c:type:`struct request` structure.
           :c:macro:`blk_rq_bytes` macro.
 
 .. hint:: To find out the buffer associated to the request, use
-          :c:data:`bio_data`(:c:data:`rq->bio`).
+          :c:data:`bio_data` (:c:data:`rq->bio`).
 
 .. hint:: A description of useful macros is in the `Requests for block devices`_
           section.
 
-.. hint:: You can find useful information in the
-          `block device driver example
-          <https://github.com/martinezjavier/ldd3/blob/master/sbull/sbull.c>`_
-          from `Linux Device Driver <http://lwn.net/Kernel/LDD3/>`_.
+Useful information can be found in the example of the block device driver in
+Linux Device Drivers.
 
-For testing, use the test file :file:`user/ram-disk-test.c`.
-The test program is compiled automatically at ``make build``, copied to the
-virtual machine at ``make copy`` and can be run on the QEMU virtual machine
-using the command:
+For testing, use the :file:`ram-disk-test.c` test file. You compile it using on
+the host, the command:
+
+.. code-block:: shell
+
+    make -f Makefile.test
+
+and then run it using the QEMU virtual machine command:
 
 .. code-block:: shell
 
    ./ram-disk-test
 
 There is no need to insert the module into the kernel, it will be inserted by
-the ``ram-disk-test`` command.
+the :command:`ram-disk-test` executable.
 
-Some tests may fail because of lack of synchronization between the transmitted
+Some tests may crash because of lack of synchronization between the transmitted
 data (flush).
 
 4. Read data from the disk
@@ -1064,22 +1013,22 @@ data (flush).
 The purpose of this exercise is to read data from the
 :c:macro:`PHYSICAL_DISK_NAME` disk (:file:`/dev/vdb`) directly from the kernel.
 
-.. attention:: Before solving the exercise, we need to make sure the disk is
-               added to the virtual machine.
-
-               Check the variable ``QEMU_OPTS`` from :file:`qemu/Makefile`.
-               There should already be two extra disks added using ``-drive ...``.
-
-               If there are not, generate a file that we will use as
+.. attention:: Before solving the exercise, we need to add the disk to the
+               virtual machine. To do this, generate a file that we will use as
                the disk image using the command:
-               :command:`dd if=/dev/zero of=qemu/mydisk.img bs=1024 count=1`
-               and add the following option:
-               :command:`-drive file=qemu/mydisk.img,if=virtio,format=raw`
-               to :file:`qemu/Makefile` (in the :c:data:`QEMU_OPTS` variable,
-               after the root disk).
+
+               .. code-block:: shell
+
+               dd if=/dev/zero of=qemu/mydisk.img bs=1024 count=1
+
+               and add the command:
+               :command:`-drive file = qemu/mydisk.img, if=virtio, format=raw 
+               qemu`
+               in the :file:`qemu/Makefile` file (in the
+               :c:data:`QEMU_OPTS` variable)
 
 Follow the comments marked with **TODO 4** in the directory :file:`4-5-relay/`
-and implement :c:func:`open_disk` and :c:func:`close_disk`.
+and implement the :c:func:`open_disk` and the :c:func:`close_disk` functions.
 Use the :c:func:`blkdev_get_by_path` and :c:func:`blkdev_put` functions. The
 device must be opened in read-write mode exclusively
 (:c:macro:`FMODE_READ` | :c:macro:`FMODE_WRITE` | :c:macro:`FMODE_EXCL`), and
@@ -1089,15 +1038,15 @@ Implement the :c:func:`send_test_bio` function. You will have to create a new
 :c:type:`struct bio` structure and fill it, submit it and wait for it. Read the
 first sector of the disk. To wait, call the :c:func:`submit_bio_wait` function.
 
-.. hint:: The first sector of the disk is the sector with the index 0.
-          This value must be used to initialize the field
-          :c:member:`bi_iter.bi_sector` of the :c:type:`struct bio`.
+.. hint:: The first sector of the disk is the sector with the index 0. At this
+          value the field :c:member:`bi_iter.bi_sector` of the
+          :c:type:`struct bio` structure must be initialized.
 
-          For the read operation, use the :c:macro:`REQ_OP_READ` macro to
-          initialize the :c:member:`bi_opf` field of the :c:type:`struct bio`.
+For the read operation, use the :c:macro:`REQ_OP_READ` and the
+:c:macro:`bio_set_op_attrs` macros.
 
 After finishing the operation, display the first 3 bytes of data read by
-:c:type:`struct bio` structure. Use the format ``"% 02x"`` for :c:func:`printk`
+:c:type:`struct bio` structure. Use the format "% 02x" for the :c:func:`printk`
 to display the data and the :c:macro:`kmap_atomic` and :c:macro:`kunmap_atomic`
 macros respectively.
 
@@ -1105,7 +1054,7 @@ macros respectively.
           page which is allocated above in the code, in the :c:data:`page`
           variable.
 
-.. hint:: Review the sections :ref:`bio_content` and :ref:`bio_completion`.
+.. hint:: Review the sections ref:`bio_content` and ref:`bio_completion`.
 
 For testing, use the :file:`test-relay-disk` script, which is copied on the
 virtual machine when running :command:`make copy`. If it is not copied, make
@@ -1115,7 +1064,7 @@ sure it is executable:
 
    chmod +x test-relay-disk
 
-There is no need to load the module into the kernel, it will be loaded by
+There is no need to load the module into the kernel, it will be loaded by the
 :command:`test-relay-disk`.
 
 Use the command below to run the script:
@@ -1128,7 +1077,7 @@ The script writes "abc" at the beginning of the disk indicated by
 :c:macro:`PHYSICAL_DISK_NAME`. After running, the module will display 61 62 63
 (the corresponding hexadecimal values of letters "a", "b" and "c").
 
-5. Write data to the disk
+5. Write data to the disk 
 -------------------------
 
 Follow the comments marked with **TODO 5** to write a message
@@ -1142,13 +1091,13 @@ macros.
 
 Inside the :c:func:`send_test_bio` function, if the operation is write, fill in
 the buffer associated to the :c:type:`struct bio` structure with the message
-:c:macro:`BIO_WRITE_MESSAGE`. Use the :c:macro:`kmap_atomic` and the
+:c:macro:`BIO_WRITE_MESSAGE`. Use the :c:macro:`kmap_atomic` and the 
 :c:macro:`kunmap_atomic` macros to work with the buffer associated to the
 :c:type:`struct bio` structure.
 
 .. hint:: You need to update the type of the operation associated to the
-          :c:type:`struct bio` structure by setting the :c:member:`bi_opf` field
-          accordingly.
+          :c:type:`struct bio` structure operation using
+          :c:macro:`bio_set_op_attrs` macrodefinition.
 
 For testing, run the :file:`test-relay-disk` script using the command:
 
@@ -1156,19 +1105,13 @@ For testing, run the :file:`test-relay-disk` script using the command:
 
    ./test-relay-disk
 
-The script will display the ``"read from /dev/sdb: 64 65 66"`` message at the
+The script will display the "read from /dev/sdb: 64 65 66" message at the
 standard output.
 
 6. Processing requests from the request queue at :c:type:`struct bio` level
 ---------------------------------------------------------------------------
 
-In the implementation from Exercise 3, we have only processed a
-:c:type:`struct bio_vec` of the current :c:type:`struct bio` from the request.
-We want to process all :c:type:`struct bio_vec` structures from all
-:c:type:`struct bio` structures.
-For this, we will iterate through all :c:type:`struct bio` requests and through
-all :c:type:`struct bio_vec` structures (also called segments) of each
-:c:type:`struct bio`.
+In the implementation from exercise 3, we have only processed a bio_vec of the current bio from the request. We want to process all bio_vecs from all bio. For this we will go through all bio requests and all bio_vecs (also called segments) to each bio.
 
 Add, within the ramdisk implementation (:file:`1-2-3-6-ram-disk/` directory),
 support for processing the requests from the request queue at
@@ -1197,7 +1140,14 @@ the pages of each :c:type:`struct bio` structure and access its associated
 buffers. For the actual transfer, call the :c:func:`my_block_transfer` function
 implemented in the previous exercise.
 
-For testing, use the :file:`ram-disk-test.c` test file:
+For testing, use the :file:`ram-disk-test.c` test file. You compile it using on
+the host, the command:
+
+.. code-block:: shell
+
+    make -f Makefile.test
+
+and then run it using the QEMU virtual machine command:
 
 .. code-block:: shell
 
