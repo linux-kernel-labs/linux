@@ -40,6 +40,7 @@ then point your browser at **Documentation/output/labs/index.html**.
    lectures/interrupts.rst
    lectures/smp.rst
    lectures/debugging.rst
+   lectures/fs.rst
    labs/vm.rst
    labs/exercises.rst
    labs/introduction.rst
