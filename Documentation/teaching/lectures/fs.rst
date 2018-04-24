@@ -28,13 +28,64 @@ Contents
 File System Software Stack
 ==========================
 
-TODO
+`The Linux Storage Stack <https://upload.wikimedia.org/wikipedia/commons/3/30/IO_stack_of_the_Linux_kernel.svg>`_
 
 .. slide:: Overview of File System Software Stack
    :inline-contents: False
    :level: 2
 
-   * TODO
+   .. ditaa::
+
+                           read, write, lseek, open, close
+         user space
+                                         +
+                                         |
+        +------------------------------------------------------------------------------+
+                                         |
+                         +---------------v------------------------------+
+         kernel space    |            system call interface             |
+                         +---------------+------------------------------+
+                                         |
+                                         |
+                         +---------------v-------------+
+                         |      file system driver     |
+                         +------+   +--------------+   |
+                         +----+ |   | +----------+ |   | +--------------+
+                         |    | +---+ |          | +---+ |              |
+                         |    |       |          |       |              |
+                         |    +-------+          +-------+              |
+                         |                                              |
+                         |             Virtual File System              |
+                         |                                              |
+                         +---------------+------------------------------+
+                                         |
+                                         |
+                         +---------------v------------------------------+
+                         |                                              |
+                         |                   block I/O layer            |
+                         +------+---------------------------------------+
+                                |
+                                |
+                         +------v------+  +-------------+
+                         | block device|  |             |      ...
+                         |    driver   |  |             |
+                         +-------------+  +-------------+
+                                |
+        +------------------------------------------------------------------------------+
+                                |
+                                |
+         hardware        +------v----------+
+                         |                 |
+                         |    controller   |
+                         |                 |
+                         +------+----------+
+                                |
+                                |
+                         +------v----------+
+                         |                 |
+                         |  block device   |
+                         |                 |
+                         +-----------------+
 
 TODO
 
@@ -42,7 +93,15 @@ TODO
    :inline-contents: False
    :level: 2
 
-   * TODO
+   * used by block device drivers
+
+   * disk and its partitions share major number, disk uses minor 0
+
+   * block_device: physical device description
+
+   * gendisk: logical device description (entry in /dev)
+
+   * may be formatted with filesystem
 
 TODO
 
@@ -50,7 +109,11 @@ TODO
    :inline-contents: False
    :level: 2
 
-   * TODO
+   * sectors: smallest physical addressable unit
+
+   * block: logical addressing, multiple of sectors
+
+   * filesystem generally uses blocks of 4K (page size)
 
 TODO
 
@@ -58,7 +121,11 @@ TODO
    :inline-contents: False
    :level: 2
 
-   * TODO
+   * sends read/write command to the device controller
+
+   * knows disk geometry, controller registers
+
+   * gets data from block I/O layer as request or bio
 
 TODO
 
@@ -68,7 +135,11 @@ TODO
 
    * also named "I/O Subsystem", "I/O Manager"
 
-   * I/O schedulers
+   * defines I/O schedulers
+
+   * sorting and merging data from higher layer (generally filesystem)
+
+   * sends data to block device driver in bigger chunks to improve efficiency
 
 TODO
 
@@ -76,11 +147,19 @@ TODO
    :inline-contents: False
    :level: 2
 
-   * struct bio
+   * struct bio: basic I/O metadata structure (equivalent to NT kernel IRP: I/O Request Packet)
 
-   * struct bvec
+     * data sector, direction, device
 
-   * struct request
+     * list of bvec structures
+
+   * struct bvec: smallest block metadata: block/page, start, length
+
+   * struct request: array of bio structures
+
+     * used for efficiency
+
+     * usually sent out to block device drivers who define a reques_fn() function
 
 TODO
 
@@ -88,11 +167,13 @@ TODO
    :inline-contents: False
    :level: 2
 
-   * old block I/O data structure
+   * old block I/O data structure, maps a block (bh->b_data)
 
    * used by VFS and file system drivers
 
    * bread(), sb_bread(), brelse()
+
+   * submit_bh() submits a buffer head, creates a bio behind the scenes
 
 TODO
 
@@ -104,6 +185,11 @@ TODO
 
    * Installable File System (IFS) on Windows
 
+   * kernel-level framework for file system driver
+
+   * provides data structures and implements generic methods
+
+
 TODO
 
 .. slide:: File System Driver (FSD)
@@ -113,6 +199,10 @@ TODO
    * uses VFS methods and data structures
 
    * interprets data on disk
+
+   * registers callbacks called by VFS
+
+   * difficulty lies in knowing what is part of VFS and what needs implementing
 
 TODO
 
@@ -126,7 +216,15 @@ TODO
    :inline-contents: False
    :level: 2
 
-   * TODO
+   * inode is basic file metadata (at VFS level)
+
+   * file is open file
+
+   * file is pointed to by entry in file descriptor table (part of each process)
+
+   * file points to inode
+
+   * multiple files may point to one inode
 
 TODO
 
@@ -134,7 +232,13 @@ TODO
    :inline-contents: False
    :level: 2
 
-   * TODO
+   * VFS inode (generic) is allocated into memory with kmalloc() or friends, and then initialized with generic data
+
+   * disk inode (file system specific) is read into memory from disk using sb_bread()
+
+   * data from disk inode is filled into VFS inode
+
+   * extra data from disk inode is part of a file system specific in-memory data structure pointed to by VFS inode
 
 TODO
 
@@ -142,15 +246,13 @@ TODO
    :inline-contents: False
    :level: 2
 
-   * TODO
+   * inode: file medatada: type, permissions, ownership, timestamps, accounting, pointers to data blocks
 
-TODO
+   * superblock: file system metadata: filesystem magic number, file system layout, accounting
 
-.. slide:: Filling VFS Data Structures
-   :inline-contents: False
-   :level: 2
+   * dentry: (name, inode) mappings
 
-   * TODO
+     * multiple dentries may point to same inode: hard links or simply links
 
 TODO
 
@@ -158,7 +260,11 @@ TODO
    :inline-contents: False
    :level: 2
 
-   * TODO
+   * regular files: data is byte stream, no structure
+
+   * directories: data is array of records (dentries)
+
+   * dentries have no file system region of their own, they are part of directory data blocks
 
 TODO
 
@@ -166,7 +272,8 @@ TODO
    :inline-contents: False
    :level: 2
 
-   * TODO
+   .. figure:: /_static/fs-layout.png
+      :class: fill
 
 TODO
 
