@@ -59,6 +59,7 @@ int __init my_tcp_sock_init(void)
 	int addrlen = sizeof(addr);
 	/* address of peer */
 	struct sockaddr_in raddr;
+	int raddrlen = sizeof(raddr);
 
 	/* TODO 1/5: create listening socket */
 	err = sock_create_kern(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP, &sock);
@@ -81,13 +82,12 @@ int __init my_tcp_sock_init(void)
 		goto out_release;
 	}
 
-	/* TODO 2/6: create new socket for the accepted connection */
-	err = sock_create_lite(PF_INET, SOCK_STREAM, IPPROTO_TCP, &new_sock);
+	/* TODO 2/5: create new socket for the accepted connection */
+	err = sock_create_kern(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP, &new_sock);
 	if (err < 0) {
 		printk(LOG_LEVEL "can't create new socket\n");
 		goto out;
 	}
-	new_sock->ops = sock->ops;
 
 	/* TODO 2/5: accept a connection */
 	err = sock->ops->accept(sock, new_sock, 0, true);
@@ -97,12 +97,12 @@ int __init my_tcp_sock_init(void)
 	}
 
 	/* TODO 2/6: get the address of the peer and print it */
-	err = sock->ops->getname(new_sock, (struct sockaddr *) &raddr, 1);
+	err = sock->ops->getname(new_sock, (struct sockaddr *) &raddr,
+			&raddrlen, 1);
 	if (err < 0) {
 		printk(LOG_LEVEL "can't find peer name\n");
 		goto out_release_new_sock;
 	}
-	print_sock_address(raddr);
 
 	return 0;
 

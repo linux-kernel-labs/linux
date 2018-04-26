@@ -1,5 +1,5 @@
 /*
- * SO2 - Networking Lab (#10)
+ * SO2 - Networking Lab (#11)
  *
  * Exercise #1, #2: simple netfilter module
  *
