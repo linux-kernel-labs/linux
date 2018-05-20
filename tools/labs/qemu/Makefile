@@ -84,14 +84,8 @@ disk2.img:
 	qemu-img create -f raw $@ 100M
 
 clean::
-<<<<<<< HEAD
 	-rm -f .modinst
 	-rm -f disk1.img disk2.img
 	-rm -f pipe1.in pipe1.out pipe2.in pipe2.out
 
 .PHONY: boot gdb clean tap0 tap1
-=======
-	rm -f .modinst disk1.img disk2.img
-
-.PHONY: clean tap0 tap1
->>>>>>> tools:labs: Add white spaces to Makefile
