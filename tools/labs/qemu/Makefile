@@ -3,15 +3,15 @@ ARCH ?= x86
 ifeq ($(ARCH),x86)
 b = b
 endif
-ZIMAGE=$(KDIR)/arch/$(ARCH)/boot/$(b)zImage
-KCONFIG=$(KDIR)/.config
+ZIMAGE = $(KDIR)/arch/$(ARCH)/boot/$(b)zImage
+KCONFIG = $(KDIR)/.config
 
-YOCTO_URL=http://downloads.yoctoproject.org/releases/yocto/yocto-2.3/machines/qemu/qemu$(ARCH)/
-YOCTO_IMAGE=core-image-minimal-qemu$(ARCH).ext4
-#YOCTO_IMAGE=core-image-minimal-dev-qemu$(ARCH).ext4
-#YOCTO_IMAGE=core-image-sato-dev-qemu$(ARCH).ext4
-#YOCTO_IMAGE=core-image-sato-qemu$(ARCH).ext4
-#YOCTO_IMAGE=core-image-sato-sdk-qemu$(ARCH).ext4
+YOCTO_URL = http://downloads.yoctoproject.org/releases/yocto/yocto-2.3/machines/qemu/qemu$(ARCH)/
+YOCTO_IMAGE = core-image-minimal-qemu$(ARCH).ext4
+#YOCTO_IMAGE = core-image-minimal-dev-qemu$(ARCH).ext4
+#YOCTO_IMAGE = core-image-sato-dev-qemu$(ARCH).ext4
+#YOCTO_IMAGE = core-image-sato-qemu$(ARCH).ext4
+#YOCTO_IMAGE = core-image-sato-sdk-qemu$(ARCH).ext4
 
 QEMU_OPTS = -kernel $(ZIMAGE) \
 	-device virtio-serial \
@@ -75,6 +75,7 @@ pipe2.out: pipe1.in
 
 disk1.img:
 	qemu-img create -f raw $@ 100M
+
 disk2.img:
 	qemu-img create -f raw $@ 100M
 
@@ -82,4 +83,3 @@ clean::
 	rm -f .modinst disk1.img disk2.img
 
 .PHONY: clean tap0 tap1
-
