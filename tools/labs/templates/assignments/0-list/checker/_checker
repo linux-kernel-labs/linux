@@ -60,7 +60,7 @@ basic_test()
 }
 
 module="list"
-module_file="$module".ko
+module_file=../"$module".ko
 proc_folder="/proc/list"
 preview="$proc_folder/preview"
 management="$proc_folder/management"
