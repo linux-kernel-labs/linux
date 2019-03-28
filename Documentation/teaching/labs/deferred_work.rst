@@ -594,7 +594,7 @@ For example, the following call:
 
 Will create a thread kernel with the name mykthread0.
 
-The kernel thread created with this function will stopped (in the
+The kernel thread created with this function will be stopped (in the
 *TASK_INTERRUPTIBLE* state). To start the kernel thread, call the
 :c:func:`wake_up_process`:
 
@@ -799,7 +799,7 @@ type operation and its parameters (if any) on the command line.
 
 	  .. code-block:: c
 
-	     ./test with 3
+	     ./test s 3
 
 	  To disable the timer use:
 
