@@ -35,7 +35,7 @@ There will be a file system that will be the root, the rest being mounted in its
 The general file system model
 =============================
 
-The general file system model, to which any implemented file system needs to be reduced, consists of several well-defined entities: :c:type:`superblock`, :c:type:`inode`, :c:type:`file`, and :c:type:`dentry`.
+The general file system model, to which any implemented file system needs to be reduced, consists of several well-defined entities: :c:type:`superbloc`, :c:type:`inode`, :c:type:`file`, and :c:type:`dentry`.
 These entities are file system metadata (they contain information about data or other metadata).
 
 Model entities interact using some VFS or kernel subsystems: dentry cache, inode cache, buffer cache.
@@ -69,7 +69,7 @@ An inode stores information like:
   * file size;
   * access rights;
   * access or modify time;
-  * location of data on the disk (pointers to disk blocks containing data).
+  * location of data on the dick (pointers to disk blocks containing data).
 
 .. note::
   Usually, the inode does not contain the file name. The name is stored by the :c:type:`dentry` entity. This way, an inode can have multiple names (hardlinks).
@@ -92,7 +92,7 @@ Each inode is generally identified by a number. On Linux, the ``-i`` argument of
 file
 ----
 
-File is the component of the file system model that is closest to the user.
+File is the component of the file system model that is closest the user.
 The structure exists only as a VFS entity in memory and has no physical correspondent on disk.
 
 While the inode abstracts a file on the disk, the file structure abstracts an open file.
@@ -130,7 +130,6 @@ Register and unregister filesystems
 ===================================
 
 In the current version, the Linux kernel supports about 50 file systems, including:
-
   * ext2/ ext4
   * reiserfs
   * xfs
@@ -200,16 +199,14 @@ Functions mount, kill_sb
 ------------------------
 
 When mounting  the file system, the kernel calls the mount function defined within the structure :c:type:`file_system_type`. The function makes a set of initializations and returns a dentry (the structure :c:type:`struct dentry`) that represents the mount point directory. Usually :c:func:`mount` is a simple function that calls one of the functions:
-
   * :c:func:`mount_bdev`, which mounts a file system stored on a block device
   * :c:func:`mount_single`, which mounts a file system that shares an instance between all mount operations
   * :c:func:`mount_nodev`, which mounts a file system that is not on a physical device
   * :c:func:`mount_pseudo`, a helper function for pseudo-file systems (``sockfs``, ``pipefs``, generally file systems that can not be mounted)
 
-These functions get as parameter a pointer to a function :c:func:`fill_super` that will be called after the superblock initialization to finish its initialization by the driver. An example of such a function can be found in the ``fill_super`` section.
+These functions get as parameter a pointer to a function :c:func:`fill_super` that will be called after the superblock initialization to finish the its initialization it by the driver. An example of such a function can be found in the ``fill_super`` section.
 
 When unmounting the file system, the kernel calls :c:func:`kill_sb`, which performs cleanup operations and invokes one of the functions:
-
   * :c:func:`kill_block_super`, which unmounts a file system on a block device
   * :c:func:`kill_anon_super`, which unmounts a virtual file system (information is generated when requested)
   * :c:func:`kill_litter_super`, which unmounts a file system that is not on a physical device (the information is kept in memory)
@@ -283,21 +280,21 @@ The superblock can be viewed as an abstract object to which its own data is adde
 Superblock operations
 ---------------------
 
-The superblock operations are described by the :c:type:`struct super_operations` structure:
+The superbloc operations are described by the :c:type:`struct super_operations` structure:
 
 .. code-block:: c
 
-	struct super_operations {
-	       //...
-	       int (*write_inode) (struct inode *, struct writeback_control *wbc);
-	       struct inode *(*alloc_inode)(struct super_block *sb);
-	       void (*destroy_inode)(struct inode *);
-	 
-	       void (*put_super) (struct super_block *);
-	       int (*statfs) (struct dentry *, struct kstatfs *);
-	       int (*remount_fs) (struct super_block *, int *, char *);
-	       //...
-	};
+  struct super_operations {
+        // ...
+        int ( * write_inode ) ( struct inode *, struct writeback_control * wbc ) ;
+        structure inode * ( * alloc_inode ) ( struct super_block * sb ) ;
+        void ( * destroy_inode ) ( struct inode * ) ;
+
+        void ( * put_super ) ( struct super_block * ) ;
+        int ( * statfs ) ( struct dentry *, struct kstatfs * ) ;
+        int ( * remount_fs ) ( super_block structure *, int *, char * ) ;
+        // ...
+  } ;
 
 The fields of the structure are function pointers with the following meanings:
 
@@ -317,51 +314,50 @@ An example of implementation is the :c:func:`ramfs_fill_super` function which is
 
 .. code-block:: c
 
-	#include <linux/pagemap.h>
-	 
-	#define RAMFS_MAGIC     0x858458f6
-	 
-	static const struct super_operations ramfs_ops = {
-		.statfs         = simple_statfs,
-		.drop_inode     = generic_delete_inode,
-		.show_options   = ramfs_show_options,
-	};
-	 
-	static int ramfs_fill_super(struct super_block *sb, void *data, int silent)
-	{
-		struct ramfs_fs_info *fsi;
-		struct inode *inode;
-		int err;
-	 
-		save_mount_options(sb, data);
-	 
-		fsi = kzalloc(sizeof(struct ramfs_fs_info), GFP_KERNEL);
-		sb->s_fs_info = fsi;
-		if (!fsi)
-			return -ENOMEM;
-	 
-		err = ramfs_parse_options(data, &fsi->mount_opts);
-		if (err)
-			return err;
-	 
-		sb->s_maxbytes          = MAX_LFS_FILESIZE;
-		sb->s_blocksize         = PAGE_SIZE;
-		sb->s_blocksize_bits    = PAGE_SHIFT;
-		sb->s_magic             = RAMFS_MAGIC;
-		sb->s_op                = &ramfs_ops;
-		sb->s_time_gran         = 1;
-	 
-		inode = ramfs_get_inode(sb, NULL, S_IFDIR | fsi->mount_opts.mode, 0);
-		sb->s_root = d_make_root(inode);
-		if (!sb->s_root)
-			return -ENOMEM;
-	 
-		return 0;
-	}
+  #include <linux / pagemap.h>
 
+  #define RAMFS_MAGIC 0x858458f6
+
+  static const struct super_operations ramfs_ops = {
+          .  statfs = simple_statfs ,
+          .  drop_inode = generic_delete_inode ,
+          .  show_options = ramfs_show_options ,
+  } ;
+
+  static int ramfs_fill_super ( super_block structure * sb , void * data , int silent )
+  {
+          struct ramfs_fs_info * fsi ;
+          struct inode * inode ;
+          int err ;
+
+          save_mount_options ( sb , data ) ;
+
+          fsi = kzaloc ( sizeof ( struct ramfs_fs_info ) , GFP_KERNEL ) ;
+          sb -> s_fs_info = fsi ;
+          if ( ! fsi )
+                  return - ENOM ;
+
+          err = ramfs_parse_options ( data , & fsi -> mount_opts ) ;
+          if ( err )
+                  return err ;
+
+          sb -> s_maxbytes = MAX_LFS_FILESIZE ;
+          sb -> s_blocksize = PAGE_SIZE ;
+          sb -> s_blocksize_bits = PAGE_SHIFT ;
+          sb -> s_magic = RAMFS_MAGIC
+          sb -> s_op = & ramfs_ops ;
+          sb -> s_time_gran = 1 ;
+
+          inode = ramfs_get_inode ( sb , NULL , S_IFDIR | fsi -> mount_opts mode , 0 ) ;
+          sb - & s_root = d_make_root ( inode ) ;
+          if ( ! sb -> s_root )
+                  return - ENOM ;
+
+          return 0 ;
+  }
 
 The kernel provides generic function to implement operations with file system structures.
-The :c:func:`generic_delete_inode` and :c:func:`simple_statfs` functions used in the above code are such functions and can be used to implement the drivers if their functionality is sufficient.
+The :c:func:`generic_drop_inode` and :c:func:`simple_statfs` functions used in the above code are such functions and can be used to implement the drivers if their functionality is sufficient.
 
 The :c:func:`ramfs_fill_super` function in the above code fills some fields in the superblock, then reads the root inode and allocates the root dentry.
 Reading the root inode is done in the :c:func:`ramfs_get_inode` function, and consists of allocating a new inode using :c:func:`new_inode` and initializing it. In order to free the inode, :c:func:`iput` is used, and :c:func:`d_make_root` is used to allocate the root dentry.
@@ -369,7 +365,7 @@ Reading the root inode is done in the :c:func:`ramfs_get_inode` function, and co
 An example implementation for a disk file system is the :c:func:`minix_fill_super` function in the minix file system.
 The functionality for the disk file system is similar to that of the virtual file system, with the exception of using the buffer cache.
 Also, the minix file system keeps private data using the :c:type:`struct minix_sb_info` structure.
-A large part of this function deals with the initialization of these private data.
+A large part of this function deals with the initialization of these private data (not included in the code snippet above for clarity).
 The private data is allocated using the :c:func:`kzalloc` function and stored in the ``s_fs_info`` field of the superblock structure.
 
 VFS functions typically get as arguments the superblock, an inode and/or a dentry that contain a pointer to the superblock so that these private data can be easily accessed.
@@ -380,7 +376,7 @@ Buffer cache
 ============
 
 Buffer cache is a kernel subsystem that handles caching (both read and write) blocks from block devices.
-The base entity used by buffer cache is the :c:type:`struct buffer_head` structure.
+The base entity used by cache buffer is the :c:type:`struct buffer_head` structure.
 The most important fields in this structure are:
 
   * ``b_data``, pointer to a memory area where the data was read from or where the data must be written to
@@ -442,11 +438,12 @@ Further reading
 Exercises
 =========
 
-.. include:: ../labs/exercises-summary.hrst
-.. |LAB_NAME| replace:: filesystems
+.. important::
 
-..
-  _[SURVEY-LABEL]
+   .. include:: exercises-summary.hrst
+
+   .. |LAB_NAME| replace:: filesystems
+
 
 myfs
 ----
@@ -463,9 +460,9 @@ The first step in working with the file system is to register and unregister it.
 The steps you need to take are described in the section :ref:`RegisterUnregisterSection`. Use the ``"myfs"`` string for the file system name.
 
 .. note::
-  Within the file system structure, use the ``myfs_mount`` function present in the code skeleton to fill the superblock (done when mounting). In ``myfs_mount`` call the function specific to a file system without disk support. As an argument for the specific mount function, use the function of type ``fill_super`` defined in the code skeleton. You can review the :ref:`FunctionsMountKillSBSection` section.
+  Within the file system structure, use the ``myfs_mount`` function present in the code skeleton to fill the superblock (done when mounting). In ``myfs_mount`` call the function specific to a file system without disk support (TODO). As an argument for the specific mount function, use the function of type ``fill_super`` defined in the code skeleton.
 
-  To destroy the superblock (done at unmounting) use ``kill_litter_super``, also a function specific to a file system without disk support. The function is already implemented, you need to fill it in the :c:type:`struct file_system_type` structure.
+  To destroy the superblock (done at unmounting) use ``kill_litter_super``, also a function specific to a file system without disk support.
 
 
 After completing the sections marked with ``TODO 1`` , compile the module, copy it to the QEMU virtual machine, and start the virtual machine. Load the kernel module and then check the presence of the ``myfs`` file system within the ``/proc/filesystems`` file.
@@ -492,13 +489,13 @@ The error message we get shows that we have not implemented the operations that 
 2. Completing myfs superblock
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To be able to mount the file system, we need to fill its superblock's fields, that is, a generic VFS structure of type :c:type:`struct super_block`.
+To be able to mount the file system, we need to complete its superblock, that is, a generic VFS structure of type :c:type:`struct super_block`.
 We will fill out the structure within the :c:func:`myfs_fill_super` function; the superblock is represented by the variable ``sb`` passed as an argument to the function.
 Follow the hints marked with ``TODO 2``.
 
 .. note::
 
-  To fill the ``myfs_fill_super`` function, you can start from the example in the section :ref:`FillSuperSection`.
+  To complete the ``myfs_fill_super`` function, you can start from the example in the section :ref:`FillSuperSection`.
 
   For the superblock structure fields, use the macros defined within the code skeleton wherever possible.
 
@@ -526,22 +523,22 @@ Typically, this function is used to create and initialize all inodes; In this ex
 
 The :c:type:`inode` is allocated inside the ``myfs_get_inode`` function (local variable ``inode``, allocated using the :c:func:`new_inode` function call).
 
-To successfully complete mounting the file system, you will need to fill the ``myfs_get_inode`` function. Follow directions marked with ``TODO 3``. A starting point is the `ramfs_get_inode <https://elixir.bootlin.com/linux/latest/source/fs/ramfs/inode.c#L63>`_ function.
+To successfully complete mounting the file system, you will need to fill the ``myfs_get_inode`` function. Follow directions marked with ``TODO 3``. A starting point is the :c:func:`ramfs_get_inode` function.
 
 .. note::
 
-  To initialize ``uid``, ``gid`` and ``mode`` , you can use the :c:func:`inode_init_owner` function as it is used in :c:func:`ramfs_get_inode`.
+  To initialize ``uid`` ,``gid`` and ``mode`` , you can use the :c:func:`inode_init_owner` function as it is used in :c:func:`ramfs_get_inode`.
   When you call :c:func:`inode_init_owner`, use ``NULL`` as the second parameter because there is no parent directory for the created inode.
 
-  Initialize the ``i_atime``, ``i_ctime``, and ``i_mtime`` of the VFS inode to the value returned by the :c:func:`current_time` function.
+  Initialize the ``i_atime``, ``i_atime``, and ``i_mtime`` of the VFS inode to the value returned by the :c:func:`current_time` function.
 
   You will need to initialize the operations for the inode of type directory. To do this, follow the steps:
 
     #. Check if this is a directory type inode using the ``S_ISDIR`` macro.
     #. For the ``i_op`` and ``i_fop`` fields, use kernel functions that are already implemented:
 
-       * for ``i_op``: :c:type:`simple_dir_inode_operations`.
-       * for ``i_fop``: :c:type:`simple_dir_operations`
+       * for ``i_op``: :c:func:`simple_dir_inode_operations`.
+       * for ``i_fop``: :c:func:`simple_dir_operations`
 
     #. Increase the number of links for the directory using the :c:func:`inc_nlink` function.
 
@@ -568,7 +565,7 @@ We check myfs file system statistics using the following command:
 
 .. code-block:: console
 
-  stat -f /mnt/myfs
+  state -f / mnt / myfs
 
 We want to see what the mount point ``/mnt/myfs`` contains and if we can create files.
 For this we run the commands:
@@ -621,10 +618,10 @@ The rest of the operations will be implemented in the next lab.
 
 Follow the diagram below to clarify the role of structures within the ``minfs`` file system.
 
-.. image:: ../res/minfs.png
+.. image:: minfs.png
 
-1. Registering and unregistering the minfs file system
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1. Registering and unregister the minfs file system
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. note::
 
@@ -632,17 +629,17 @@ Follow the diagram below to clarify the role of structures within the ``minfs`` 
 
   .. code-block:: console
 
-    dd if=/dev/zero of=mydisk.img bs=1M count=100
+    dd if=/dev/zero of=qemu/mydisk.img bs=1M count=100
 
-  and add the ``-drive file=mydisk.img,if=virtio,format=raw`` argument to the ``qemu`` command in ``qemu/Makefile`` (in the ``QEMU_OPTS`` variable).
+  and add the ``-drive file=qemu/mydisk.img,if=virtio,format=raw`` argument to the ``qemu`` command in ``qemu/Makefile`` (in the ``QEMU_OPTS`` variable).
   The new argument for the ``qemu`` command must be added after the one for the existing disk (``YOCTO_IMAGE``).
 
-To register and unregister the file system, you will need to fill the ``minfs_fs_type`` and ``minfs_mount`` functions in ``minfs.c``. Follow the directions marked with ``TODO 1``.
+To register and register the file system, you will need to fill the ``minfs_fs_type`` and ``minfs_mount`` functions in ``minfs.c``. Follow the directions marked with ``TODO 1``.
 
 .. note::
 
   In the file system structure, for mount, use the ``minfs_mount`` function from in the code skeleton.
-  In this function, call the function to mount a file system with disk support (See the :ref:`FunctionsMountKillSBSection` section. Use :c:func:`mount_bdev`).
+  In this function, call the function to mount a file system with disk support (see :ref:`FunctionsMountKillSBSection` use :c:func:`mount_bdev`).
   Choose the most suitable function for destroying the superblock (done at unmount); keep in mind that it is a file system with disk support. Use the :c:func:`kill_block_super` function.
 
   Initialize the ``fs_flags`` field of the :c:type:`minfs_fs_type` structure with the appropriate value for a file system with disk support. See the section :ref:`RegisterUnregisterSection`.
@@ -654,11 +651,11 @@ Load the kernel module and then check the presence of the ``minfs`` file system 
 
 To test the mounting of the ``minfs`` file system we will need to format the disk with its structure. Formatting requires the ``mkfs.minfs`` formatting tool from the ``minfs/user`` directory. The utility is automatically compiled when running ``make build`` and copied to the virtual machine at ``make copy``.
 
-After compiling, copying, and starting the virtual machine, format the ``/dev/vdd`` using the formatting utility:
+After compiling, copying, and starting the virtual machine, format the ``/dev/vdX`` using the formatting utility:
 
 .. code-block:: console
 
-  # ./mkfs.minfs /dev/vdd
+  # ./mkfs.minfs /dev/vdX
 
 Load the kernel module:
 
@@ -674,18 +671,16 @@ Create mount point ``/mnt/minfs/``:
 
 and mount the filesystem
 
-.. code-block:: console
-
-  # mount -t minfs /dev/vdd /mnt/minfs/
+  # mount -t minfs /dev/vdX /mnt/minfs/
 
 The operation fails because the root inode is not initialized.
 
 2. Completing minfs superblock
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To be able to mount the file system, you will need to fill the superblock (i.e a structure with type :c:type:`struct super_block`) within the ``minfs_fill_super`` function; it is the ``s`` argument of the function.
+To be able to mount the file system, you will need to fill the superloclock (i.e a structure with type :c:type:`struct super_block`) within the ``minfs_fill_super`` function; it is the ``s`` argument of the function.
 The structure of operations on the superblock is already defined: ``minfs_ops``.
-Follow the directions marked with ``TODO 2``. You can also follow the implementation of the `minix_fill_super <https://elixir.bootlin.com/linux/latest/source/fs/minix/inode.c#L153>`_ function.
+Follow the directions marked with ``TODO 2``. You can also follow the implementation of the ``minix_fill_super`` function.
 
 .. note::
 
@@ -703,7 +698,7 @@ Follow the directions marked with ``TODO 2``. You can also follow the implementa
 To check the functionality, we need a function for reading the root inode.
 For the time being, use the ``myfs_get_inode`` function from ``myfs`` file system exercises.
 Copy the function into the source code and call it the same as you did for myfs.
-The third argument when calling the ``myfs_get_inode`` function is the inode creation permissions, similar to the virtual file system exercise (myfs).
+The second argument when calling the ``myfs_get_inode`` function is the inode creation permissions, similar to the virtual file system exercise (myfs).
 
 Validate the implementation by executing the commands from the previous exercise.
 
@@ -747,14 +742,14 @@ Make ``minfs_iget`` read the root minfs inode from the disk (:c:type:`struct min
 In the ``minfs_fill_super`` function, replace the ``myfs_get_inode`` call with the ``minfs_iget`` function call.
 
 .. note::
-  To implement the ``minfs_iget`` function, follow the implementation of `V1_minix_iget <https://elixir.bootlin.com/linux/v4.15/source/fs/minix/inode.c#L460>`_.
+  To implement the ``minfs_iget`` function, follow the implementation of :c:func:`V1_minix_iget`.
   To read a block, use the :c:func:`sb_bread` function.
-  Cast the read data (the ``b_data`` field of the :c:type:`struct buffer_head` structure) to the minfs inode from the disk (:c:type:`struct minfs_inode`).
+  Cast the read data (the ``b_data`` field of the :c:type:`struct structure_head` structure) to the minfs inode from the disk (:c:type:`struct minfs_inode`).
 
   The ``i_uid``, ``i_gid``, ``i_mode``, ``i_size`` must be filled in the VFS inode with the values in the minfs inode structure read from disk.
   To initialize the ``i_uid`` and ``i_gid fields``, use the functions :c:func:`i_uid_write` , and :c:func:`i_gid_write`.
 
-  Initialize the ``i_atime`` , ``i_ctime``, and ``i_mtime`` fields of the VFS inode to the value returned by the :c:func:`current_time` function.
+  Initialize the ``i_atime`` , ``i_atime``, and ``i_mtime`` fields of the VFS inode to the value returned by the :c:func:`current_time` function.
 
   You will need to initialize the operations for the inode with type directory. To do this, follow the steps:
 
