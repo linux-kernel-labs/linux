@@ -14,7 +14,7 @@ Inode
 
 The inode is an essential component of a UNIX file system and, at the same time, an important component of VFS. An inode is a metadata (it has information about information).
 An inode uniquely identifies a file on disk and holds information about it (uid, gid, access rights, access times, pointers to data blocks, etc.).
-An important aspect is that an inode does not have information about the file name (it is retained by the associated :c:type:`struct dentry` structure).
+An important aspect is that an inode does not have information about the file name (it is retained by the associated ``dentry`` structure).
 
 The inode refers to a file on the disk. To refer an open file (associated with a file descriptor within a process), the :c:type:`struct file` structure is used.
 An inode can have any number of (zero or more) ``file`` structures associated (multiple processes can open the same file, or a process can open the same file several times).
@@ -26,12 +26,12 @@ Like the other structures in VFS, :c:type:`struct inode` is a generic structure 
 The inode structure
 -------------------
 
-The inode structure is the same for all file systems. In general, file systems also have private information. These are referenced through the ``i_private`` field of the structure.
+The inode structure is the same for all file systems. In general, file systems also have particular information. These are referenced through the ``i_private`` field of the structure.
 Conventionally, the structure that keeps that particular information is called ``<fsname>_inode_info``, where ``fsname`` represents the file system name. For example, minix and ext4 filesystems store particular information in structures :c:type:`struct minix_inode_info`, or :c:type:`struct ext4_inode_info`.
 
 Some of the important fields of :c:type:`struct inode` are:
 
-  * ``i_sb`` : The superblock structure of the file system the inode belongs to.
+  * ``i_sb`` : The superblock structure of the file system to which the inode belongs to.
   * ``i_rdev``: the device on which this file system is mounted
   * ``i_ino`` : the number of the inode (uniquely identifies the inode within the file system)
   * ``i_blkbits``: number of bits used for the block size == log\ :sub:`2`\ (block size)
@@ -39,9 +39,9 @@ Some of the important fields of :c:type:`struct inode` are:
 
   * ``i_size``: file/directory/etc. size in bytes
   * ``i_mtime``, ``i_atime``, ``i_ctime``: change, access, and creation time
-  * ``i_nlink``: the number of names entries (dentries) that use this inode; for file systems without links (either hard or symbolic) this is always set to 1
-  * ``i_blocks``: the number of blocks used by the file (all blocks, not just data); this is only used by the quota subsystem
-  * ``i_op``, ``i_fop``: pointers to operations structures: :c:type:`struct inode_operations` and :c:type:`struct file_operations`; ``i_mapping->a_ops`` contains a pointer to :c:type:`struct address_space_operations`.
+  * ``i_nlink``: the number of names entries (dentries) that use this inode; for file systems without links (either hard or symbolic) is always set to 1
+  * ``i_blocks``: the number of blocks used by the file (all blocks, not just data); is only used by the quota subsystem
+  * ``i_op``, ``i_fop``: pointers to operations structures: c:type:`struct inode_operations` and :c:type:`struct file_operations`; ``i_mapping->a_ops`` contains a pointer to :c:type:`struct address_space_operations`.
   * ``i_count``: the inode counter indicating how many kernel components use it.
 
 Some functions that can be used to work with inodes:
@@ -51,7 +51,7 @@ Some functions that can be used to work with inodes:
 
     .. warning::
 
-      An inode created with :c:func:`new_inode` is not in the hash table, and unless you have serious reasons not to, you must enter it in the hash table;
+      An inode created with :c:func:`new_inode` is not in the hash table, and unless you have serious reasons, you must enter it in the hash table;
 
   * :c:func:`mark_inode_dirty`: marks the inode as dirty; at a later moment, it will be written on the disc;
   * :c:func:`iget_locked`: loads the inode with the given number from the disk, if it is not already loaded;
@@ -68,7 +68,7 @@ Getting an inode
 One of the main inode operations is obtaining an inode (the :c:type:`struct inode` in VFS).
 Until version ``2.6.24`` of the Linux kernel, the developer defined a ``read_inode`` function.
 Starting with version ``2.6.25``, the developer must define a ``<fsname>_iget`` where ``<fsname>`` is the name of the file system.
-This function is responsible with finding the VFS inode if it exists or creating a new one and filling it with the information from the disk.
+This function is responsible for finding the VFS inode if it exists or creating a new one and filling it with the information from the disk.
 
 Generally, this function will call :c:func:`iget_locked` to get the inode structure from VFS. If the inode is newly created then it will need to read the inode from the disk (using :c:func:`sb_bread`) and fill in the useful information.
 
@@ -112,7 +112,7 @@ Otherwise, the function calls the :c:func:`V1_minix_iget` function that will rea
 Superoperations
 ^^^^^^^^^^^^^^^
 
-Many of the superoperations (components of the :c:type:`struct super_operations` structure used by the superblock) are used when working with inodes. These operations are described next:
+Many of the superoperations (components of the :c:type:`struct super_operations` structure used by the superbloc) are used when working with inodes. These operations are described next:
 
   * ``alloc_inode``: allocates an inode.
     Usually, this funcion allocates a :c:type:`struct <fsname>_inode_info` structure and performs basic VFS inode initialization (using :c:func:`inode_init_once`);
@@ -130,8 +130,8 @@ Many of the superoperations (components of the :c:type:`struct super_operations`
   * ``evict_inode``: removes any information about the inode with the number received in the ``i_ino`` field from the disk and memory (both the inode on the disk and the associated data blocks). This involves performing the following operations:
 
     * delete the inode from the disk;
-    * updates disk bitmaps (if any);
-    * delete the inode from the page cache by calling :c:func:`truncate_inode_pages`;
+    * updates disk bitmaps (if any)
+    * delete the inode the page cache by calling :c:func:`truncate_inode_pages`;
     * delete the inode from memory by calling :c:func:`clear_inode` ;
     * an example is the :c:func:`minix_evict_inode` function from the minix file system.
 
@@ -151,12 +151,12 @@ The operations of an inode are initialized and accessed using the ``i_op`` field
 The file structure
 ==================
 
-The ``file`` structure corresponds to a file open by a process and exists only in memory, being associated with an inode.
-It is the closest VFS entity to user-space; the structure fields contain familiar information of a user-space file (access mode, file position, etc.) and the operations with it are performed by known system calls (``read``, ``write`` , etc.).
+The ``file`` structure corresponds to a file open by a process and exists only in memory, being associated with an inode
+It is the VFS entity closest to user-space; the structure fields contain familiar information of a user-space file (access mode, file position, etc.) and the operations with it are known system calls (``read``, ``write`` , etc.).
 
 The file operations are described by the :c:type:`struct file_operations` structure.
 
-The file operations for a file system are initialized using the ``i_fop`` field of the :c:type:`struct inode` structure.
+To file operations for a file system are initialozed using the ``i_fop`` field of the :c:type:`struct inode` structure.
 When opening a file, the VFS initializes the ``f_op`` field of the :c:type:`struct file` structure with address of ``inode->i_fop``, such that subsequent system calls use the value stored in the ``file->f_op``.
 
 .. _FileInodes:
@@ -172,7 +172,7 @@ The type of the inode determines the operations that it needs to implement.
 Regular files inode operations
 ------------------------------
 
-In the ``minix`` file system, the ``minix_file_inode_operations`` structure is defined for the operations on an inode and for the file operations the ``minix_file_operations`` structure is defined:
+In the ``minix`` file system, the ``minix_file_inode_operations`` structure is defined for the operations on an inode and for the file operations the ``minix_file_operations structure`` is defined:
 
 .. code-block:: c
 
@@ -313,10 +313,10 @@ Most of the specific functions are very easy to implement, as follows:
            return generic_block_bmap(mapping, block, minix_get_block);
   }
 
-All that needs to be done is to implement :c:type:`minix_get_block`, which has to translate a block of a file into a block on the device.
+All that needs to be done is implement :c:type:`minix_get_block`, which has to translate a block of a file into a block on the device.
 If the flag ``create`` received as a parameter is set, a new block must be allocated.
 In case a new block is created, the bit map must be updated accordingly.
-To notify the kernel not to read the block from the disk, ``bh`` must be marked with :c:func:`set_buffer_new`. The buffer must be associated with the block through :c:func:`map_bh`.
+To notify the kernel not to read the block from the disk, ``bh`` must be marked bh with :c:func:`set_buffer_new`. The buffer must be associated with the block through :c:func:`map_bh`.
 
 Dentry structure
 ================
@@ -357,12 +357,12 @@ The most commonly operations applied to dentries are:
 
   * ``d_make_root``: allocates the root dentry. It is generally used in the function that is called to read the superblock (``fill_super``), which must initialize the root directory.
     So the root inode is obtained from the superblock and is used as an argument to this function, to fill the ``s_root`` field from the :c:type:`struct super_block` structure.
-  * ``d_add``: associates a dentry with an inode; the dentry received as a parameter in the calls discussed above signifies the entry (name, length) that needs to be created. This function will be used when creating/loading a new inode that does not have a dentry associated with it and has not yet been introduced to the hash table of inodes (at ``lookup``);
-  * ``d_instantiate``: The lighter version of the previous call, in which the dentry was previously added in the hash table.
+  * ``d_add``: associates a dentry with an inode; the dentry received as a parameter in the calls discussed above signifies the entry (name, length) that needs to be created. This function will be used when creating/loading a new inode that does not have a dentry associated with it and has not yet been introduced to the hash (at ``lookup``);
+  * ``d_instantiate``: The lighter version of the previous call, in which the dentry was previously added in hash.
 
 .. warning::
 
-  ``d_instantiate`` must be used to implement create calls (``mkdir``, ``mknod``, ``rename``, ``symlink``) and  NOT ``d_add``.
+  ``d_instantiate`` must be used for create calls (``mkdir``, ``mknod``, ``rename``, ``symlink``) and  NOT ``d_add``.
 
 .. _DirectoryInodes:
 
@@ -413,7 +413,7 @@ The inode creation function is indicated by the field ``create`` in the ``inode_
 In the minix case, the function is :c:func:`minix_create`.
 This function is called by the ``open`` and ``creat`` system calls. Such a function performs the following operations:
 
-  #. Introduces a new entry into the physical structure on the disk; the update of the bit maps on the disk must not be forgotten.
+  #. Introduces a new entry into the physical structure on the disk; the update of the bit maps on the disk must bot be forgotten.
   #. Configures access rights to those received as a parameter.
   #. Marks the inode as dirty with the :c:func:`mark_inode_dirty` function.
   #. Instantiates the directory entry (``dentry``) with the ``d_instantiate`` function.
@@ -602,8 +602,11 @@ Further reading
 Exercises
 =========
 
-.. include:: ../labs/exercises-summary.hrst
-.. |LAB_NAME| replace:: filesystems
+.. important::
+
+   .. include:: exercises-summary.hrst
+
+   .. |LAB_NAME| replace:: filesystems
 
 .. important::
 
@@ -626,7 +629,7 @@ At the end of these exercises, we will be able to create, modify and delete regu
 We will mostly use the ``inode`` and ``dentry`` VFS structures.
 The ``inode`` structure defines a file (of any type: regular, directory, link), while the ``dentry`` structure defines a name, which is an entry in a directory.
 
-For this we will access the ``myfs`` directory in the lab skeleton.
+For this we will access the ``myfs/kernel`` directory in the lab skeleton.
 The previously generated skeleton contains the solution for the previous lab; we will start from this. As in the previous lab, we will use the ``ramfs`` file system as a starting point.
 
 1. Directory operations
@@ -650,7 +653,7 @@ You will need to specify the following directory operations:
   * rename (``rename`` function)
 
 For this, define the ``myfs_dir_inode_operations`` structure in the code, where marked with ``TODO 5``.
-To begin, just define the structure ``myfs_dir_inode_operations``; you will define the structures ``myfs_file_operations``, ``myfs_file_inode_operations`` , and ``myfs_aops`` in the next exercise.
+To begin, just define the structure ``myfs_dir_inode_operations``; you will define the structures ``myfs_file_inode_operations``, ``myfs_file_inode_operations`` , and ``myfs_aops`` in the next exercise .
 
 .. tip::
 
@@ -658,7 +661,7 @@ To begin, just define the structure ``myfs_dir_inode_operations``; you will defi
 
   As a model, you are following the ``ramfs_dir_inode_operations`` structure.
 
-Implement the ``mkdir``, ``mknod`` and ``create`` operations inside ``myfs_mkdir``, ``myfs_mknod`` and ``myfs_create``.
+Implement the ``mkdir`` and ``creatr`` operations inside ``myfs_mkdir`` and ``myfs_create``.
 These operations will allow you to create directories and files in the file system.
 
 .. tip::
@@ -731,7 +734,6 @@ To unload the kernel module, use the command
 
 .. code-block:: console
 
-  umount /mnt/myfs
   rmmod myfs
 
 To test the functionality provided by the kernel module, we can use the dedicated script ``test-myfs-1.sh``.
@@ -741,7 +743,7 @@ If the implementation is correct, no error messages will be displayed.
 ^^^^^^^^^^^^^^^^^^
 
 We want to implement the operations for working with files, which are used for accessing a file's content: read, write, truncate, etc.
-For this you will specify the operations described in the structures :c:type:`struct inode_operations`, :c:type:`struct file_operations` and :c:type:`struct address_space_operations`.
+For this you will specify the operations described in the structures :c:type:`struct inode_operations`, c:type:`struct file_operations` and c:type:`struct address_space_operations`.
 
 Follow the locations marked with ``TODO`` 6 which will guide you through the steps you need to take.
 
@@ -769,7 +771,7 @@ Continue with defining the structure ``myfs_aops``.
 
   Use the generic functions provided by VFS.
 
-  An implementation example is the ``ramfs`` file system: the ``ramfs_aops`` structure.
+  An implementation example is the ``ramfs`` file system: the :``ramfs_aops`` structure.
 
   You do not need to define the function of type ``set_page_dirty``.
 
@@ -797,7 +799,7 @@ If the implementation is correct, no error messages will be displayed when runni
 minfs
 -----
 
-For the exercises below, we will use the minfs file system whose development started in the previous lab.
+For the exercises below, we will use the minfs file system whose development we started in the previous lab.
 This is a file system with disk support.
 We stopped after mounting the file system and now we will continue with the operations on regular files and directories.
 At the end of these exercises we will be able to create and delete entries in the file system.
@@ -819,7 +821,7 @@ The formatting tool prepares a virtual machine disk using a command like
 
 After formatting, the disk has a structure like the one in the diagram below:
 
-.. image:: ../res/minfs_arch.png
+.. image:: minfs_arch.png
 
 As shown in the diagram, ``minfs`` is a minimalist file system.
 ``minfs`` contains a maximum of 32 inodes, each inode having a single data block (the file size is limited to block size).
@@ -875,7 +877,7 @@ Iterate over all the entries in the data block and fill the user space buffer in
   For each index, get the corresponding entry of the ``struct minfs_dir_entry`` by using pointer arithmetics on the ``bh->b_data`` field.
   Ignore dentries that have an ``ino`` field equal to 0. Such a dentry is a free slot in the director's dentry list.
 
-  For each valid entry, there is an existing call :c:func:`dir_emit` with the appropriate parameters. This is the call that sends the dentries to the caller (and then to user space).
+  For each valid entry, call :c:func:`dir_emit` with the appropriate parameters.
 
   Check the call examples in :c:func:`qnx6_readdir` and :c:func:`minix_readdir`.
 
@@ -891,7 +893,7 @@ To do this, we compile the kernel module (``make build``) and copy the result to
 
   .. code-block:: console
 
-    student@eg106:~/src/linux/tools/labs$ chmod +x skels/filesystems/minfs/user/test-minfs*.sh
+    student@eg106:~/so2/linux/tools/labs$ chmod +x skels/filesystems/minfs/user/test-minfs*.sh
 
 After we start the virtual machine, we format the ``/dev/vdb`` disk, create the mount point and mount the file system:
 
@@ -918,6 +920,8 @@ To test the functionality provided by the module, we can use the dedicated scrip
 
   # ./test-minfs-0.sh
   # ./test-minfs-1.sh
+
+If the implementation is correct, no error messages will be displayed when running the scripts above.
 
 2. Lookup operation
 ^^^^^^^^^^^^^^^^^^^
@@ -952,7 +956,7 @@ Iterating means going through the entries in the directory's data block (of type
   Store in the ``final_de`` variable the dentry found.
   If you do not find any dentry, then the ``final_de`` variable will have the value ``NULL``, the value with which it was initialized.
 
-Comment the ``simple_lookup`` call in the ``minfs_lookup`` function to invoke the implementation of ``minfs_readdir``.
+Update the ``lookup`` field of the ``minfs_dir_inode_operations`` structure, structure of type :c:type:`inode_operations`.
 
 Testing
 """""""
@@ -990,7 +994,7 @@ If the implementation is correct, no error messages will be displayed when runni
   We notice that we get an error because we did not implement the directory operations that allow us to create a file.
   We will do this for the next exercise.
 
-3. Create operation
+2. Create operation
 ^^^^^^^^^^^^^^^^^^^
 
 In order to allow the creation of a file in a directory, we must implement the ``create`` operation.
@@ -1005,11 +1009,13 @@ Follow directions marked with ``TODO 7`` which will guide you through the steps 
 
   Inspect the code in the ``minfs_create`` and the skeleton of functions ``minfs_new_inode`` and ``minfs_add_link``.
 
+Complete the functions ``minfs_readdir`` and ``minfs_find_entry`` with the implementation from the previous exercise.
+
 Implement the function ``minfs_new_inode``. Inside this function you will create (using :c:func:`new_inode`) and initialize an inode. The initialization is done using the data from disk.
 
 .. tip::
 
-  Use the :c:func:`minix_new_inode` function as a model.
+  Use the :c:func:`minix_new_inode`` function as a model.
   Find the first free inode in imap (``sbi->imap``).
   Use bitwise operations (``find_first_zero_bit`` and ``set_bit``).
   Read the :ref:`BitmapOperations` section.
@@ -1017,7 +1023,7 @@ Implement the function ``minfs_new_inode``. Inside this function you will create
   The buffer for the superblock (``sbi->sbh``) must be marked as dirty .
 
   You must initialize the usual fields as it is done for the ``myfs`` file system.
-  Initialize the ``i_mode`` field to ``0`` in the call to ``inode_init_owner``. It will be initialized in the caller later.
+  Initialize the ``i_mode`` field to ``0``. It will be initialized in the caller later.
 
 Implement the ``minfs_add_link`` function. The function adds a new dentry (``struct minfs_dir_entry``) to the parent directory data block (``dentry->d_parent->d_inode``).
 
@@ -1031,7 +1037,7 @@ For this, you will iterate over the directory data block and you will find the f
 .. tip::
 
   In order to work with the directory, get the inode of type ``struct minfs_inode_info`` corresponding to the parent directory (the **dir** inode).
-  Do not use the variable ``inode`` to get ``struct minfs_inode_info``; that inode belongs to the file, not to the parent directory inside which you want to add the link/dentry.
+  Do not use the variable ``inode`` to get ``struct_minfs_inode_info``; that inode belongs to the file, not to the parent directory inside which you want to add the link /dentry.
   To get the ``struct minfs_inode_info`` structure, use :c:func:`container_of`.
 
   The structure ``struct minfs_inode_info`` is useful for finding the directory data block (the one indicated by the ``dentry->d_parent->d_inode``, which is the ``dir`` variable).
@@ -1039,17 +1045,12 @@ For this, you will iterate over the directory data block and you will find the f
   This block contains the entries in the directory. Use :c:func:`sb_bread` to read the block and then ``bh->b_data`` to refer to the data.
   The block contains at most ``MINFS_NUM_ENTRIES`` entries of type ``struct minfs_dir_entry``.
 
-  If all entries are occupied, return ``-ENOSPC``.
+  If all entries are occupied, return -ENOSPC .
+
+  Get the entry name in the form of a string (``char *``) in the variable ``name``.
 
   Iterate over the entries in the data block using the variable ``de`` and extract the first free entry (for which the ``ino`` field is ``0``).
-
-  When you have found a free place, fill in the corresponding entry:
-
-    * the ``inode->i_ino`` field in ``de->ino``
-    * the ``dentry->d_name.name`` field in ``de->name``
-
-  Then mark the buffer dirty.
-
+  When you have found a free place, fill in the corresponding entry: the ``ino`` field and the ``name`` field in the ``de`` variable. You can use ``strcpy`` or ``memcpy`` to initialize the name to the contents of the ``name`` variable.
 
 Testing
 """""""
