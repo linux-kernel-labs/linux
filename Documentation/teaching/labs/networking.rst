@@ -988,7 +988,7 @@ Exercises
   is enabled via ``CONFIG_NETFILTER``. To activate it, run :command:`make menuconfig` in
   the :file:`linux` directory and check the ``Network packet filtering framework
   (Netfilter)`` option in ``Networking support -> Networking options``. If it
-  was not enabled, enable it (as builtin, not external mode - it must be
+  was not enabled, enable it (as builtin, not external module - it must be
   marked with ``*``).
 
 
