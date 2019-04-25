@@ -337,6 +337,7 @@ pointers for specific protocol implementations:
   				      struct sockaddr *addr,
   				      int peer);
   	//...
+  }
 
 The initialization of the ``ops`` field from :c:type:`struct socket` is done in
 the :c:func:`__sock_create` function, by calling the :c:func:`create` function,
