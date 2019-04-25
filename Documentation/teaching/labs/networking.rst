@@ -108,7 +108,7 @@ Creation is similar to calling the :c:func:`socket` function in user space, but 
 The parameters of these calls are as follows:
 
   * ``net``, where it is present, used as reference to the network namespace used;
-    we will usually initialize it with ``init_net:`;
+    we will usually initialize it with ``init_net``;
   * ``family`` represents the family of protocols used in the transfer of
     information; they usually begin with the ``PF_`` (Protocol Family) string;
     the constants representing the family of protocols used are found in
@@ -1234,7 +1234,7 @@ For sending the message use :c:func:`kernel_sendmsg`.
 
 The message transmission parameters are retrieved from the kernel space. Cast
 the :c:type:`struct iovec` structure pointer to a :c:type:`struct kvec` pointer
-in the :c:func:`kernel_sendmsg call`.
+in the :c:func:`kernel_sendmsg` call.
 
 .. hint::
 
