@@ -332,10 +332,10 @@ pointers for specific protocol implementations:
   	int		(*socketpair)(struct socket *sock1,
   				      struct socket *sock2);
   	int		(*accept)    (struct socket *sock,
-  				      struct socket *newsock, int flags);
+  				      struct socket *newsock, int flags, bool kern);
   	int		(*getname)   (struct socket *sock,
   				      struct sockaddr *addr,
-  				      int *sockaddr_len, int peer);
+  				      int peer);
   	//...
 
 The initialization of the ``ops`` field from :c:type:`struct socket` is done in
@@ -1123,6 +1123,9 @@ need to call ``sock->ops->...;`` examples of such functions you can call are
   how they are called in the :c:func:`sys_bind` and :c:func:`sys_listen` system
   call handlers.
 
+  Look for the system call handlers in the ``net/socket.c`` file in the Linux
+  kernel source code tree.
+
 .. note::
 
   For the second argument of the ``listen`` (backlog) call, use the
@@ -1151,8 +1154,13 @@ structure`_ sections.
 For the kernel space ``accept`` equivalent, see the system call handler for
 :c:func:`sys_accept4`. Follow the :c:func:`lnet_sock_accept` implementation, and
 how the ``sock->ops->accept`` call is used. Use ``0`` as the value for the
-second to last argument (``flags``), and ``false`` for the last argument
+second to last argument (``flags``), and ``true`` for the last argument
 (``kern``).
+
+.. note::
+
+  Look for the system call handlers in the ``net/socket.c`` file in the Linux
+  kernel source code tree.
 
 .. note::
 
