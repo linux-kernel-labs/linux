@@ -210,9 +210,9 @@ These functions get as parameter a pointer to a function :c:func:`fill_super` th
 
 When unmounting the file system, the kernel calls :c:func:`kill_sb`, which performs cleanup operations and invokes one of the functions:
 
-  * :c:func:`kill_block_super`, which unmounts a file system on a block device
-  * :c:func:`kill_anon_super`, which unmounts a virtual file system (information is generated when requested)
-  * :c:func:`kill_litter_super`, which unmounts a file system that is not on a physical device (the information is kept in memory)
+  * :c:func:`kill_block_super`, which unmounts a file system that is formatted on a block devic such as ``ext4`` or ``jfs``
+  * :c:func:`kill_litter_super`, which unmounts a file system that is not formatted on a physical device, but on memory (i.e. the file system layout is in kernel memory) such as ``ramfs``
+  * :c:func:`kill_anon_super`, which unmounts a virtual file system (i.e. there is no actual file system layout, rather data from kernel memory is available as files and folders to the user) such as ``procfs`` or ``sysfs``
 
 An example for a file system without disk support is the :c:func:`ramfs_mount` function in the ``ramfs`` file system:
 
