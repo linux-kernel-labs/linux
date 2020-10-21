@@ -446,7 +446,7 @@ that called the :c:func:`read` on that file.
 
 .. hint:: Use :c:func:`proc_create`. For the mode parameter, use 0,
           and for the parent parameter use NULL. Use
-          :c:func:`my_proc_file_ops` for operations.
+          :c:data:`struct file_operations my_proc_file_ops` for operations.
 
 In the module exit function, delete the :c:macro:`PROC_ENTRY_NAME` entry
 using :c:func:`remove_proc_entry`.
