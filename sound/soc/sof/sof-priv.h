@@ -20,6 +20,8 @@
 #include <uapi/sound/sof/fw.h>
 #include <sound/sof/ext_manifest.h>
 
+struct snd_sof_pcm_stream;
+
 /* debug flags */
 #define SOF_DBG_ENABLE_TRACE	BIT(0)
 #define SOF_DBG_RETAIN_CTX	BIT(1)	/* prevent DSP D3 on FW exception */
@@ -205,7 +207,7 @@ struct snd_sof_dsp_ops {
 
 	/* host read DSP stream data */
 	void (*ipc_msg_data)(struct snd_sof_dev *sdev,
-			     struct snd_pcm_substream *substream,
+			     struct snd_sof_pcm_stream *sps,
 			     void *p, size_t sz); /* mandatory */
 
 	/* host configure DSP HW parameters */
@@ -587,7 +589,7 @@ void sof_block_read(struct snd_sof_dev *sdev, u32 bar, u32 offset, void *dest,
 int sof_fw_ready(struct snd_sof_dev *sdev, u32 msg_id);
 
 void intel_ipc_msg_data(struct snd_sof_dev *sdev,
-			struct snd_pcm_substream *substream,
+			struct snd_sof_pcm_stream *sps,
 			void *p, size_t sz);
 int intel_ipc_pcm_params(struct snd_sof_dev *sdev,
 			 struct snd_pcm_substream *substream,

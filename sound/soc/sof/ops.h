@@ -402,10 +402,10 @@ snd_sof_pcm_platform_trigger(struct snd_sof_dev *sdev,
 
 /* host DSP message data */
 static inline void snd_sof_ipc_msg_data(struct snd_sof_dev *sdev,
-					struct snd_pcm_substream *substream,
+					struct snd_sof_pcm_stream *sps,
 					void *p, size_t sz)
 {
-	sof_ops(sdev)->ipc_msg_data(sdev, substream, p, sz);
+	sof_ops(sdev)->ipc_msg_data(sdev, sps, p, sz);
 }
 
 /* host configure DSP HW parameters */

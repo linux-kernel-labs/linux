@@ -17,6 +17,7 @@
 #include <linux/firmware/imx/dsp.h>
 
 #include "../ops.h"
+#include "../sof-audio.h"
 #include "imx-common.h"
 
 #define MBOX_OFFSET	0x800000
@@ -232,7 +233,7 @@ static int imx8m_get_bar_index(struct snd_sof_dev *sdev, u32 type)
 }
 
 static void imx8m_ipc_msg_data(struct snd_sof_dev *sdev,
-			       struct snd_pcm_substream *substream,
+			       struct snd_sof_pcm_stream *sps,
 			       void *p, size_t sz)
 {
 	sof_mailbox_read(sdev, sdev->dsp_box.offset, p, sz);

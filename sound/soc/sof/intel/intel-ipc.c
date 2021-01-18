@@ -18,6 +18,7 @@
 #include <sound/sof/stream.h>
 
 #include "../ops.h"
+#include "../sof-audio.h"
 #include "../sof-priv.h"
 
 struct intel_stream {
@@ -26,12 +27,13 @@ struct intel_stream {
 
 /* Mailbox-based Intel IPC implementation */
 void intel_ipc_msg_data(struct snd_sof_dev *sdev,
-			struct snd_pcm_substream *substream,
+			struct snd_sof_pcm_stream *sps,
 			void *p, size_t sz)
 {
-	if (!substream || !sdev->stream_box.size) {
+	if (!sps || !sdev->stream_box.size) {
 		sof_mailbox_read(sdev, sdev->dsp_box.offset, p, sz);
 	} else {
+		struct snd_pcm_substream *substream = sps->substream;
 		struct intel_stream *stream = substream->runtime->private_data;
 
 		/* The stream might already be closed */
