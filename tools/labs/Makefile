@@ -31,6 +31,26 @@ copy: $(YOCTO_IMAGE)
 	sudo umount $(TEMPDIR)
 	rmdir $(TEMPDIR)
 
+scp:
+	if  [ ! -e qemu.mon ]; then exit 1; fi
+	IP=$$(qemu/get_vm_ip.sh); \
+	if  [ -z "$$IP" ]; then exit 1; fi; \
+	modules=$$(find skels -type f \( -name *.ko -or -executable \)); \
+	echo -n $$modules | xargs -d ' ' --no-run-if-empty dirname | xargs ssh root@$$IP mkdir -p || true; \
+	echo -n $$modules | xargs -d ' ' -I _ --no-run-if-empty scp _ root@$$IP:_ || true; \
+	checkers=$$(find skels -type d \( -name checker \)); \
+	echo -n $$checkers | xargs -d ' ' --no-run-if-empty dirname | xargs ssh root@$$IP mkdir -p || true; \
+	echo -n $$checkers | xargs -d ' ' -I _ --no-run-if-empty scp -r _ root@$$IP:_ || true
+
+ssh:
+	if  [ ! -e qemu.mon ]; then exit 1; fi
+	IP=$$(qemu/get_vm_ip.sh); \
+	if  [ -z "$$IP" ]; then exit 1; fi; \
+	ssh root@$$IP
+
+ip:
+	qemu/get_vm_ip.sh
+
 docker-docs:
 	cd docker && docker-compose build docs-build
 	cd docker && UID=$(shell id -u) GID=$(shell id -g) docker-compose run docs-build bash -c "cd /linux/tools/labs && make docs"
@@ -57,4 +77,4 @@ clean::
 clean_skels:
 	rm -rf skels
 
-.PHONY: skels build copy docs docker-docs docker-kernel stop-docker-kernel clean clean_skels
+.PHONY: skels build copy scp ssh ip docs docker-docs docker-kernel stop-docker-kernel clean clean_skels
