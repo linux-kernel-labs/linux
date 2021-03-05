@@ -19,6 +19,8 @@ on a Debian/Ubuntu system:
 * ``kvm``
 * ``python3``
 * ``minicom``
+* ``bison``
+* ``flex``
 
 The virtual machine setup uses prebuild Yocto images that it downloads and a
 kernel image that it builds itself. The following images are supported:
