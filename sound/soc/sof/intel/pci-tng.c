@@ -153,8 +153,8 @@ const struct snd_sof_dsp_ops sof_tng_ops = {
 	.get_mailbox_offset = atom_get_mailbox_offset,
 	.get_window_offset = atom_get_window_offset,
 
-	.ipc_msg_data	= intel_ipc_msg_data,
-	.ipc_pcm_params	= intel_ipc_pcm_params,
+	.ipc_msg_data	= sof_ipc_msg_data,
+	.ipc_pcm_params	= sof_ipc_pcm_params,
 
 	/* machine driver */
 	.machine_select = atom_machine_select,
@@ -168,8 +168,8 @@ const struct snd_sof_dsp_ops sof_tng_ops = {
 	.dbg_dump	= atom_dump,
 
 	/* stream callbacks */
-	.pcm_open	= intel_pcm_open,
-	.pcm_close	= intel_pcm_close,
+	.pcm_open	= sof_stream_pcm_open,
+	.pcm_close	= sof_stream_pcm_close,
 
 	/* module loading */
 	.load_module	= snd_sof_parse_module_memcpy,
