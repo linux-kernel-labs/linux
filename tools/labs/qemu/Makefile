@@ -25,7 +25,7 @@ QEMU_OPTS = -kernel $(ZIMAGE) \
 	-drive file=disk1.img,if=virtio,format=raw \
 	-drive file=disk2.img,if=virtio,format=raw \
 	--append "root=/dev/vda loglevel=15 console=hvc0" \
-	--display $(QEMU_DISPLAY) -s -m 256
+	--display $(QEMU_DISPLAY) -s -m 512
 
 boot: .modinst tap0 tap1 pipe1.in pipe1.out pipe2.in pipe2.out disk1.img disk2.img nttcp-run
 	ARCH=$(ARCH) qemu/qemu.sh $(QEMU_OPTS)
@@ -33,6 +33,10 @@ boot: .modinst tap0 tap1 pipe1.in pipe1.out pipe2.in pipe2.out disk1.img disk2.i
 TEMPDIR := $(shell mktemp -u)
 
 $(KCONFIG): qemu/kernel_config.x86
+ifeq ($(ARCH),x86_64)
+	echo "CONFIG_64BIT=y" >> $^
+	echo "CONFIG_IA32_EMULATION=y" >> $^
+endif
 	cp $^ $@
 	$(MAKE) -C $(KDIR) oldnoconfig
 
