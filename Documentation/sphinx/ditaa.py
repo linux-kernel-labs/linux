@@ -7,7 +7,6 @@
     :copyright: Copyright 2017 by Yongping Guo
     :license: BSD, see LICENSE for details.
 """
-from __future__ import print_function
 
 import re, os
 import codecs
@@ -77,7 +76,7 @@ class Ditaa(directives.images.Image):
 
     def run(self):
         if self.arguments:
-            print(self.arguments)
+            print self.arguments
             document = self.state.document
             if self.content:
                 return [document.reporter.warning(
@@ -120,13 +119,11 @@ class Ditaa(directives.images.Image):
 
 def render_ditaa(app, code, options, format, prefix='ditaa'):
     """Render ditaa code into a PNG output file."""
-    # ditaa expects UTF-8 by default
-    code = code.encode('utf-8')
-    hashkey = str(code) + str(options) + \
+    hashkey = code.encode('utf-8') + str(options) + \
               str(app.builder.config.ditaa) + \
               str(app.builder.config.ditaa_args)
-    infname = '%s-%s.%s' % (prefix, sha(hashkey.encode('utf-8')).hexdigest(), "ditaa")
-    outfname = '%s-%s.%s' % (prefix, sha(hashkey.encode('utf-8')).hexdigest(), "png")
+    infname = '%s-%s.%s' % (prefix, sha(hashkey).hexdigest(), "ditaa")
+    outfname = '%s-%s.%s' % (prefix, sha(hashkey).hexdigest(), "png")
 
     rel_imgpath = (format == "html") and relative_uri(app.builder.env.docname, app.builder.imagedir) or ''
     infullfn = path.join(app.builder.outdir, app.builder.imagedir, infname)
@@ -138,23 +135,25 @@ def render_ditaa(app, code, options, format, prefix='ditaa'):
         return outrelfn, outfullfn
 
     ensuredir(path.dirname(outfullfn))
+    # ditaa expects UTF-8 by default
+    if isinstance(code, unicode): code = code.encode('utf-8')
 
     ditaa_args = [app.builder.config.ditaa]
     ditaa_args.extend(app.builder.config.ditaa_args)
     ditaa_args.extend(options)
     ditaa_args.extend( [infname, outfname] ) # use relative path
-    f = open(infullfn, 'wb')
-    f.write(code)
-    f.close()
+    f = open(infullfn, 'w')
+    f.write(code.encode('utf-8'))
+    f.close() 
     currpath = os.getcwd()
     os.chdir(path.join(app.builder.outdir, app.builder.imagedir))
 
     try:
         if app.builder.config.ditaa_log_enable:
-            print("rending %s" %(outfullfn))
+            print "rending %s" %(outfullfn)
         #app.builder.warn(ditaa_args)
         p = Popen(ditaa_args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
-    except OSError as err:
+    except OSError, err:
         if err.errno != ENOENT:   # No such file or directory
             raise
         app.builder.warn('ditaa command %r cannot be run (needed for ditaa '
@@ -170,11 +169,11 @@ def render_ditaa(app, code, options, format, prefix='ditaa'):
         # Ditaa may close standard input when an error occurs,
         # resulting in a broken pipe on communicate()
         stdout, stderr = p.communicate(code)
-    except OSError as err:
+    except OSError, err:
         if err.errno != EPIPE:
             raise
         wentWrong = True
-    except IOError as err:
+    except IOError, err:
         if err.errno != EINVAL:
             raise
         wentWrong = True

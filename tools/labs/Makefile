@@ -32,27 +32,13 @@ copy: $(YOCTO_IMAGE)
 	rmdir $(TEMPDIR)
 
 docker-docs:
-	cd docker && docker-compose build docs-build
-	cd docker && docker-compose up -d docs-build
-	cd docker && docker-compose exec -u ubuntu docs-build bash -c "cd /linux/tools/labs && make docs"
-
-docker-docs-server:
-	cd docker && docker-compose build docs-server
-	cd docker && docker-compose up -d docs-server
-
-docker-kernel:
-	cd docker && ARG_UID=$(shell id -u) ARG_GID=$(shell id -g) docker-compose build kernel-build
-	cd docker && docker-compose up -d kernel-build
-	cd docker && docker-compose exec -u ubuntu kernel-build bash
-
-stop-docker-kernel:
-	cd docker && docker-compose down
+	cd docs && docker-compose build
+	cd docs && docker-compose run docs-build bash -c "cd /linux/tools/labs && make docs"
 
 docs:
 	$(MAKE) -C $(KDIR) DOCBOOKS= SPHINXDIRS="teaching" htmldocs
 	$(MAKE) -C $(KDIR) BUILDDIR=$(KDIR)/Documentation/output/slides DOCBOOKS= SPHINXDIRS="teaching" slides
 	for i in $(KDIR)/Documentation/output/slides/teaching/lectures/*.html; do name=$$(basename $$i .html); cp $$i $(KDIR)/Documentation/output/teaching/lectures/$$name-slides.html; done
-	for i in $(KDIR)/Documentation/output/slides/teaching/so2/lec*.html; do name=$$(basename $$i .html); cp $$i $(KDIR)/Documentation/output/teaching/so2/$$name-slides.html; done
 	cp -r $(KDIR)/Documentation/output/slides/teaching/_static $(KDIR)/Documentation/output/teaching/
 
 clean::
@@ -62,4 +48,4 @@ clean::
 clean_skels:
 	rm -rf skels
 
-.PHONY: skels build copy docs docker-docs docker-kernel stop-docker-kernel clean clean_skels
+.PHONY: skels build copy docs docker-docs clean clean_skels

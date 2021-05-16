@@ -41,19 +41,13 @@ tools/labs/docs/Dockerfile for dependencies):
    cd tools/labs && make docs
 
 .. toctree::
-
-   so2/index.rst
-
-.. toctree::
    :caption: Lectures
 
+   lectures/so2.cs.pub.ro.rst
    lectures/intro.rst
    lectures/syscalls.rst
-   lectures/processes.rst
    lectures/interrupts.rst
    lectures/smp.rst
-   lectures/address-space.rst
-   lectures/memory-management.rst
    lectures/debugging.rst
 
 .. toctree::
@@ -77,6 +71,5 @@ tools/labs/docs/Dockerfile for dependencies):
    :caption: Useful info
 
    info/vm.rst
-   info/extra-vm.rst
    info/contributing.rst
 

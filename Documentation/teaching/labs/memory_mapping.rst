@@ -45,7 +45,7 @@ A physical page of memory is identified by the Page Frame Number
 dividing it with the size of the page (or by shifting the physical
 address with PAGE_SHIFT bits to the right).
 
-.. image:: ../res/paging.png
+.. image:: paging.png
    :width: 49 %
 
 For efficiency reasons, the virtual address space is divided into
@@ -64,7 +64,7 @@ physically contiguous. Memory allocated by :c:func:`vmalloc` is not
 contiguous and does not reside in lowmem (it has a dedicated zone in
 highmem).
 
-.. image:: ../res/kernel-virtmem-map.png
+.. image:: kernel-virtmem-map.png
    :width: 49 %
 
 Structures used for memory mapping
@@ -96,7 +96,7 @@ There are many functions that interact with this structure:
 * :c:func:`page_to_pfn` return the page frame number associated with a
   :c:type:`struct page`
 * :c:func:`page_address` returns the virtual address of a
-  :c:type:`struct page`; this functions can be called only for pages from
+  :c:type:`struc page`; this functions can be called only for pages from
   lowmem
 * :c:func:`kmap` creates a mapping in kernel for an arbitrary physical
   page (can be from highmem) and returns a virtual address that can be
@@ -208,7 +208,7 @@ into the virtual space represented by :c:type:`vm_area_struct`:
 * *addr* - the virtual address space from where remapping begins; page
   tables for the virtual address space between addr and addr + size
   will be formed as needed
-* *pfn* - the page frame number to which the virtual address should be
+* *pfn* the page frame number to which the virtual address should be
   mapped
 * *size* - the size (in bytes) of the memory to be mapped
 * *prot* - protection flags for this mapping
@@ -258,7 +258,7 @@ and finally for :c:func:`alloc_pages`:
    unsigned long pfn = page_to_pfn(page);
 
 .. attention:: Note that memory allocated with :c:func:`vmalloc` is not
-               physically contiguous so if we want to map a range allocated
+               physically contiguous so if we want to map a range alocated
                with :c:func:`vmalloc`, we have to map each page individually
                and compute the physical address for each page.
 
@@ -278,7 +278,7 @@ Enabling is done using :c:func:`SetPageReserved` while reseting it
        if (!mem)
 	   return mem;
 
-       for(i = 0; i < npages * PAGE_SIZE; i += PAGE_SIZE)
+       for(i = 0; i < npages * PAGE_SIZE; i += PAGE_SIZE) {
 	   SetPageReserved(virt_to_page(((unsigned long)mem) + i));
 
        return mem;
@@ -288,7 +288,7 @@ Enabling is done using :c:func:`SetPageReserved` while reseting it
    {
        int i;
 
-       for(i = 0; i < npages * PAGE_SIZE; i += PAGE_SIZE)
+       for(i = 0; i < npages * PAGE_SIZE; i += PAGE_SIZE) {
 	   ClearPageReserved(virt_to_page(((unsigned long)mem) + i));
 
        kfree(mem);
@@ -307,7 +307,7 @@ Further reading
 Exercises
 =========
 
-.. include:: ../labs/exercises-summary.hrst
+.. include:: exercises-summary.hrst
 .. |LAB_NAME| replace:: memory_mapping
 
 1. Mapping contiguous physical memory to userspace
@@ -398,9 +398,9 @@ Implement the mmap driver function.
 
                Loop through all virtual pages and for each:
                * determine the physical address
-               * map it with :c:func:`remap_pfn_range`
+               * map it with :c:func:`remap_fpn_range`
 
-               Make sure that you determine the physical address
+               Make sure the that you determine the physical address
                each time and that you use a range of one page for mapping.
 
 For testing, load the kernel module and run:

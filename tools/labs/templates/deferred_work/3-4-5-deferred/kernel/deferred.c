@@ -61,13 +61,11 @@ static struct mon_proc *get_proc(pid_t pid)
 	struct task_struct *task;
 	struct mon_proc *p;
 
-	rcu_read_lock();
 	task = pid_task(find_vpid(pid), PIDTYPE_PID);
-	rcu_read_unlock();
 	if (!task)
 		return ERR_PTR(-ESRCH);
 
-	p = kmalloc(sizeof(*p), GFP_ATOMIC);
+	p = kmalloc(sizeof(p), GFP_ATOMIC);
 	if (!p)
 		return ERR_PTR(-ENOMEM);
 

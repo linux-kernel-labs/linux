@@ -1257,12 +1257,10 @@ static bool try_fill_recv(struct virtnet_info *vi, struct receive_queue *rq,
 			break;
 	} while (rq->vq->num_free);
 	if (virtqueue_kick_prepare(rq->vq) && virtqueue_notify(rq->vq)) {
-		unsigned long flags;
-
 		local_bh_disable();
-		flags = u64_stats_update_begin_irqsave(&rq->stats.syncp);
+		u64_stats_update_begin(&rq->stats.syncp);
 		rq->stats.kicks++;
-		u64_stats_update_end_irqrestore(&rq->stats.syncp, flags);
+		u64_stats_update_end(&rq->stats.syncp);
 		local_bh_enable();
 	}
 

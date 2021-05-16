@@ -10,11 +10,8 @@ Lab objectives
 * presenting how a module can be used with a kernel
 * simple kernel debugging methods
 
-..
-  _[SECTION-OVERVIEW-BEGIN]
-
-Kernel Modules Overview
-=======================
+Overview
+========
 
 A monolithic kernel, though faster than a microkernel, has the disadvantage of
 lack of modularity and extensibility. On modern monolithic kernels, this has
@@ -27,12 +24,6 @@ modules.
 For the development of Linux device drivers, it is recommended to download the
 kernel sources, configure and compile them and then install the compiled version
 on the test /development tool machine.
-
-..
-  _[SECTION-OVERVIEW-END]
-
-..
-  _[SECTION-MODULE-EXAMPLE-BEGIN]
 
 An example of a kernel module
 =============================
@@ -81,12 +72,6 @@ by the logging daemon (syslog). To display kernel messages, you can use the
    Hi
    Bye
 
-..
-  _[SECTION-MODULE-EXAMPLE-END]
-
-..
-  _[SECTION-COMPILE-MODULES-BEGIN]
-
 Compiling kernel modules
 ========================
 
@@ -130,7 +115,7 @@ as instructed in this file.
 
           .. code-block:: bash
 
-              KDIR = /home/student/src/linux
+              KDIR = /home/student/so2/linux
               [...]
 
 A :file:`Kbuild` file contains one or more directives for compiling a kernel
@@ -188,11 +173,6 @@ follows:
 For more details, see the :file:`Documentation/kbuild/makefiles.txt` and
 :file:`Documentation/kbuild/modules.txt` files within the kernel sources.
 
-..
-  _[SECTION-COMPILE-MODULES-END]
-
-..
-  _[SECTION-LOAD-MODULES-BEGIN]
 
 Loading/unloading a kernel module
 =================================
@@ -250,14 +230,8 @@ Information about modules loaded into the kernel can be found using the
 :command:`lsmod` command or by inspecting the :file:`/proc/modules`,
 :file:`/sys/module` directories.
 
-..
-  _[SECTION-LOAD-MODULES-END]
-
-..
-  _[SECTION-DEBUG-MODULES-BEGIN]
-
-Kernel Module Debugging
-=======================
+Debugging
+=========
 
 Troubleshooting a kernel module is much more complicated than debugging a
 regular program. First, a mistake in a kernel module can lead to blocking the
@@ -749,11 +723,11 @@ use of the predefined constants :code:`__FILE__`, :code:`__LINE__` and
 
 .. note::
     :code:`__FILE__` and :code:`__LINE__` are part of the ANSI C specifications:
-    :code:`__func__` is part of specification C99; :code:`__FUNCTION__` is a GNU
-    :code:`C` extension and is not portable; However, since we write code for the
-    :code:`Linux` kernel, we can use it without any problems.
+    :code`__func__` is part of specification C99; :code:`__FUNCTION__` is a GNU
+    :codeC extension and is not portable; However, since we write code for the
+    :codeLinux kernel, we can use it without any problems.
 
-The following macro definition can be used in this case:
+The following macrodefinition can be used in this case:
 
 .. code-block:: c
 
@@ -849,15 +823,15 @@ Dyndbg Options
 
   .. code-block:: bash
 
-     module sunrpc
+     Modules sunrpc
 
 * ``format`` - only messages whose display format contains the specified string.
 
-  .. code-block:: bash
+   .. code-block:: bash
 
-     format "nfsd: SETATTR"
+      format "nfsd: SETATTR"
 
-* ``line`` - the line or lines for which we want to enable debug calls.
+* line - the line or lines for which we want to enable debug calls.
 
   .. code-block:: bash
 
@@ -867,24 +841,24 @@ Dyndbg Options
      $ echo 'file svcsock.c line -1605 +p' > /sys/kernel/debug/dynamic_debug/control
 
 In addition to the above options, a series of flags can be added, removed, or set
-with operators ``+``, ``-`` or ``=``:
+with operators ``+`, ``-`` or ``=``:
 
    * ``p`` activates the pr_debug() .
    * ``f`` includes the name of the function in the printed message.
-   * ``l`` includes the line number in the printed message.
-   * ``m`` includes the module name in the printed message.
-   * ``t`` includes the thread id if it is not called from interrupt context
+   * ``I`` includes the line number in the printed message.
+   * ``M`` includes the module name in the printed message.
+   * ``T`` includes the thread id if it is not called from interrupt context
    * ``_`` no flag is set.
 
 KDB: Kernel debugger
 --------------------
 
 The kernel debugger has proven to be very useful to facilitate the development and
-debugging process. One of its main advantages is the possibility to perform live debugging.
+debugging process. One of its main advantages it the possibility to perform live debugging.
 This allows us to monitor, in real time, the accesses to memory or even modify the memory
 while debugging.
 The debugger has been integrated in the mainline kernel starting with version 2.6.26-rci.
-KDB is not a *source debugger*, but for a complete analysis it can be used in parallel with
+KDB is not a *source debugger", but for a complete analysis it can be used in parallel with
 gdb and symbol files -- see :ref:`the GDB debugging section <gdb_intro>`
 
 To use KDB, you have the following options:
@@ -934,15 +908,12 @@ breakpoint to monitor the changes of the ``mVar`` variable.
   # return from KDB
   kdb> go
 
-..
-  _[SECTION-DEBUG-MODULES-END]
-
 Exercises
 =========
 
 .. _exercises_summary:
 
-.. include:: ../labs/exercises-summary.hrst
+.. include:: exercises-summary.hrst
 .. |LAB_NAME| replace:: kernel_modules
 
 0. Intro
@@ -987,9 +958,6 @@ in the Linux kernel source code:
   For more info on using :command:`cscope`, read the
   :ref:`cscope section <cscope_intro>` in the previous lab.
 
-..
-  _[EXERCISE1-BEGIN]
-
 1. Kernel module
 ----------------
 
@@ -1031,13 +999,6 @@ using `minicom -D serial.pts` and perform the following tasks:
           a kernel module, you can specify only the module name
           (without extension).
 
-..
-  _[EXERCISE1-END]
-
-..
-  _[EXERCISE2-BEGIN]
-
-
 2. Printk
 ---------
 
@@ -1056,12 +1017,6 @@ Load/unload the module again.
 The messages should not be printed to the virtual machine console,
 but they should be visible when running ``dmesg``.
 
-..
-  _[EXERCISE2-END]
-
-..
-  _[EXERCISE3-BEGIN]
-
 3. Error
 --------
 
@@ -1074,31 +1029,19 @@ errors occurred? **Hint:** How does this module differ from the previous module?
 Modify the module to solve the cause of those errors, then compile and test
 the module.
 
-..
-  _[EXERCISE3-END]
-
-..
-  _[EXERCISE4-BEGIN]
-
 4. Sub-modules
 --------------
 
 Inspect the C source files ``mod1.c`` and ``mod2.c`` in :file:`4-multi-mod/`.
 Module 2 contains only the definition of a function used by module 1.
 
-Change the :file:`Kbuild` file to create the ``multi_mod.ko`` module from the
-two C source files.
+Change the :file:`Kbuild` file to create the ``multi_mod.ko`` module from
+from the two C source files.
 
 .. hint:: Read the `Compiling kernel modules`_ section of the lab.
 
 Compile, copy, boot the VM, load and unload the kernel module. Make sure messages
 are properly displayed on the console.
-
-..
-  _[EXERCISE4-END]
-
-..
-  _[EXERCISE5-BEGIN]
 
 5. Kernel oops
 --------------
@@ -1130,12 +1073,6 @@ kernel since the oops; Until the release of those references (which is
 almost impossible in the case of an oops), the module can not be
 unloaded.
 
-..
-  _[EXERCISE5-END]
-
-..
-  _[EXERCISE6-BEGIN]
-
 6. Module parameters
 --------------------
 
@@ -1152,12 +1089,6 @@ message shown is ``Early bird gets tired``.
           <http://tldp.org/LDP/lkmpg/2.6/html/x323.html>`_.
 
 .. _proc-info:
-
-..
-  _[EXERCISE6-END]
-
-..
-  _[EXERCISE7-BEGIN]
 
 7. Proc info
 ------------
@@ -1195,19 +1126,13 @@ from the executable :file:`/sbin/insmod` when the module is loaded and
 when the module is unloaded a process is created from the executable
 :file:`/sbin/rmmod`.
 
-..
-  _[EXERCISE7-END]
-
-..
-  _[EXTRA-EXERCISE-BEGIN]
-
 Extra Exercises
 ===============
 
 1. KDB
 ------
 
-Go to the **8-kdb** directory. Activate KDB over the serial port and enter KDB
+Go to the **8-kdb** directory. Activate KDB the over serial port and enter KDB
 mode using :command:`SysRq`. Connect to the pseudo-terminal linked to virtiocon0
 using :command:`minicom`, configure KDB to use the hvc0 serial port:
 
@@ -1343,6 +1268,3 @@ Without unloading the module, deactivate :c:func:`pr_debug` calls.
 
 .. hint::
     You can delete the set flags. Unload the kernel module.
-
-..
-  _[EXTRA-EXERCISE-END]

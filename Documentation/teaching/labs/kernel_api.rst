@@ -60,7 +60,7 @@ this case, the device driver must use special features and not directly access
 the buffer. This is necessary to prevent access to invalid memory areas.
 
 Another difference from the user-space scheduling, relative to memory, is due to
-the stack, a stack whose size is fixed and limited. A stack of 4K is used in
+the stack, a stack whose size is fixed and limited. A stack of 4K it is used in
 Linux, and a stack of 12K is used in Windows. For this reason, the
 allocation of large structures on stack or the use of recursive calls should
 be avoided.
@@ -196,10 +196,10 @@ call:
    pr_alert(fmt, ...); /* similar to printk(KERN_ALERT pr_fmt(fmt), ...); */
    pr_crit(fmt, ...); /* similar to printk(KERN_CRIT pr_fmt(fmt), ...); */
    pr_err(fmt, ...); /* similar to printk(KERN_ERR pr_fmt(fmt), ...); */
-   pr_warn(fmt, ...); /* similar to printk(KERN_WARNING pr_fmt(fmt), ...); */
+   pr_warning(fmt, ...); /* similar to printk(KERN_WARNING pr_fmt(fmt), ...); */
+   pr_warn(fmt, ...); /* similar to cu printk(KERN_WARNING pr_fmt(fmt), ...); */
    pr_notice(fmt, ...); /* similar to printk(KERN_NOTICE pr_fmt(fmt), ...); */
    pr_info(fmt, ...); /* similar to printk(KERN_INFO pr_fmt(fmt), ...); */
-   pr_debug(fmt, ...); /* similar to printk(KERN_DEBUG pr_fmt(fmt), ...); */
 
 A special case is :c:func:`pr_debug` that calls the :c:func:`printk` function
 only when the :c:macro:`DEBUG` macro is defined or if dynamic debugging is used.
@@ -338,7 +338,7 @@ The following code shows how to use these routines:
 
 The evolution of the list can be seen in the following figure:
 
-.. image:: ../res/list_evolution.png
+.. image:: list_evolution.png
    :width: 85%
 
 You see the stack type behavior introduced by the :c:macro:`list_add` macro,
@@ -385,10 +385,10 @@ operations associated with a spinlock are :c:func:`spin_lock_init`,
 In Linux, you can use reader-writer spinlocks, useful for readers-writers
 problems.
 These types of locks are identified by :c:type:`rwlock_t`, and the functions
-that can work on a reader-writer spinlock are
-:c:func:`rwlock_init`,
-:c:func:`read_lock`,
-:c:func:`write_lock`.
+that can work on a reader-writer spinlock are:
+* :c:func:`rwlock_init`
+* :c:func:`read_lock`
+* :c:func:`write_lock`
 An example of use:
 
 
@@ -500,7 +500,7 @@ Such an usage is shown schematically in the code below:
 	int initial_flag;
 
 	/*
-	 * Check if flag is UNLOCKED; if so, lock it and do it atomically.
+	 * Check if flag is UNLOCKED; if not, lock it and do it atomically.
 	 *
 	 * This is the atomic equivalent of
 	 *	if (flag == UNLOCKED)
@@ -600,7 +600,7 @@ performed.
 Exercises
 =========
 
-.. include:: ../labs/exercises-summary.hrst
+.. include:: exercises-summary.hrst
 .. |LAB_NAME| replace:: kernel_api
 
 0. Intro
@@ -830,8 +830,6 @@ the contents of the :file:`list-test.c` file. We'll use it as a test
 module. It will call functions exported by the **6-list-sync**
 task. The exported functions are the ones marked with **extern** in
 :file:`list-test.c` file.
-
-Uncomment the commented code from :file:`7-list-test.c`. Look for ``TODO 1``.
 
 To export the above functions from the module located at :file:`6-list-sync/`
 directory, the following steps are required:

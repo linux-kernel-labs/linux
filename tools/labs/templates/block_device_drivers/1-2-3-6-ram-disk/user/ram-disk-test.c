@@ -56,11 +56,7 @@ int main(void)
 	int back_errno;
 
 	printf("insmod ../kernel/" MODULE_NAME ".ko\n");
-	if (system("insmod ../kernel/" MODULE_NAME ".ko\n")) {
-		fprintf(stderr, "insmod failed\n");
-		exit(EXIT_FAILURE);
-	}
-
+	system("insmod ../kernel/" MODULE_NAME ".ko\n");
 	sleep(1);
 
 	printf("mknod " DEVICE_NAME " b " MY_BLOCK_MAJOR " " MY_BLOCK_MINOR "\n");

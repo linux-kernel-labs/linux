@@ -27,19 +27,14 @@ QEMU_OPTS = -kernel $(ZIMAGE) \
 	--append "root=/dev/vda loglevel=15 console=hvc0" \
 	--display $(QEMU_DISPLAY) -s -m 256
 
-ifdef ENABLE_KVM
-QEMU_OPTS += -enable-kvm -cpu host
-ENABLE_KVM_SUDO = sudo
-endif
-
 boot: .modinst tap0 tap1 pipe1.in pipe1.out pipe2.in pipe2.out disk1.img disk2.img nttcp-run
-	$(ENABLE_KVM_SUDO) ARCH=$(ARCH) qemu/qemu.sh $(QEMU_OPTS)
+	ARCH=$(ARCH) qemu/qemu.sh $(QEMU_OPTS)
 
 TEMPDIR := $(shell mktemp -u)
 
 $(KCONFIG): qemu/kernel_config.x86
 	cp $^ $@
-	$(MAKE) -C $(KDIR) olddefconfig
+	$(MAKE) -C $(KDIR) oldnoconfig
 
 zImage: $(ZIMAGE)
 

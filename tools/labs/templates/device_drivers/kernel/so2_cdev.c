@@ -65,7 +65,7 @@ static int so2_cdev_open(struct inode *inode, struct file *file)
 		return -EBUSY;
 
 	set_current_state(TASK_INTERRUPTIBLE);
-	schedule_timeout(10 * HZ);
+	schedule_timeout(10);
 
 	return 0;
 }

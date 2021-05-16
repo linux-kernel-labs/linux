@@ -611,7 +611,7 @@ should keep in mind with regard to CPU scalability:
    * Pay attention to algorithm complexity
 
 
-Overview of the Linux kernel
+Overview the of Linux kernel
 ============================
 
 

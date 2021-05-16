@@ -17,9 +17,6 @@ Keywords
 *  cscope, LXR
 *  gdb, /proc/kcore, addr2line, dump\_stack
 
-..
-  _[SECTION-ABOUT-BEGIN]
-
 About this laboratory
 =====================
 
@@ -41,14 +38,8 @@ For best laboratory performance, we recommend that you read the related slides.
 To fully understand a laboratory, we recommend going through the lab support. For
 in-depth study, use the supporting documentation.
 
-..
-  _[SECTION-ABOUT-END]
-
-..
-  _[SECTION-REFERENCES-BEGIN]
-
-References
-==========
+Documentation
+=============
 
 -  Linux
 
@@ -63,12 +54,6 @@ References
 
    -  `mailing list <http://cursuri.cs.pub.ro/cgi-bin/mailman/listinfo/pso>`__
       (`searching the mailing list <http://blog.gmane.org/gmane.education.region.romania.operating-systems-design>`__)
-
-..
-  _[SECTION-REFERENCES-END]
-
-..
-  _[SECTION-CODE-NAVIGATION-BEGIN]
 
 Source code navigation
 ======================
@@ -179,32 +164,8 @@ These commands will activate cscope for the C and C++ modes automatically.
 search for a symbol (if you call it when the cursor is over a word,
 it will use that). For more details, check `https://github.com/dkogan/xcscope.el`
 
-clangd
-------
-
-`Clangd <https://clangd.llvm.org/>`__ is a language server that provides tools
-for navigating C and C++ code. 
-`Language Server Protocol <https://microsoft.github.io/language-server-protocol/>`__
-facilitates features like go-to-definition, find-references, hover, completion, etc.,
-using semantic whole project analysis.
-
-Clangd requires a compilation database to understand the kernel source code.
-It can be generated with:
-
-.. code-block:: bash
-
-    make defconfig
-    make
-    scripts/clang-tools/gen_compile_commands.py
-
-LSP clients:
-
-- Vim/Neovim (`coc.nvim <https://github.com/neoclide/coc.nvim>`__, `nvim-lsp <https://github.com/neovim/nvim-lspconfig>`__, `vim-lsc <https://github.com/natebosch/vim-lsc>`__, `vim-lsp <https://github.com/prabirshrestha/vim-lsp>`__)
-- Emacs (`lsp-mode <https://github.com/emacs-lsp/lsp-mode>`__)
-- VSCode (`clangd extension <https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.vscode-clangd>`__)
-
 Kscope
-------
+~~~~~~
 
 For a simpler interface, `Kscope <http://sourceforge.net/projects/kscope/>`__
 is a cscope frontend which uses QT. It is lightweight, very fast and very
@@ -287,14 +248,8 @@ a copy, because SourceWeb doesn't have, at this moment, the capability
 to regenerate the index for a single file and you will have to regenerate
 the complete index.
 
-..
-  _[SECTION-CODE-NAVIGATION-END]
-
-..
-  _[SECTION-DEBUGGING-BEGIN]
-
-Kernel Debugging
-================
+Debugging
+=========
 
 Debugging a kernel is a much more difficult process than the debugging
 of a program, because there is no support from the operating system.
@@ -447,12 +402,6 @@ execution paths, which makes this method difficult.
 In these situations, it is useful to get a stack trace, which can be
 simply done using the function :code:`dump_stack()`.
 
-..
-  _[SECTION-DEBUGGING-END]
-
-..
-  _[SECTION-DOCUMENTATION-BEGIN]
-
 Documentation
 =============
 
@@ -477,14 +426,8 @@ A few links related to the Linux kernel are shown bellow:
 The links are not comprehensive. Using  `The Internet <http://www.google.com>`__ and
 `kernel source code <http://lxr.free-electrons.com/>`__ is essential.
 
-..
-  _[SECTION-DOCUMENTATION-END]
-
 Exercises
 =========
-
-..
-  _[SECTION-EXERCISES-REMARKS-BEGIN]
 
 Remarks
 -------
@@ -512,14 +455,8 @@ Remarks
 .. important::
     Before solving an exercice, **carefully** read all its bullets.
 
-..
-  _[SECTION-EXERCISES-REMARKS-END]
-
-..
-  _[EXERCISE1-BEGIN]
-
-Booting the virtual machine
----------------------------
+1. Booting the virtual machine
+------------------------------
 
 A summary of the virtual machine infrastructure:
 
@@ -542,7 +479,7 @@ a console exposed by the virtual machine using :command:`minicom` or :command:`s
 
 .. code-block:: shell
 
-    student@eg106:~/src/linux/tools/labs$ minicom -D serial.pts
+    student@eg106:~/so2/linux/tools/labs$ minicom -D serial.pts
 
     <press enter>
 
@@ -550,7 +487,7 @@ a console exposed by the virtual machine using :command:`minicom` or :command:`s
     Poky (Yocto Project Reference Distro) 2.3 qemux86 /dev/hvc0
 
 Alternatively, you can start the virtual machine with graphical interface support, using
-the :command:`QEMU_DISPLAY=gtk make boot`.
+the :command:`QEMU_DISPLAY=sdl make boot`.
 
 .. note::
     To access the virtual machine, at the login prompt, enter the
@@ -558,20 +495,14 @@ the :command:`QEMU_DISPLAY=gtk make boot`.
     The virtual machine will start with the permissions of the
     root account.
 
-..
-  _[EXERCISE1-END]
-
-..
-  _[EXERCISE2-BEGIN]
-
-Adding and using a virtual disk
--------------------------------
+2. Adding and using a virtual disk
+----------------------------------
 
 .. note:: If you don't have the file :file:`mydisk.img`, you can download
           it from the address http://elf.cs.pub.ro/so2/res/laboratoare/mydisk.img.
           The file must be placed in :file:`tools/labs`.
 
-In the :file:`~/src/linux/tools/labs` directory, you have a new virtual
+In the :file:`~/src/linux/tools/labs/qemu` directory, you have a new virtual
 machine disk, in the file :file:`mydisk.img`. We want to add the disk
 to the virtual machine and use it within the virtual machine.
 
@@ -648,14 +579,8 @@ With support for the :command:`btrfs` filesystem, now :command:`mount` will fini
           you to return to the initial setup in order to have an environment
           identical to the one used by vmchecker.
 
-..
-  _[EXERCISE2-END]
-
-..
-  _[EXERCISE3-BEGIN]
-
-GDB and QEMU
-------------
+3. GDB and QEMU
+---------------
 
 We can investigate and troubleshoot the QEMU virtual machine in real time.
 
@@ -711,12 +636,6 @@ such as :command:`list` and :command:`backtrace` to trace the execution.
 .. hint:: At the :command:`gdb` prompt, you can press :command:`Enter`
           (without anything else) to rerun the last command.
 
-..
-  _[EXERCISE3-END]
-
-..
-  _[EXERCISE4-BEGIN]
-
 4. GDB spelunking
 -----------------
 
@@ -762,17 +681,10 @@ The :code:`jiffies` variable holds the number of ticks (clock beats) since the s
 
               x/wx & jiffies
 
-..
-  _[EXERCISE4-END]
-
-..
-  _[EXERCISE5-BEGIN]
-
-
 5. Cscope spelunking
 --------------------
 
-Use LXR or cscope in the :file:`~/src/linux/` directory to discover
+Use LXR or cscope in the :file:`~/so2/linux/` directory to discover
 the location of certain structures or functions.
 
 Cscope index files are already generated. Use :command:`vim` and other related commands

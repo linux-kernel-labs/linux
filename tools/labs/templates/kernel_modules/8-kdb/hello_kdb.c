@@ -2,8 +2,8 @@
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 
-int kdb_write_address;
-EXPORT_SYMBOL(kdb_write_address);
+int write_address;
+EXPORT_SYMBOL(write_address);
 
 noinline void dummy_func18(void)
 {
@@ -90,7 +90,7 @@ static int hello_proc_open(struct inode *inode, struct  file *file) {
 static int edit_write(struct file *file, const char *buffer,
 		size_t count, loff_t *data)
 {
-	kdb_write_address += 1;
+	write_address = 1;
 	return count;
 }
 
@@ -101,30 +101,32 @@ static int bug_write(struct file *file, const char *buffer,
 	return count;
 }
 
-static const struct proc_ops edit_proc_ops = {
-	.proc_open	= hello_proc_open,
-	.proc_read	= seq_read,
-	.proc_write	= edit_write,
-	.proc_lseek	= seq_lseek,
-	.proc_release	= single_release,
+static const struct file_operations edit_proc_fops = {
+	.owner = THIS_MODULE,
+	.open = hello_proc_open,
+	.read = seq_read,
+	.write = edit_write,
+	.llseek = seq_lseek,
+	.release = single_release,
 };
 
-static const struct proc_ops bug_proc_ops = {
-	.proc_open	= hello_proc_open,
-	.proc_read	= seq_read,
-	.proc_write	= bug_write,
-	.proc_lseek	= seq_lseek,
-	.proc_release	= single_release,
+static const struct file_operations bug_proc_fops = {
+	.owner = THIS_MODULE,
+	.open = hello_proc_open,
+	.read = seq_read,
+	.write = bug_write,
+	.llseek = seq_lseek,
+	.release = single_release,
 };
 
 static int __init hello_proc_init(void) {
 	struct proc_dir_entry *file;
-	file = proc_create("hello_kdb_bug", 0, NULL, &bug_proc_ops);
+	file = proc_create("hello_kdb_bug", 0, NULL, &bug_proc_fops);
 	if (file == NULL) {
 		return -ENOMEM;
 	}
 
-	file = proc_create("hello_kdb_break", 0, NULL, &edit_proc_ops);
+	file = proc_create("hello_kdb_break", 0, NULL, &edit_proc_fops);
 	if (file == NULL) {
 		remove_proc_entry("hello_kdb_bug", NULL);
 		return -ENOMEM;

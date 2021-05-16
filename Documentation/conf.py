@@ -19,8 +19,6 @@ import subprocess
 
 from distutils.version import LooseVersion
 
-from subprocess import check_output
-
 # Get Sphinx version
 major, minor, patch = sphinx.version_info[:3]
 
@@ -127,9 +125,9 @@ else:
     extensions.append("sphinx.ext.pngmath")
 
 try:
-    hglyph_ver = subprocess.check_output(["hieroglyph", "--version"]).decode('utf-8')
+    hglyph_ver = subprocess.check_output(["hieroglyph", "--version"])
     if LooseVersion(hglyph_ver) > LooseVersion("1.0.0"):
-        extensions.append("hieroglyph")
+	    extensions.append('hieroglyph')
 except:
     None
 

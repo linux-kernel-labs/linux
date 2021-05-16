@@ -262,17 +262,15 @@ old_version_h := include/linux/version.h
 clean-targets := %clean mrproper cleandocs
 no-dot-config-targets := $(clean-targets) \
 			 cscope gtags TAGS tags help% %docs check% coccicheck \
-			 $(version_h) headers headers_% archheaders archscripts \
-			 %asm-generic kernelversion %src-pkg %slides dt_binding_check \
-			 outputmakefile
-no-sync-config-targets := $(no-dot-config-targets) %install kernelrelease
-single-targets := %.a %.i %.ko %.lds %.ll %.lst %.mod %.o %.s %.symtypes %/
+			 $(version_h) headers_% archheaders archscripts \
+			 %asm-generic kernelversion %slides %src-pkg
+no-sync-config-targets := $(no-dot-config-targets) install %install \
+			   kernelrelease
 
-config-build	:=
-mixed-build	:=
-need-config	:= 1
-may-sync-config	:= 1
-single-build	:=
+config-targets  := 0
+mixed-targets   := 0
+dot-config      := 1
+may-sync-config := 1
 
 ifneq ($(filter $(no-dot-config-targets), $(MAKECMDGOALS)),)
 	ifeq ($(filter-out $(no-dot-config-targets), $(MAKECMDGOALS)),)

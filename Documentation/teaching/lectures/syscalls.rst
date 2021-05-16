@@ -182,7 +182,7 @@ dup2 system call and inspect the state.
 
    |_|
 
-   .. asciicast:: ../res/syscalls-inspection.cast
+   .. asciicast:: syscalls-inspection.cast
 
 
 In summary, this is what happens during a system call:
@@ -388,7 +388,7 @@ With VDSO the system call interface is decided by the kernel:
 
    |_|
 
-   .. asciicast:: ../res/syscalls-vdso.cast
+   .. asciicast:: syscalls-vdso.cast
 
 
 
@@ -413,7 +413,7 @@ as vsyscalls are: getpid or gettimeofday.
 
 
 Accessing user space from system calls
-======================================
+=====================================
 
 As we mentioned earlier, user space must be accessed with special APIs
 (:c:func:`get_user`, :c:func:`put_user`, :c:func:`copy_from_user`,

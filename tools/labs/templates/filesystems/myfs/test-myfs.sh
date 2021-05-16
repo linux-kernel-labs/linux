@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -ex
+set -x
 
 #load module
 insmod myfs.ko
