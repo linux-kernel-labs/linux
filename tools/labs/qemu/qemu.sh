@@ -10,6 +10,9 @@ case $ARCH in
     x86)
 	qemu=qemu-system-i386
 	;;
+	x86_64)
+    qemu=qemu-system-x86_64
+	;;
     arm)
 	qemu=qemu-system-arm
 	;;
