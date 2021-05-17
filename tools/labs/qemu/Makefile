@@ -43,11 +43,11 @@ boot: .modinst tap0 tap1 pipe1.in pipe1.out pipe2.in pipe2.out disk1.img disk2.i
 TEMPDIR := $(shell mktemp -u)
 
 $(KCONFIG): qemu/kernel_config.x86
-ifeq ($(ARCH),x86_64)
-	echo "CONFIG_64BIT=y" >> $^
-	echo "CONFIG_IA32_EMULATION=y" >> $^
-endif
 	cp $^ $@
+ifeq ($(ARCH),x86_64)
+	echo "CONFIG_64BIT=y" >> $@
+	echo "CONFIG_IA32_EMULATION=y" >> $@
+endif
 	$(MAKE) -C $(KDIR) olddefconfig
 
 zImage: $(ZIMAGE)
