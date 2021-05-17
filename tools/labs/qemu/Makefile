@@ -1,19 +1,24 @@
 QEMU_DISPLAY ?= none
 ARCH ?= x86
+IMG_ARCH := $(ARCH)
+
 ifeq ($(ARCH),x86)
 b = b
+else ifeq ($(ARCH),x86_64)
+b = b
+IMG_ARCH = x86
 endif
 
 ZIMAGE = $(KDIR)/arch/$(ARCH)/boot/$(b)zImage
 KCONFIG = $(KDIR)/.config
 NTTCP = $(KDIR)/tools/labs/templates/assignments/6-e100/nttcp
 
-YOCTO_URL = http://downloads.yoctoproject.org/releases/yocto/yocto-2.3/machines/qemu/qemu$(ARCH)/
-YOCTO_IMAGE = core-image-minimal-qemu$(ARCH).ext4
-#YOCTO_IMAGE = core-image-minimal-dev-qemu$(ARCH).ext4
-#YOCTO_IMAGE = core-image-sato-dev-qemu$(ARCH).ext4
-#YOCTO_IMAGE = core-image-sato-qemu$(ARCH).ext4
-#YOCTO_IMAGE = core-image-sato-sdk-qemu$(ARCH).ext4
+YOCTO_URL = http://downloads.yoctoproject.org/releases/yocto/yocto-2.3/machines/qemu/qemu$(IMG_ARCH)/
+YOCTO_IMAGE = core-image-minimal-qemu$(IMG_ARCH).ext4
+#YOCTO_IMAGE = core-image-minimal-dev-qemu$(IMG_ARCH).ext4
+#YOCTO_IMAGE = core-image-sato-dev-qemu$(IMG_ARCH).ext4
+#YOCTO_IMAGE = core-image-sato-qemu$(IMG_ARCH).ext4
+#YOCTO_IMAGE = core-image-sato-sdk-qemu$(IMG_ARCH).ext4
 
 QEMU_OPTS = -kernel $(ZIMAGE) \
 	-device virtio-serial \
@@ -25,7 +30,7 @@ QEMU_OPTS = -kernel $(ZIMAGE) \
 	-drive file=disk1.img,if=virtio,format=raw \
 	-drive file=disk2.img,if=virtio,format=raw \
 	--append "root=/dev/vda loglevel=15 console=hvc0" \
-	--display $(QEMU_DISPLAY) -s -m 256
+	--display $(QEMU_DISPLAY) -s -m 512
 
 ifdef ENABLE_KVM
 QEMU_OPTS += -enable-kvm -cpu host
@@ -38,6 +43,10 @@ boot: .modinst tap0 tap1 pipe1.in pipe1.out pipe2.in pipe2.out disk1.img disk2.i
 TEMPDIR := $(shell mktemp -u)
 
 $(KCONFIG): qemu/kernel_config.x86
+ifeq ($(ARCH),x86_64)
+	echo "CONFIG_64BIT=y" >> $^
+	echo "CONFIG_IA32_EMULATION=y" >> $^
+endif
 	cp $^ $@
 	$(MAKE) -C $(KDIR) olddefconfig
 
