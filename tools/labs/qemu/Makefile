@@ -25,7 +25,8 @@ QEMU_OPTS = -kernel $(ZIMAGE) \
 	-drive file=disk1.img,if=virtio,format=raw \
 	-drive file=disk2.img,if=virtio,format=raw \
 	--append "root=/dev/vda loglevel=15 console=hvc0" \
-	--display $(QEMU_DISPLAY) -s -m 256
+	--display $(QEMU_DISPLAY) -s -m 256\
+        -drive file=mydisk.img,if=virtio,format=raw
 
 ifdef ENABLE_KVM
 QEMU_OPTS += -enable-kvm -cpu host
