@@ -1,0 +1,4 @@
+#added flags
+EXTRA_CFLAGS = -Wall -g 
+
+obj-m = oops_mod.o

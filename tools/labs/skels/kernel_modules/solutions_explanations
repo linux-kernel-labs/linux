@@ -1,0 +1,6 @@
+2:  In order that the messages won't display directly to the console I printed the messages using prink ans set the kernel warning to KERN_ALERT.
+3:  Added the needed headers to the module c code
+4:  Changed the Kbuild file to link the two objects file into one obj file
+5:  Added the -g flag to compile the module, oops came from the following line  *p='a';
+6:  insmod 6-cmd-mod.ko str="tired"
+7:  Solution is in the c file

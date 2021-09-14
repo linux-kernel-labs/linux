@@ -1,0 +1,7 @@
+ccflags-y = -Wno-unused-function -Wno-unused-label -Wno-unused-variable
+
+EXTRA_CFLAGS = -Wall -g
+
+obj-m        = supermodule.o
+supermodule-y = mod1.o mod2.o
+
