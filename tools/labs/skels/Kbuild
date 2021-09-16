@@ -2,6 +2,8 @@
 ccflags-y += -Wno-unused-function -Wno-unused-label -Wno-unused-variable 
 obj-m += ./kernel_api/1-mem/
 obj-m += ./kernel_api/3-memory/
+obj-m += ./kernel_api/7-list-test/
 obj-m += ./kernel_api/2-sched-spin/
+obj-m += ./kernel_api/6-list-sync/
 obj-m += ./kernel_api/4-list/
 obj-m += ./kernel_api/5-list-full/
