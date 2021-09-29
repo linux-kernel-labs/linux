@@ -67,10 +67,6 @@ static int so2_cdev_open(struct inode *inode, struct file *file)
 	set_current_state(TASK_INTERRUPTIBLE);
 	schedule_timeout(10 * HZ);
 	
-	set_current_state(TASK_INTERRUPTIBLE);
-	schedule_timeout(1000);
-	
-	
 	return 0;
 }
 
@@ -97,7 +93,6 @@ static ssize_t so2_cdev_read(struct file *file,char __user *user_buffer, size_t 
 #ifdef EXTRA
 	/* TODO 7: extra tasks for home */
 #endif
-	pr_info("Here!\n");
 	/* TODO 4: Copy data->buffer to user_buffer, use copy_to_user */
 	size_t i;
 	to_read = copy_to_user(user_buffer, data->read_buffer, size);
@@ -108,36 +103,37 @@ static ssize_t so2_cdev_read(struct file *file,char __user *user_buffer, size_t 
 	}
 	else if(to_read == 0)
 	{   
-	    pr_info("Before finished reading: Offset: %lld \n", *offset);
-		for(i = *offset ; i < size ; i++)
-		{
-				pr_info("%c", user_buffer[i]);
-		}
+		pr_info("%s",user_buffer);
 		*offset = size;
-		pr_info("Finised reading: Offset: %lld \n", *offset);
 		return 0;
 	}
-	
-	for(i = *offset ; i < to_read ; i++)
+	else
 	{
-		pr_info("%c", user_buffer[i]);
+		//case that only part of the buffer was copied
+		for(i = *offset ; i < to_read ; i++)
+		{
+			pr_info("%c", user_buffer[i]);
+		}
+		*offset += to_read;
 	}
 	
-	*offset += to_read;
-	pr_info("Reading: Offset: %lld \n", *offset);
 	return to_read;
 }
 
 static ssize_t
-so2_cdev_write(struct file *file,
-		const char __user *user_buffer,
-		size_t size, loff_t *offset)
+so2_cdev_write(struct file *file, const char __user *user_buffer, size_t size, loff_t *offset)
 {
-	struct so2_device_data *data =
-		(struct so2_device_data *) file->private_data;
+	struct so2_device_data *data = (struct so2_device_data *) file->private_data;
 
 
 	/* TODO 5: copy user_buffer to data->buffer, use copy_from_user */
+	size_t status =  copy_from_user(data->read_buffer, user_buffer, size);
+	if(status != 0)
+	{
+		pr_info("returns status\n");
+		return status;
+	}
+	
 	/* TODO 7: extra tasks for home */
 
 	return size;
@@ -150,9 +146,12 @@ so2_cdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		(struct so2_device_data *) file->private_data;
 	int ret = 0;
 	int remains;
-
+	
 	switch (cmd) {
 	/* TODO 6: if cmd = MY_IOCTL_PRINT, display IOCTL_MESSAGE */
+	case MY_IOCTL_PRINT:
+		pr_info("%s\n", IOCTL_MESSAGE);
+		break;
 	/* TODO 7: extra tasks, for home */
 	default:
 		ret = -EINVAL;
@@ -167,9 +166,11 @@ static const struct file_operations so2_fops = {
 	.open = so2_cdev_open,
 	.release = so2_cdev_release,
 /* TODO 4: add read function */
-    .read =  so2_cdev_read,
+    .read = so2_cdev_read,
 /* TODO 5: add write function */
+    .write = so2_cdev_write,
 /* TODO 6: add ioctl function */
+	.unlocked_ioctl = so2_cdev_ioctl,
 };
 
 static int so2_cdev_init(void)
