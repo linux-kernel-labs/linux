@@ -1,0 +1,45 @@
+
+oops_mod.ko:     file format elf32-i386
+
+
+Disassembly of section .text.unlikely:
+
+d0834000 <init_module>:
+MODULE_DESCRIPTION("Oops generating module");
+MODULE_AUTHOR("So2rul Esforever");
+MODULE_LICENSE("GPL");
+
+static int my_oops_init(void)
+{
+d0834000:	55                   	push   %ebp
+d0834001:	89 e5                	mov    %esp,%ebp
+	char *p = 0;
+
+	pr_info("before init\n");
+d0834003:	68 00 00 00 00       	push   $0x0
+d0834008:	e8 fc ff ff ff       	call   d0834009 <init_module+0x9>
+	*p = 'a';
+d083400d:	c6 05 00 00 00 00 61 	movb   $0x61,0x0
+	pr_info("after init\n");
+d0834014:	68 0f 00 00 00       	push   $0xf
+d0834019:	e8 fc ff ff ff       	call   d083401a <init_module+0x1a>
+
+	return 0;
+}
+d083401e:	31 c0                	xor    %eax,%eax
+d0834020:	c9                   	leave  
+d0834021:	c3                   	ret    
+
+d0834022 <cleanup_module>:
+
+static void my_oops_exit(void)
+{
+d0834022:	55                   	push   %ebp
+d0834023:	89 e5                	mov    %esp,%ebp
+	pr_info("module goes all out\n");
+d0834025:	68 1d 00 00 00       	push   $0x1d
+d083402a:	e8 fc ff ff ff       	call   d083402b <cleanup_module+0x9>
+}
+d083402f:	58                   	pop    %eax
+d0834030:	c9                   	leave  
+d0834031:	c3                   	ret    

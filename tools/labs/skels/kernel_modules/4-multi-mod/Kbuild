@@ -1,0 +1,4 @@
+ccflags-y = -Wno-unused-function -Wno-unused-label -Wno-unused-variable
+
+obj-m = multi_mod.o
+multi_mod-y = mod1.o mod2.o

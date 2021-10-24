@@ -1,0 +1,37 @@
+
+hello_mod.ko:     file format elf32-i386
+
+
+Disassembly of section .text.unlikely:
+
+00000000 <init_module>:
+MODULE_DESCRIPTION("Simple module");
+MODULE_AUTHOR("Kernel Hacker");
+MODULE_LICENSE("GPL");
+
+static int my_hello_init(void)
+{
+   0:	55                   	push   %ebp
+   1:	89 e5                	mov    %esp,%ebp
+	pr_debug("Hello!\n");
+   3:	68 00 00 00 00       	push   $0x0
+   8:	e8 fc ff ff ff       	call   9 <init_module+0x9>
+	return 0;
+}
+   d:	31 c0                	xor    %eax,%eax
+   f:	c9                   	leave  
+  10:	c3                   	ret    
+
+00000011 <cleanup_module>:
+
+static void hello_exit(void)
+{
+  11:	55                   	push   %ebp
+  12:	89 e5                	mov    %esp,%ebp
+	pr_debug("Goodbye!\n");
+  14:	68 0a 00 00 00       	push   $0xa
+  19:	e8 fc ff ff ff       	call   1a <cleanup_module+0x9>
+}
+  1e:	58                   	pop    %eax
+  1f:	c9                   	leave  
+  20:	c3                   	ret    
