@@ -1,6 +1,6 @@
 /*
  * ARM Kernel Development
- * 
+ *
  * simple_driver.c - Simple platform driver to demonstrate device
  * probing
  */
@@ -36,8 +36,8 @@ static int simple_remove(struct platform_device *pdev)
 }
 
 struct platform_driver simple_driver = {
-	.probe	= simple_probe,
-	.remove	= simple_remove,
+	.probe  = simple_probe,
+	.remove = simple_remove,
 	.driver = {
 		.name = "simple_driver",
 		.of_match_table = simple_device_ids,

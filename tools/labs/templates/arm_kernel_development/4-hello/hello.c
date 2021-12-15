@@ -1,6 +1,6 @@
 /*
  * ARM Kernel Development
- * 
+ *
  * hello.c - Simple hello world module
  */
 
