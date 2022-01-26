@@ -264,7 +264,7 @@ Since system calls are executed in kernel mode, they have access to
 kernel space and if pointers are not properly checked user
 applications might get read or write access to kernel space.
 
-For example, lets consider the case where such a check is not made for
+For example, let's consider the case where such a check is not made for
 the read or write system calls. If the user passes a kernel-space
 pointer to a write system call then it can get access to kernel data
 by later reading the file. If it passes a kernel-space pointer to a
@@ -281,7 +281,7 @@ read system call then it can corrupt kernel memory.
 
 Likewise, if a pointer passed by the application is invalid
 (e.g. unmapped, read-only for cases where it is used for writing), it
-could "crash" the kernel. There two approaches that could be used:
+could "crash" the kernel. There are two approaches that could be used:
 
 .. slide:: Invalid pointers handling approaches
    :inline-contents: True
