@@ -1,0 +1,38 @@
+KDIR = /home/so2/vm/linux
+
+include Makefile
+
+$(YOCTO_IMAGE): clean-slate.$(YOCTO_IMAGE)
+	cp clean-slate.$(YOCTO_IMAGE) $(YOCTO_IMAGE)
+
+setup: $(YOCTO_IMAGE)
+	mkdir -p out
+
+copy:
+	if  [ -e qemu.mon ]; then exit 1; fi
+	mkdir $(TEMPDIR)
+	sudo mount -t ext4 -o loop $(YOCTO_IMAGE) $(TEMPDIR)
+	find skels -type f \( -name *.ko -or -executable \) | xargs sudo cp -t $(TEMPDIR)/home/root || true
+	sudo cp -r skels/assignments/*/checker/* -t $(TEMPDIR)/home/root || true
+	sudo umount $(TEMPDIR)
+	rmdir $(TEMPDIR)
+
+extract:
+	if  [ -e qemu.mon ]; then exit 1; fi
+	mkdir $(TEMPDIR)
+	sudo mount -t ext4 -o loop $(YOCTO_IMAGE) $(TEMPDIR)
+	sudo cp $(TEMPDIR)/home/root/run-stdout.vmr out/ && sudo chown so2:so2 out/run-stdout.vmr || true
+	sudo cp $(TEMPDIR)/home/root/run-stderr.vmr out/ && sudo chown so2:so2 out/run-stderr.vmr || true
+	sudo umount $(TEMPDIR)
+	rmdir $(TEMPDIR)
+	test -f out/run-stdout.vmr || echo "No testing output (likely due to submission errors)." > out/run-stdout.vmr
+	test -f out/run-stderr.vmr || echo "No testing output (likely due to submission errors)." > out/run-stderr.vmr
+
+postprocess:
+	sed -i '/^Linux version /,/^netconsole: network logging started/d' out/run-km.vmr
+
+destroy:
+	-rm -rf out
+	-rm -f $(YOCTO_IMAGE)
+
+.PHONY: setup copy extract postprocess destroy

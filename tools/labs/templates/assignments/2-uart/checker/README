@@ -1,0 +1,38 @@
+= UART16550 TEST SUITE ==
+
+Test suite for UART16550
+
+== FILES ==
+
+README
+	* this file
+
+Makefile
+	* Makefile to build the test suite executable
+
+_checker
+	* script to run all tests defined in _test/test.c
+
+_test/test.c
+	* test suite for UART16550
+
+_test/solution.ko
+	* kernel module implementing UART16550,
+	used to transmit/receive data to/from your kernel module
+
+== BUILDING ==
+
+Use the Makefile to properly build the test executable:
+
+	make
+
+== RUNNING ==
+
+Copy your uart16550.ko module and _checker, test and solution.ko
+to fsimg/root directory on your QEMU/KVM virtual machine.
+
+In order to run the test suite you can use the _checker script.
+
+The _checker script runs all tests and computes assignment grade:
+
+	./_checker

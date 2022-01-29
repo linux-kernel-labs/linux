@@ -1,0 +1,36 @@
+version: '3'
+services:
+  docs-build:
+    tty: true
+    build:
+      context: .
+      dockerfile: ./docs/Dockerfile
+    volumes:
+      - ../../../:/linux
+    environment:
+      # workaround for binfmt_misc support in containers
+      - SPHINX_DITAA_CMD=jexec
+      - SPHINX_DITAA_ARG=/usr/bin/ditaa
+  docs-server:
+    build:
+      context: .
+      dockerfile: ./docs/Dockerfile.server
+    volumes:
+      - ../../../:/linux
+    ports:
+    - 8000:8000
+  kernel-build:
+    privileged: true
+    tty: true
+    hostname: "so2"
+    environment:
+      - DISPLAY
+    build:
+      context: .
+      dockerfile: ./kernel/Dockerfile
+      args:
+              ARG_UID: ${ARG_UID}
+              ARG_GID: ${ARG_GID}
+    volumes:
+      - ../../../:/linux
+      - /tmp/.X11-unix:/tmp/.X11-unix
