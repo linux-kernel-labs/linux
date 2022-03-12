@@ -1,0 +1,3 @@
+Am buildat cu make build
+insmod mem.ko => afiseaza foarte multi de Z
+rmmod mem.ko => nu afiseaza nimic
