@@ -20,18 +20,19 @@ static int sched_spin_init(void)
 	spin_lock_init(&lock);
 
 	/* TODO 0: Use spin_lock to aquire the lock */
-
+	spin_lock(&lock);
 	set_current_state(TASK_INTERRUPTIBLE);
 	/* Try to sleep for 5 seconds. */
 	schedule_timeout(5 * HZ);
 
 	/* TODO 0: Use spin_unlock to release the lock */
-
+	spin_unlock(&lock);
 	return 0;
 }
 
 static void sched_spin_exit(void)
 {
+	pr_info("Exiting..\n");
 }
 
 module_init(sched_spin_init);
