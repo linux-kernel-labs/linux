@@ -26,10 +26,10 @@ static struct list_head head;
 
 /* TODO 1: you can use either a spinlock or rwlock, define it here */
 
+static spinlock_t my_spin_lock;
 static struct task_info *task_info_alloc(int pid)
 {
 	struct task_info *ti;
-
 	ti = kmalloc(sizeof(*ti), GFP_KERNEL);
 	if (ti == NULL)
 		return NULL;
@@ -58,8 +58,9 @@ static struct task_info *task_info_find_pid(int pid)
 static void task_info_add_to_list(int pid)
 {
 	struct task_info *ti;
-
+	spin_lock_init(&my_spin_lock);
 	/* TODO 1: Protect list, is this read or write access? */
+	spin_lock(&my_spin_lock);
 	ti = task_info_find_pid(pid);
 	if (ti != NULL) {
 		ti->timestamp = jiffies;
@@ -68,11 +69,16 @@ static void task_info_add_to_list(int pid)
 		return;
 	}
 	/* TODO 1: critical section ends here */
+	spin_unlock(&my_spin_lock);
 
 	ti = task_info_alloc(pid);
 	/* TODO 1: protect list access, is this read or write access? */
+	spin_lock(&my_spin_lock);
 	list_add(&ti->list, &head);
 	/* TODO 1: critical section ends here */
+	spin_unlock(&my_spin_lock);
+
+
 }
 
 void task_info_add_for_current(void)
@@ -88,15 +94,17 @@ void task_info_print_list(const char *msg)
 {
 	struct list_head *p;
 	struct task_info *ti;
-
+	spin_lock_init(&my_spin_lock);
 	pr_info("%s: [ ", msg);
 
 	/* TODO 1: Protect list, is this read or write access? */
+	spin_lock(&my_spin_lock);
 	list_for_each(p, &head) {
 		ti = list_entry(p, struct task_info, list);
 		pr_info("(%d, %lu) ", ti->pid, ti->timestamp);
 	}
 	/* TODO 1: Critical section ends here */
+	spin_unlock(&my_spin_lock);
 	pr_info("]\n");
 }
 /* TODO 2: Export the kernel symbol */
@@ -105,8 +113,10 @@ void task_info_remove_expired(void)
 {
 	struct list_head *p, *q;
 	struct task_info *ti;
+	spin_lock_init(&my_spin_lock);
 
 	/* TODO 1: Protect list, is this read or write access? */
+	spin_lock(&my_spin_lock);
 	list_for_each_safe(p, q, &head) {
 		ti = list_entry(p, struct task_info, list);
 		if (jiffies - ti->timestamp > 3 * HZ && atomic_read(&ti->count) < 5) {
@@ -114,6 +124,7 @@ void task_info_remove_expired(void)
 			kfree(ti);
 		}
 	}
+	spin_unlock(&my_spin_lock);
 	/* TODO 1: Critical section ends here */
 }
 /* TODO 2: Export the kernel symbol */
@@ -122,13 +133,16 @@ static void task_info_purge_list(void)
 {
 	struct list_head *p, *q;
 	struct task_info *ti;
+	spin_lock_init(&my_spin_lock);
 
 	/* TODO 1: Protect list, is this read or write access? */
+	spin_lock(&my_spin_lock);
 	list_for_each_safe(p, q, &head) {
 		ti = list_entry(p, struct task_info, list);
 		list_del(p);
 		kfree(ti);
 	}
+	spin_unlock(&my_spin_lock);
 	/* TODO 1: Critical sections ends here */
 }
 
