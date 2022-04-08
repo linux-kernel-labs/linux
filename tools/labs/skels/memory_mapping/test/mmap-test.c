@@ -127,12 +127,14 @@ int main(int argc, const char **argv)
 		assert(system("rm " MMAP_DEV) == 0);
 		exit(EXIT_FAILURE);
 	}
-
+	int j;
 	for (i = 0; i < NPAGES * getpagesize(); i += getpagesize()) {
 		if (addr[i] != 0xaa || addr[i + 1] != 0xbb ||
-				addr[i + 2] != 0xcc || addr[i + 3] != 0xdd)
+				addr[i + 2] != 0xcc || addr[i + 3] != 0xdd) {
 			printf("0x%x 0x%x 0x%x 0x%x\n", addr[i], addr[i+1],
 					addr[i+2], addr[i+3]);
+			printf("Addr: %lu ", (unsigned long)(addr + i));
+		}
 		else
 			printf("matched\n");
 	}

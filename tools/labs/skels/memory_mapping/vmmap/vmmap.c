@@ -111,6 +111,7 @@ static int my_seq_show(struct seq_file *seq, void *v)
 static int my_seq_open(struct inode *inode, struct file *file)
 {
 	/* TODO 3: Register the display function */
+	return 0;
 }
 
 static const struct proc_ops my_proc_ops = {
