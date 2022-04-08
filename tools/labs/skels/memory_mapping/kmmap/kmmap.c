@@ -54,8 +54,12 @@ static int my_read(struct file *file, char __user *user_buffer,
 		size_t size, loff_t *offset)
 {
 	/* TODO 2: check size doesn't exceed our mapped area size */
+	if (size > NPAGES * PAGE_SIZE) {
+		return -EIO;	
+	}
 
 	/* TODO 2: copy from mapped area to user buffer */
+	memcpy(user_buffer, kmalloc_area, size);
 
 	return size;
 }
@@ -64,9 +68,11 @@ static int my_write(struct file *file, const char __user *user_buffer,
 		size_t size, loff_t *offset)
 {
 	/* TODO 2: check size doesn't exceed our mapped area size */
-
+	if (size > NPAGES * PAGE_SIZE) {
+		return -EIO;
+	}
 	/* TODO 2: copy from user buffer to mapped area */
-
+	memcpy(kmalloc_area, user_buffer, size);
 	return size;
 }
 

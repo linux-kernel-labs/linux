@@ -1,3 +1,5 @@
 1) In module_init, aloc memorie cu kmap, marchez paginile ca neswapabile si scriu la inceputul fiecarei pagini. In implementarea
 functiei "my_mmap", mapez adresa de user-space peste pagina fizica corespunzatoare memoriei alocate anterior.
-2) Similar pt vmap, cu mentiunea ca remapez cate o pagina din userspace in memoria fizica, intrucat aceasta nu este alocata contiguu. 
+2) Similar pt vmap, cu mentiunea ca remapez cate o pagina din userspace in memoria fizica, intrucat aceasta nu este alocata contiguu.
+3) Cum spatiul de memorie alocat a fost mapat cu permisiunile necesare, se pot efectua operatii atat de read, cat si de write. De asemenea, intrucat spatiul de memorie este mapat peste memoria de kernel si nu de user, s-a putut face transfer folosind memcpy, fara a fi nevoie de copy_to/from_user.
+
