@@ -1,0 +1,2 @@
+1) In module_init, aloc memorie cu kmap, marchez paginile ca neswapabile si scriu la inceputul fiecarei pagini. In implementarea
+functiei "my_mmap", mapez adresa de user-space peste pagina fizica corespunzatoare memoriei alocate anterior. 
