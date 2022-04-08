@@ -74,12 +74,20 @@ static int my_mmap(struct file *filp, struct vm_area_struct *vma)
 	unsigned long start = vma->vm_start;
 	char *vmalloc_area_ptr = vmalloc_area;
 	unsigned long pfn;
-
+	int i;
+	
 	if (length > NPAGES * PAGE_SIZE)
 		return -EIO;
 
 	/* TODO 1: map pages individually */
-
+	for (i = 0; i < NPAGES * PAGE_SIZE; i+= PAGE_SIZE) {
+		unsigned long pfn = vmalloc_to_pfn(vmalloc_area + i);
+		ret = remap_pfn_range(vma, start + i, pfn, PAGE_SIZE, vma->vm_page_prot);
+		if (ret < 0) {
+			pr_err("Could not map the address area\n");
+			return -EIO;
+		}
+	}		
 	return 0;
 }
 
@@ -134,10 +142,27 @@ static int __init my_init(void)
 	}
 
 	/* TODO 1: allocate NPAGES using vmalloc */
+	vmalloc_area = vmalloc(NPAGES * PAGE_SIZE);
+	if (!vmalloc_area) 
+		return -ENOMEM;
 
 	/* TODO 1: mark pages as reserved */
-
+	for (i = 0; i < NPAGES * PAGE_SIZE; i += PAGE_SIZE) {
+		SetPageReserved(vmalloc_to_page(((unsigned long)vmalloc_area) + i));
+	}
+	
 	/* TODO 1: write data in each page */
+	unsigned char a = 0xaa;
+        unsigned char b = 0xbb;
+        unsigned char c = 0xcc;
+	unsigned char d = 0xdd;
+	
+	for (i = 0; i < NPAGES * PAGE_SIZE; i += PAGE_SIZE) {
+		memcpy(vmalloc_area + i, &a, 1);
+		memcpy(vmalloc_area + i + 1, &b, 1);
+                memcpy(vmalloc_area + i + 2, &c, 1);
+		memcpy(vmalloc_area + i + 3, &d, 1);
+	}
 
 	cdev_init(&mmap_cdev, &mmap_fops);
 	ret = cdev_add(&mmap_cdev, MKDEV(MY_MAJOR, 0), 1);
@@ -165,7 +190,12 @@ static void __exit my_exit(void)
 	cdev_del(&mmap_cdev);
 
 	/* TODO 1: clear reservation on pages and free mem.*/
-
+	for (i = 0; i < NPAGES * PAGE_SIZE; i+=PAGE_SIZE) {
+		struct page *pg = vmalloc_to_page(((unsigned long)vmalloc_area) + i);
+		ClearPageReserved(pg);
+	}
+	vfree(vmalloc_area);
+		
 	unregister_chrdev_region(MKDEV(MY_MAJOR, 0), 1);
 	/* TODO 3: remove proc entry */
 }
