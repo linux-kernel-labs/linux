@@ -53,12 +53,10 @@ static int my_release(struct inode *inode, struct file *filp)
 static int my_read(struct file *file, char __user *user_buffer,
 		size_t size, loff_t *offset)
 {
-	/* TODO 2: check size doesn't exceed our mapped area size */
 	if (size > NPAGES * PAGE_SIZE) {
 		return -EIO;	
 	}
 
-	/* TODO 2: copy from mapped area to user buffer */
 	memcpy(user_buffer, kmalloc_area, size);
 
 	return size;
@@ -67,11 +65,9 @@ static int my_read(struct file *file, char __user *user_buffer,
 static int my_write(struct file *file, const char __user *user_buffer,
 		size_t size, loff_t *offset)
 {
-	/* TODO 2: check size doesn't exceed our mapped area size */
 	if (size > NPAGES * PAGE_SIZE) {
 		return -EIO;
 	}
-	/* TODO 2: copy from user buffer to mapped area */
 	memcpy(kmalloc_area, user_buffer, size);
 	return size;
 }
@@ -85,7 +81,6 @@ static int my_mmap(struct file *filp, struct vm_area_struct *vma)
 	if (length > NPAGES * PAGE_SIZE)
 		return -EIO;
 	
-	/* TODO 1: map the whole physically contiguous area in one piece */
 	unsigned long addr = vma->vm_start;
 	unsigned long physical_address = virt_to_phys(kmalloc_area);
 	unsigned long pfn = physical_address >> PAGE_SHIFT;
@@ -112,20 +107,22 @@ static int my_seq_show(struct seq_file *seq, void *v)
 	struct vm_area_struct *vma_iterator;
 	unsigned long total = 0;
 
-	/* TODO 3: Get current process' mm_struct */
-
-	/* TODO 3: Iterate through all memory mappings */
-
-	/* TODO 3: Release mm_struct */
-
-	/* TODO 3: write the total count to file  */
+	mm = get_task_mm(current);
+	vma_iterator = mm->mmap;
+	
+	while (vma_iterator) {
+		pr_info("%lx, %lxn", vma_iterator->vm_start, vma_iterator->vm_end);
+		total += vma_iterator->vm_end - vma_iterator->vm_start;
+		vma_iterator = vma_iterator->vm_next;	
+	}
+	mmput(mm);
+	seq_printf(seq, "%lu", total);
 	return 0;
 }
 
 static int my_seq_open(struct inode *inode, struct file *file)
 {
-	/* TODO 3: Register the display function */
-	return 0;
+	return single_open(file, my_seq_show, NULL);
 }
 
 static const struct proc_ops my_proc_ops = {
@@ -139,7 +136,11 @@ static int __init my_init(void)
 {
 	int ret = 0;
 	unsigned int i;
-	/* TODO 3: create a new entry in procfs */
+	
+	if (!proc_create(PROC_ENTRY_NAME, 0, NULL, &my_proc_ops)) {
+		pr_err("could not create procfs entry\n");
+		goto out;
+	}	
 
 	ret = register_chrdev_region(MKDEV(MY_MAJOR, 0), 1, "mymap");
 	if (ret < 0) {
@@ -147,21 +148,17 @@ static int __init my_init(void)
 		goto out_no_chrdev;
 	}
 
-	/* TODO 1: allocate NPAGES+2 pages using kmalloc */
 	kmalloc_ptr = kmalloc((NPAGES + 2) * PAGE_SIZE, GFP_KERNEL);
 	if (!kmalloc_ptr) 
 	       return -ENOMEM;
 
-	/* TODO 1: round kmalloc_ptr to nearest page start address */
 	kmalloc_area = PAGE_ALIGN((unsigned int)kmalloc_ptr);
 
-	/* TODO 1: mark pages as reserved */
 	for (i = 0; i < NPAGES * PAGE_SIZE; i+= PAGE_SIZE) {
 		struct page *page = virt_to_page(((unsigned int)kmalloc_area) + i);
 		SetPageReserved(page);
 	}
 
-	/* TODO 1: write data in each page */
 	unsigned char a = 0xaa;
 	unsigned char b = 0xbb;
 	unsigned char c = 0xcc;
@@ -200,7 +197,6 @@ static void __exit my_exit(void)
 
 	cdev_del(&mmap_cdev);
 
-	/* TODO 1: clear reservation on pages and free mem. */
 
 	for (i = 0; i < NPAGES * PAGE_SIZE; i+=PAGE_SIZE) {
 		struct page *pg = virt_to_page(((unsigned long)kmalloc_area) + i);
@@ -209,7 +205,7 @@ static void __exit my_exit(void)
 	kfree(kmalloc_ptr);
 
 	unregister_chrdev_region(MKDEV(MY_MAJOR, 0), 1);
-	/* TODO 3: remove proc entry */
+	remove_proc_entry(PROC_ENTRY_NAME, NULL);
 }
 
 module_init(my_init);
