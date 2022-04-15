@@ -179,6 +179,11 @@ static int __init my_block_init(void)
 	int err = 0;
 
 	/* TODO 1: register block device */
+	err = register_blkdev(MY_BLOCK_MAJOR, MY_BLKDEV_NAME);
+	if (err < 0) {
+		printk(KERN_ERR "register_blkdev: unable to register\n");
+		return err;
+	}
 
 	/* TODO 2: create block device using create_block_device */
 
@@ -209,6 +214,7 @@ static void __exit my_block_exit(void)
 	/* TODO 2: cleanup block device using delete_block_device */
 
 	/* TODO 1: unregister block device */
+	unregister_blkdev(MY_BLOCK_MAJOR, MY_BLKDEV_NAME);
 }
 
 module_init(my_block_init);
