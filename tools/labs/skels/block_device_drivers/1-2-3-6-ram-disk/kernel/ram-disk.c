@@ -67,6 +67,13 @@ static void my_block_transfer(struct my_block_dev *dev, sector_t sector,
 		return;
 
 	/* TODO 3: read/write to dev buffer depending on dir */
+	if (dir == 0) {
+		// read
+		memcpy(buffer, dev->data + offset, len);
+	} else if (dir == 1) {
+		// write
+		memcpy(dev->data + offset, buffer, len);
+	}
 }
 
 /* to transfer data using bio structures enable USE_BIO_TRANFER */
@@ -110,6 +117,9 @@ static blk_status_t my_block_request(struct blk_mq_hw_ctx *hctx,
 	/* TODO 6: process the request by calling my_xfer_request */
 #else
 	/* TODO 3: process the request by calling my_block_transfer */
+	my_block_transfer(dev, blk_rq_pos(rq), blk_rq_bytes(rq), 
+					  bio_data(rq->bio), rq_data_dir(rq));
+
 #endif
 
 	/* TODO 2: end request successfully */
