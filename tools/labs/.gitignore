@@ -1,4 +1,4 @@
-/skels/
+#/skels/
 vmlinux
 zImage
 serial.pts
