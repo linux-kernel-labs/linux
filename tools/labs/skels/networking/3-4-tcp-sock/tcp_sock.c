@@ -73,15 +73,23 @@ int __init my_tcp_sock_init(void)
 		goto out_release;
 
 	/* TODO 2: create new socket for the accepted connection */
+	if (sock_create_lite(PF_INET, SOCK_STREAM, IPPROTO_TCP, &new_sock) < 0)
+		goto out;
 
 	/* TODO 2: accept a connection */
+	if (sock->ops->accept(sock, new_sock, 0, true) < 0)
+		goto out_release_new_sock;
 
 	/* TODO 2: get the address of the peer and print it */
+	if (sock->ops->getname(new_sock, (struct sockaddr *) &raddr, 1) < 0)
+		goto out_release_new_sock;
+	print_sock_address(raddr);
 
 	return 0;
 
 out_release_new_sock:
 	/* TODO 2: cleanup socket for accepted connection */
+	sock_release(new_sock);
 out_release:
 	/* TODO 1: cleanup listening socket */
 	sock_release(sock);
@@ -92,6 +100,7 @@ out:
 void __exit my_tcp_sock_exit(void)
 {
 	/* TODO 2: cleanup socket for accepted connection */
+	sock_release(new_sock);
 
 	/* TODO 1: cleanup listening socket */
 	sock_release(sock);
