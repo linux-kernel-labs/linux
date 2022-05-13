@@ -61,10 +61,16 @@ int __init my_tcp_sock_init(void)
 	struct sockaddr_in raddr;
 
 	/* TODO 1: create listening socket */
+	if (sock_create_kern(&init_net, PF_INET, SOCK_STREAM, IPPROTO_TCP, &sock) < 0)
+		goto out;
 
 	/* TODO 1: bind socket to loopback on port MY_TCP_PORT */
+	if (sock->ops->bind(sock, (struct sockaddr *) &addr, addrlen) < 0)
+		goto out_release;
 
 	/* TODO 1: start listening */
+	if (sock->ops->listen(sock, LISTEN_BACKLOG) < 0)
+		goto out_release;
 
 	/* TODO 2: create new socket for the accepted connection */
 
@@ -78,6 +84,7 @@ out_release_new_sock:
 	/* TODO 2: cleanup socket for accepted connection */
 out_release:
 	/* TODO 1: cleanup listening socket */
+	sock_release(sock);
 out:
 	return err;
 }
@@ -87,6 +94,7 @@ void __exit my_tcp_sock_exit(void)
 	/* TODO 2: cleanup socket for accepted connection */
 
 	/* TODO 1: cleanup listening socket */
+	sock_release(sock);
 }
 
 module_init(my_tcp_sock_init);
