@@ -50,6 +50,24 @@ static int test_daddr(unsigned int dst_addr)
 }
 
 /* TODO 1: netfilter hook function */
+static unsigned int my_nf_hookfn(void *priv, struct sk_buff *skb,
+              const struct nf_hook_state *state)
+{
+	
+	struct iphdr *iph;
+	struct tcphdr *tcph;
+
+	iph = ip_hdr(skb);
+	// printk("IP address is %pI4\n", &iph->saddr);
+
+	if (iph->protocol == IPPROTO_TCP) {
+		tcph = (struct tcphdr*)((__u32*)iph + iph->ihl);
+		printk("TCP initiated from %pI4:%d\n", &iph->saddr, ntohs(tcph->source));
+	}
+
+	// printk("IP address is %pI4\n", &iph->saddr);
+	return NF_ACCEPT;
+}
 
 static int my_open(struct inode *inode, struct file *file)
 {
@@ -83,6 +101,12 @@ static const struct file_operations my_fops = {
 };
 
 /* TODO 1: define netfilter hook operations structure */
+static struct nf_hook_ops my_nfho = {
+      .hook        = my_nf_hookfn,
+      .hooknum     = NF_INET_LOCAL_OUT,
+      .pf          = PF_INET,
+      .priority    = NF_IP_PRI_FIRST
+};
 
 int __init my_hook_init(void)
 {
@@ -101,7 +125,7 @@ int __init my_hook_init(void)
 	cdev_add(&my_cdev, MKDEV(MY_MAJOR, 0), 1);
 
 	/* TODO 1: register netfilter hook */
-
+	nf_register_net_hook(&init_net, &my_nfho);
 	return 0;
 
 out:
@@ -115,6 +139,7 @@ out:
 void __exit my_hook_exit(void)
 {
 	/* TODO 1: unregister hook */
+	nf_unregister_net_hook(&init_net, &my_nfho);
 
 	/* cleanup device */
 	cdev_del(&my_cdev);
