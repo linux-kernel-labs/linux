@@ -69,6 +69,10 @@ lkt-tap0:
 lkt-tap1:
 	qemu/create_net.sh $@
 
+lkt-tap-smbd:
+	qemu/create_net.sh $@
+
+
 nttcp-run: $(NTTCP) lkt-tap1
 	$(NTTCP) -v -i &
 
@@ -112,10 +116,10 @@ clean::
 
 YOCTO_ROOTFS = core-image-minimal-qemu$(ARCH).tar.bz2
 
-console: $(ZIMAGE) rootfs
+console: $(ZIMAGE) rootfs lkt-tap0 lkt-tap1 lkt-tap-smbd disk1.img disk2.img
 	MODE=console qemu/run-qemu.sh
 
-gui:
+gui: $(ZIMAGE) rootfs lkt-tap0 lkt-tap1 lkt-tap-smbd disk1.img disk2.img
 	MODE=gui qemu/run-qemu.sh
 
 rootfs: $(YOCTO_ROOTFS)
@@ -125,11 +129,13 @@ rootfs: $(YOCTO_ROOTFS)
 	printf '%s\n' '#!/bin/sh' '/bin/login -f root' > rootfs/sbin/rootlogin
 	chmod +x rootfs/sbin/rootlogin
 	mkdir -p rootfs/home/root/skels
-	echo "//10.0.2.2/skels /home/root/skels cifs port=4450,guest,user=dummy 0 0" >> rootfs/etc/fstab
+	echo "//10.0.2.1/skels /home/root/skels cifs port=4450,guest,user=dummy 0 0" >> rootfs/etc/fstab
+	cp qemu/legacy_rename_disks.sh rootfs/etc/init.d
+	chmod +x rootfs/etc/init.d/legacy_rename_disks.sh
+	sudo chroot rootfs update-rc.d legacy_rename_disks.sh defaults
 
 $(YOCTO_ROOTFS):
 	wget $(YOCTO_URL)/$(YOCTO_ROOTFS)
 
 
-
-.PHONY: console gui boot gdb clean lkt-tap0 lkt-tap1
+.PHONY: console gui boot gdb clean lkt-tap0 lkt-tap1 lkt-tap-smbd

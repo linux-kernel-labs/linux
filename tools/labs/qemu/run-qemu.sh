@@ -45,14 +45,14 @@ linux_loglevel=${LINUX_LOGLEVEL:-"15"}
 linux_term=${LINUX_TERM:-"TERM=xterm"}
 linux_addcmdline=${LINUX_ADD_CMDLINE:-""}
 
-linux_cmdline=${LINUX_CMDLINE:-"root=/dev/cifs rw ip=dhcp cifsroot=//10.0.2.2/rootfs,port=4450,guest,user=dummy $linux_console loglevel=$linux_loglevel $linux_term $linux_addcmdline"}
+linux_cmdline=${LINUX_CMDLINE:-"root=/dev/cifs rw ip=dhcp cifsroot=//10.0.2.1/rootfs,port=4450,guest,user=dummy $linux_console loglevel=$linux_loglevel pci=noacpi $linux_term $linux_addcmdline"}
 
 tmp_dir=$(mktemp -d)
 user=$(id -un)
 
 cat << EOF > "$tmp_dir/smbd.conf"
 [global]
-    interfaces = 127.0.0.1
+    interfaces = 10.0.2.1
     smb ports = 4450
     private dir = $tmp_dir
     bind interfaces only = yes
@@ -102,6 +102,11 @@ mkdir -p "$skels"
     -no-reboot \
     -kernel "$kernel" \
     -append "$linux_cmdline" \
+    -netdev tap,id=lkt-tap-smbd,ifname=lkt-tap-smbd,script=no,downscript=no -net nic,netdev=lkt-tap-smbd,model=virtio \
+    -netdev tap,id=lkt-tap0,ifname=lkt-tap0,script=no,downscript=no -net nic,netdev=lkt-tap0,model=virtio \
+    -netdev tap,id=lkt-tap1,ifname=lkt-tap1,script=no,downscript=no -net nic,netdev=lkt-tap1,model=i82559er \
+    -drive file=disk1.img,if=virtio,format=raw \
+    -drive file=disk2.img,if=virtio,format=raw \
     -gdb tcp::1234 \
     $qemu_display \
     $qemu_addopts
@@ -114,3 +119,4 @@ printf '\e[?7h'
 
 pkill -F "$tmp_dir/smbd.pid"
 rm -rf "$tmp_dir"
+$script_dir/cleanup-net.sh
