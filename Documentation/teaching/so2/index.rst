@@ -48,3 +48,5 @@ Operating Systems 2
    assign3-software-raid.rst
    assign4-transport-protocol.rst
    assign5-pitix.rst
+   assign7-kvm-vmm.rst
+
