@@ -435,6 +435,19 @@ A summary of a typical implementation is presented below:
      * when last file is closed: deallocate data and inode blocks
 
 
+Photographic summary
+--------------------
+
+Below is a illustration from the *Dynamic Tracing with DTrace & SystemTap*
+`book <https://myaut.github.io/dtrace-stap-book/kernel/fs.html>`_.
+
+.. slide:: Photographic summary
+   :inline-contents: True
+   :level: 2
+
+    .. image:: ../img/vfs.png
+
+
 Linux Virtual File System
 =========================
 
@@ -772,4 +785,17 @@ The Page Cache
        * page struct once IO has completed.
        */
       int block_read_full_page(struct page *page, get_block_t *get_block)
+
+
+Photographic summary
+--------------------
+
+Below is a illustration from the *Dynamic Tracing with DTrace & SystemTap*
+`book <https://myaut.github.io/dtrace-stap-book/kernel/fs.html>`_.
+
+.. slide:: Photographic summary
+   :inline-contents: True
+   :level: 2
+
+    .. image:: ../img/vfscache.png
 
