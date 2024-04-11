@@ -20,7 +20,7 @@ Assignment's Objectives
 Statement
 =========
 
-Write a kernel module that implements the RAID software functionality. `Software RAID <https://en.wikipedia.org/wiki/RAID#Software-based_RAID>`__ provides an abstraction between
+Write a kernel module that implements the RAID software functionality. `Software RAID <https://en.wikipedia.org/wiki/RAID#Software-based>`__ provides an abstraction between
 the logical device and the physical devices. The implementation will use `RAID scheme 1 <https://en.wikipedia.org/wiki/RAID#Standard_levels>`__.
 
 The virtual machine has two hard disks that will represent the physical devices: `/dev/vdb` and `/dev/vdc`. The operating system
