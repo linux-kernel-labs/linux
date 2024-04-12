@@ -227,7 +227,7 @@ Resources
 * `Lab 10 - Networking <https://linux-kernel-labs.github.io/refs/heads/master/so2/lab10-networking.html>`__
 * Linux kernel sources
 
-  * `Implementing PF_PACKET sockets <http://elixir.free-electrons.com/linux/v5.10/source/net/packet/af_packet.c>`__
+  * `Implementing of PF_PACKET sockets <http://elixir.free-electrons.com/linux/v5.10/source/net/packet/af_packet.c>`__
   * `Implementation of the UDP protocol <http://elixir.free-electrons.com/linux/v5.10/source/net/ipv4/udp.c>`__
   * `Implementation of the IP protocol <http://elixir.free-electrons.com/linux/v5.10/source/net/ipv4/af_inet.c>`__
 
