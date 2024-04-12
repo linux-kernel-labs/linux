@@ -52,6 +52,5 @@ Operating Systems 2
    assign2-driver-uart.rst
    assign3-software-raid.rst
    assign4-transport-protocol.rst
-   .. uncoment next line for pitix to be available in Docs
-   .. assign5-pitix.rst
+   assign5-pitix.rst
    assign7-kvm-vmm.rst
