@@ -269,7 +269,9 @@ Information about assigments penalties can be found on the `General Directions p
 
 In exceptional cases (the assigment passes the tests by not complying with the requirements) and if the assigment does not pass all the tests, the grade will may decrease more than mentioned above.
 
-## References
+References
+----------
+
 We recommend you the following readings before starting to work on the homework:
 * [KVM host in a few lines of code](https://zserge.com/posts/kvm/)
 
@@ -283,11 +285,11 @@ TLDR
 4. We implement the SIMVIRTIO protocol. We will describe how it behaves in the following subtasks.
 5. The guest writes in the TX queue (queue 0) the ascii code for `R` which will result in a `VMEXIT`
 6. the VMM will handle the VMEXIT caused by the previous write in the queue. When the guests receiver the
-`R` letter it will initiate the reser procedure of the device and set the device status to `DEVICE_RESET`
+`R` letter it will initiate the reset procedure of the device and set the device status to `DEVICE_RESET`
 7. After the reset handling, the guest must set the status of the device to `DRIVER_ACK`. After this, the guest will write to the TX queue the letter `C`
 8. In the VMM we will initialize the config process when letter `C` is received.It will set the device status to `DEVICE_CONFIG` and add a new entry in the device_table
 9. After the configuration process is finished, the guest will set the driver status to `DRIVER_OK`
-10. Nex, the VMM will set the device status to `DEVICE_READY`
+10. Next, the VMM will set the device status to `DEVICE_READY`
 11. The guest will write in the TX queue "Ana are mere" and will execute a halt
 12. The VMM will print to the STDOUT the message received and execute the halt request
 13. Finally, the VMM will verify that at address 0x400 and in register RAX is stored the value 42
