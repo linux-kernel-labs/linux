@@ -38,7 +38,7 @@ tasks:
 For each task you may have multiple steps to perform, usually
 incremental. These steps are marked in the source code as well as in
 the lab exercises with the keyword *TODO*. If we have multiple steps
-to perform they will be prefixed by a number, like *TODO1*, *TODO2*,
+to perform they will be suffixed by a number, like *TODO1*, *TODO2*,
 etc. If no number is used it is assumed to be the one and only
 step. If you want to resume a task from a certain step, you can using
 the **TODO** variable. The following example will generate the
