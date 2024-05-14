@@ -27,10 +27,10 @@ The driver must use interrupts for both reception and transmission to reduce lat
 `Read` and `write` calls must also be blocking. :command:`Assignments that do not meet these requirements will not be considered.`
 It is recommended that you use a buffer for the read routine and another buffer for the write routine for each serial port in the driver.
 
-A blocking read call means that the read routine called from the user-space will be blocked until :command:`at least` one byte is read
-(the read buffer in the kernel is empty and no data can be read).
-A blocking write call means that the write routine called from the user-space will be blocked until :command:`at least` one byte is written
-(the write buffer in the kernel is full and no data can be written).
+A blocking read call means that the read routine called from the user-space will be blocked until :command:`at least` one byte is available to be read
+(the read buffer in the kernel is not empty and data is available to be read).
+A blocking write call means that the write routine called from the user-space will be blocked until :command:`at least` one byte can be written
+(the write buffer in the kernel is not full and data can be written).
 
 Buffers Scheme
 --------------
