@@ -115,7 +115,7 @@ most programs nowdays need 64 bits addresses, and such we will need to switch to
 
 In ``vcpu.h``, you may found helpful macros such as CR0_PE, CR0_MP, CR0_ET, etc. 
 
-Since we will running a more complex program, we will also create a small stack for our program
+Since we will run a more complex program, we will also create a small stack for our program
 ``regs.rsp = 1 << 20;``. Don't forget to set the RIP and RFLAGS registers.
 
 Running
