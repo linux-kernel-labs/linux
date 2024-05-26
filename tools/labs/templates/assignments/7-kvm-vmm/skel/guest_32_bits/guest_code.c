@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "device.h"
 
 // Phys addr memory layout:
@@ -48,6 +49,7 @@ void
 __attribute__((noreturn))
 __attribute__((section(".start")))
 _start(void) {
+	const char *p;
 
 	for (p = "Hello, world!\n"; *p; ++p)
 		outb(0xE9, *p);
@@ -57,4 +59,5 @@ _start(void) {
     /* TODO: Using the paravirtualized driver we have written for SIMVIRTIO, send
      "Ana are mere!\n" */
 
+	asm("hlt" : /* empty */ : "a" (42) : "memory");
 }
