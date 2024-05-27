@@ -18,17 +18,19 @@ int main(int argc, char **argv) {
 	UNUSED_PARAMETER(argv);
     struct vm virtual_machine;
     struct vcpu virtual_cpu;
+    struct kvm_regs regs;
+    uint16_t memval;
 
     /* TODO: Initialize the VM. We will use 0x100000 bytes for the memory */
     /* TODO: Initialize the VCPU */
-    /* TODO: Setup real mode. We will use guest_16_bits to test this.
+    /* TODO: Setup real mode. We will use guest_16_bits to test this. */
     /* TODO: IF real mode works all right. We can try to set up long mode*/
 
     for (;;) {
         /* TODO: Run the VCPU with KVM_RUN */
 
         /* TODO: Handle VMEXITs */
-        switch (vcpu->kvm_run->exit_reason) {
+        switch (virtual_cpu.kvm_run->exit_reason) {
             case KVM_EXIT_HLT: {goto check;}
             case KVM_EXIT_MMIO: {
                 /* TODO: Handle MMIO read/write. Data is available in the shared memory at 
@@ -42,13 +44,13 @@ int main(int argc, char **argv) {
 
         fprintf(stderr,	"\nGot exit_reason %d,"
                     " expected KVM_EXIT_HLT (%d)\n",
-                    vcpu->kvm_run->exit_reason, KVM_EXIT_HLT);
+                    virtual_cpu.kvm_run->exit_reason, KVM_EXIT_HLT);
         exit(1);
     }
 
     /* We verify that the guest code ran accordingly */
     check:
-    if (ioctl(vcpu->fd, KVM_GET_REGS, &regs) < 0) {
+    if (ioctl(virtual_cpu.fd, KVM_GET_REGS, &regs) < 0) {
 		perror("KVM_GET_REGS");
 		exit(1);
 	}
@@ -60,7 +62,7 @@ int main(int argc, char **argv) {
 	}
 
     /* Verify that the guest has written 42 at 0x400 */
-	memcpy(&memval, &vm->mem[0x400], sz);
+	memcpy(&memval, &virtual_machine.mem[0x400], sizeof(uint16_t));
 	if (memval != 42) {
 		printf("Wrong result: memory at 0x400 is %lld\n",
 		       (unsigned long long)memval);

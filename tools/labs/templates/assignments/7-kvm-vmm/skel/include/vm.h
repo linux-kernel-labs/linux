@@ -7,3 +7,5 @@ typedef struct vm {
 	int fd;
 	char *mem;
 } virtual_machine;
+
+#endif
