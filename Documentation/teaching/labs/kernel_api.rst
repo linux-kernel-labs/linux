@@ -208,7 +208,7 @@ only when the :c:macro:`DEBUG` macro is defined or if dynamic debugging is used.
 Memory allocation
 -----------------
 
-In Linux only resident memory can be allocated, using :c:func:`kmalloc` call.
+In Linux, resident memory can only be allocated using the :c:func:`kmalloc` call.
 A typical :c:func:`kmalloc` call is presented below:
 
 .. code-block:: c
