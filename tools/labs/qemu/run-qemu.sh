@@ -41,10 +41,10 @@ case "$arch" in
     *) echo "unknown architecture '$arch'" >&2; exit 1 ;;
 esac
 
-smbd=${SMBD:-"smbd"}
+smbd=${SMBD:-"/usr/sbin/smbd"}
 
 qemu=${QEMU:-"qemu-system-$qemu_arch"}
-if kvm-ok; then
+if /usr/sbin/kvm-ok; then
 	qemu_kvm=${QEMU_KVM:-"-enable-kvm -cpu host"}
 fi
 qemu_cpus=${QEMU_CPUS:-"1"}
