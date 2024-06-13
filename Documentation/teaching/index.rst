@@ -85,4 +85,5 @@ tools/labs/docs/Dockerfile for dependencies):
    info/vm.rst
    info/extra-vm.rst
    info/contributing.rst
+   info/general-tips.rst
 
