@@ -107,9 +107,9 @@ Follow the seven rules of writing a good commit message: https://cbea.ms/git-com
   Author: John Doe <john.doe@mail.com>
   Date:   Mon Apr 4 11:54:39 2022 +0300
 
-    uart16550: Add initial skeleton for ssignment #2
+    uart16550: Add initial skeleton for assignment #2
 
-    This adds simple skeleton file for uart16550 assignment. Notice
+    This adds a simple skeleton file for uart16550 assignment. Notice
     module init/exit callbacks and file_operations dummy implementation
     for open/release/read/write/ioctl.
 
@@ -126,7 +126,7 @@ structures and the overall driver design. Then start coding.
 5. Do reviews
 -------------
 
-Create Pull Requests with your commits and go through review rounds with your team members. You can follow `How to create a PR` `video <https://www.youtube.com/watch?v=YvoHJJWvn98>`_.
+Create Pull Requests with your commits and go through review rounds with your team members. You can follow the `How to create a PR` `video <https://www.youtube.com/watch?v=YvoHJJWvn98>`_.
 
 6. Merge the work
 -----------------
