@@ -28,7 +28,7 @@ The objectives of the laboratory are:
 
 * deepening the notions presented in the course
 * presentation of kernel programming interfaces (kernel API)
-* gaining documenting, development and debugging skills on a freestanding
+* gaining documentation, development and debugging skills on a freestanding
   environment
 * acquiring knowledge and skills for drivers development
 
@@ -209,7 +209,7 @@ Kscope
 For a simpler interface, `Kscope <http://sourceforge.net/projects/kscope/>`__
 is a cscope frontend which uses QT. It is lightweight, very fast and very
 easy to use. It allows searching using regular expressions, call graphs, etc.
-Kscope is no longer mantained.
+Kscope is no longer maintained.
 
 There is also a `port <https///opendesktop.org/content/show.php/Kscope4?content=156987>`__
 of version 1.6 for Qt4 and KDE 4 which keeps the integration of the text
@@ -231,7 +231,7 @@ also used in the sources of `Mozilla <http://lxr.mozilla.org/>`__,
 `Apache HTTP Server <http://apache.wirebrain.de/lxr/>`__ and
 `FreeBSD <http://lxr.linux.no/freebsd/source>`__.
 
-There are a number of sites that use LXR for cross-referencing the
+There are a number of sites that use LXR for cross-referencing 
 the sources of the Linux kernel, the main site being `the original site of
 development <http://lxr.linux.no/linux/>`__ which does not work anymore. You can
 use `https://elixir.bootlin.com/ <https://elixir.bootlin.com/>`__.
@@ -255,7 +255,7 @@ provided by the Clang compiler to index the code.
 
 The main difference between cscope and SourceWeb is the fact that SourceWeb
 is, in a way, a compiler pass. SourceWeb doesn't index all the code, but
-only the code that was efectively compiled by the compiler. This way, some
+only the code that was effectively compiled by the compiler. This way, some
 problems are eliminated, such as ambiguities about which variant of a function
 defined in multiple places is used. This also means that the indexing takes
 more time, because the compiled files must pass one more time through
@@ -275,7 +275,7 @@ Usage example:
 library to :code:`LD_PRELOAD`. This way, the library is loaded by
 every process started by :code:`make` (basically, the compiler),
 registers the commands used to start the processes and generates
-a filed called :file:`btrace.log`. This file is then used by
+a file called :file:`btrace.log`. This file is then used by
 :code:`sw-btrace-to-compile-db` which converts it to a format defined
 by clang: `JSON Compilation Database <http://clang.llvm.org/docs/JSONCompilationDatabase.html>`__.
 This JSON Compilation Database resulted from the above steps is then
@@ -355,7 +355,7 @@ kernel image. A simple :command:`gdb` session is the following:
 .. code-block:: bash
 
     student@eg106$ cd ~/src/linux
-    stduent@eg106$ gdb --quiet vmlinux
+    student@eg106$ gdb --quiet vmlinux
     Using host libthread_db library "/lib/tls/libthread_db.so.1".
     (gdb) x/x 0xc02e535c
     0xc02e535c `<sys_call_table>`:    0xc011bc58
@@ -466,7 +466,7 @@ The main advantages of the Linux kernel are the access to sources and
 the open development system. Because of this, the Internet offers a
 larger number of documentation for the kernel.
 
-A few links related to the Linux kernel are shown bellow:
+A few links related to the Linux kernel are shown below:
 
 - `KernelNewbies <http://kernelnewbies.org>`__
 - `KernelNewbies - Kernel Hacking <http://kernelnewbies.org/KernelHacking>`__
@@ -510,7 +510,7 @@ Remarks
      :ref:`vm_link`.
 
 .. important::
-    Before solving an exercice, **carefully** read all its bullets.
+    Before solving an exercise, **carefully** read all its bullets.
 
 ..
   _[SECTION-EXERCISES-REMARKS-END]
