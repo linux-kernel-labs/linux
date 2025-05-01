@@ -1,18 +1,18 @@
 Infrastructure
 ==============
 
-In order to facilitate learning each topic has a hands-on exercises
+In order to facilitate learning, each topic has a hands-on exercises
 section which will contain in-depth, incremental clues on how to solve
 one or multiple tasks. To focus on a particular issue most of the
 tasks will be performed on existing skeleton drivers. Each skeleton
-driver has clearly marked sections that needs to be filled in order to
+driver has clearly marked sections that need to be filled in order to
 complete the tasks.
 
 The skeleton drivers are generated from full source examples located
 in tools/labs/templates. To solve tasks you start by generating the
 skeleton drivers, running the **skels** target in *tools/labs*. To
 keep the workspace clean it is recommended to generate the skeletons
-for one lab only and clean the workspace before start working on a new
+for one lab only and clean the workspace before starting working on a new
 lab. Labs can be selected by using the **LABS** variable:
 
 .. code-block:: shell
@@ -40,7 +40,7 @@ incremental. These steps are marked in the source code as well as in
 the lab exercises with the keyword *TODO*. If we have multiple steps
 to perform they will be prefixed by a number, like *TODO1*, *TODO2*,
 etc. If no number is used it is assumed to be the one and only
-step. If you want to resume a task from a certain step, you can using
+step. If you want to resume a task from a certain step, you can use
 the **TODO** variable. The following example will generate the
 skeleton with the first *TODO* step resolved:
 
@@ -48,7 +48,7 @@ skeleton with the first *TODO* step resolved:
 
    tools/labs $ TODO=2 LABS="kernel_modules/8-kprobes" skels
 
-Once the skelton drivers are generated you can build them with the
+Once the skeleton drivers are generated you can build them with the
 **build** make target:
 
 .. code-block:: shell
@@ -66,7 +66,7 @@ Once the skelton drivers are generated you can build them with the
    make[1]: Leaving directory '/home/tavi/src/linux'
 
 
-To copy the drivers to the VM you can use either use ssh or update the
+To copy the drivers to the VM you can either use ssh or update the
 VM image directly using the **copy** target:
 
 .. code-block:: shell
