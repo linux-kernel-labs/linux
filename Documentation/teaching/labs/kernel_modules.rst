@@ -18,7 +18,7 @@ Kernel Modules Overview
 
 A monolithic kernel, though faster than a microkernel, has the disadvantage of
 lack of modularity and extensibility. On modern monolithic kernels, this has
-been solved by using kernel modules. A kernel module (or loadable kernel mode)
+been solved by using kernel modules. A kernel module (or loadable kernel module)
 is an object file that contains code that can extend the kernel functionality
 at runtime (it is loaded as needed); When a kernel module is no longer needed,
 it can be unloaded. Most of the device drivers are used in the form of kernel
@@ -26,7 +26,7 @@ modules.
 
 For the development of Linux device drivers, it is recommended to download the
 kernel sources, configure and compile them and then install the compiled version
-on the test /development tool machine.
+on the test/development tool machine.
 
 ..
   _[SECTION-OVERVIEW-END]
@@ -90,7 +90,7 @@ by the logging daemon (syslog). To display kernel messages, you can use the
 Compiling kernel modules
 ========================
 
-Compiling a kernel module differs from compiling an user program. First, other
+Compiling a kernel module differs from compiling a user program. First, other
 headers should be used. Also, the module should not be linked to libraries.
 And, last but not least, the module must be compiled with the same options as
 the kernel in which we load the module. For these reasons, there is a standard
@@ -115,7 +115,7 @@ And the example of a :file:`Kbuild` file used to compile a module:
 
    EXTRA_CFLAGS = -Wall -g
 
-   obj-m        = modul.o
+   obj-m        := modul.o
 
 
 As you can see, calling :command:`make` on the :file:`Makefile` file in the
@@ -147,8 +147,8 @@ below:
 
    EXTRA_CFLAGS = -Wall -g
 
-   obj-m        = supermodule.o
-   supermodule-y = module-a.o module-b.o
+   obj-m        := supermodule.o
+   supermodule-y := module-a.o module-b.o
 
 For the example above, the steps to compile are:
 
@@ -537,9 +537,9 @@ the instruction that generated the oops:
 Note that the instruction that generated the oops (``c89d4005`` identified
 earlier) is:
 
-  ``C89d4005: c7 05 34 12 00 00 03 movl $ 0x3,0x1234``
+  ``C89d4005: c7 05 34 12 00 00 03 movl $0x3,0x1234``
 
-That is exactly what was expected - storing value 3 at 0x0001234.
+That is exactly what was expected — storing value 3 at 0x0001234.
 
 The :file:`/proc/modules` is used to find the address where a kernel module is
 loaded.  The :command:`--adjust-vma` option allows you to display instructions
@@ -697,7 +697,7 @@ various outputs: console, log files in :file:`/var/log` etc.
 
 Console-redirected messages can be useful for quickly viewing the effect of
 executing the kernel code, but they are no longer so useful if the kernel
-encounters an irreparable error and the system freezes. In this case, the logs
+encounters an irreparable error, and the system freezes. In this case, the logs
 of the system must be consulted, as they keep the information between system
 restarts. These are found in :file:`/var/log` and are text files, populated by
 :code:`syslogd` and :code:`klogd` during the kernel run. :code:`syslogd` and
@@ -734,7 +734,7 @@ debugging messages displayed using :code:`printk` and the time it takes to
 insert these messages into the text.
 
 A very simple way, less time-consuming for inserting :code:`printk` and
-providing the possibility to analyze the flow of instructions for tests is the
+providing the ability to analyze the flow of instructions for tests is the
 use of the predefined constants :code:`__FILE__`, :code:`__LINE__` and
 :code:`__func__`:
 
@@ -762,7 +762,7 @@ The following macro definition can be used in this case:
                   __FUNCTION__, __LINE__)
 
 Then, at each point where we want to see if it is "reached" in execution,
-insert PRINT_DEBUG; This is a simple and quick way, and can yield by carefully
+insert PRINT_DEBUG; This is a simple and quick method that can yield insights by carefully
 analyzing the output.
 
 The :command:`dmesg` command is used to view the messages printed with
@@ -880,7 +880,7 @@ KDB: Kernel debugger
 --------------------
 
 The kernel debugger has proven to be very useful to facilitate the development and
-debugging process. One of its main advantages is the possibility to perform live debugging.
+debugging process. One of its main advantages is the ability to perform live debugging.
 This allows us to monitor, in real time, the accesses to memory or even modify the memory
 while debugging.
 The debugger has been integrated in the mainline kernel starting with version 2.6.26-rci.
@@ -1044,7 +1044,7 @@ to the virtual machine console?
 Configure the system such that the messages are not displayed directly
 on the serial console, and they can only be inspected using ``dmesg``.
 
-.. hint:: One option is to set the console log level by writting
+.. hint:: One option is to set the console log level by writing
           the desired level to ``/proc/sys/kernel/printk``.
           Use a value smaller than the level used for the prints in
           the source code of the module.
@@ -1117,14 +1117,14 @@ Determine which instruction has triggered the oops.
 
 .. hint:: Use the :file:`proc/modules` information to get the load address of
           the kernel module.  Use, on the physical machine, objdump
-          and/or addr2line . Objdump needs debugging support for
+          and/or addr2line . Objdump requires debugging support for
           compilation!  Read the lab's `objdump`_ and `addr2line`_
           sections.
 
 Try to unload the kernel module. Notice that the operation does not
 work because there are references from the kernel module within the
-kernel since the oops; Until the release of those references (which is
-almost impossible in the case of an oops), the module can not be
+kernel since the oops; Until those references are released (which is
+almost impossible in the case of an oops), the module cannot be
 unloaded.
 
 ..
