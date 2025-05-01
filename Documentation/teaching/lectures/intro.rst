@@ -43,9 +43,9 @@ User vs Kernel
 
 
 Kernel and user are two terms that are often used in operating
-systems. Their definition is pretty straight forward: The kernel is
+systems. Their definition is pretty straightforward: The kernel is
 the part of the operating system that runs with higher privileges
-while user (space) usually means by applications running with low
+while user (space) usually means applications running with low
 privileges.
 
 However these terms are heavily overloaded and might have very
@@ -55,7 +55,7 @@ User mode and kernel mode are terms that may refer specifically to the
 processor execution mode. Code that runs in kernel mode can fully
 [#hypervisor]_ control the CPU while code that runs in user mode has
 certain limitations. For example, local CPU interrupts can only be
-disabled or enable while running in kernel mode. If such an operation
+disabled or enabled while running in kernel mode. If such an operation
 is attempted while running in user mode an exception will be generated
 and the kernel will take over to handle it.
 
@@ -70,8 +70,8 @@ kernel or user applications.
 
 Grossly simplifying, the kernel space is the memory area that is
 reserved to the kernel while user space is the memory area reserved to
-a particular user process. The kernel space is accessed protected so
-that user applications can not access it directly, while user space
+a particular user process. The kernel space is access protected so
+that user applications cannot access it directly, while user space
 can be directly accessed from code running in kernel mode.
 
 
@@ -119,7 +119,7 @@ changed. Linux particularly enforces this (as opposed to in kernel
 APIs that can change as needed).
 
 The kernel code itself can be logically separated in core kernel
-code and device drivers code. Device drivers code is responsible of
+code and device drivers code. Device drivers code is responsible for
 accessing particular devices while the core kernel code is
 generic. The core kernel can be further divided into multiple logical
 subsystems (e.g. file access, networking, process management, etc.)
@@ -174,7 +174,7 @@ directly called between various subsystems.
 
 However, most monolithic kernels do enforce a logical separation
 between subsystems especially between the core kernel and device
-drivers with relatively strict APIs (but not necessarily fixed in
+drivers, with relatively strict APIs (but not necessarily fixed in
 stone) that must be used to access services offered by one subsystem
 or device drivers. This, of course, depends on the particular kernel
 implementation and the kernel's architecture.
@@ -184,10 +184,10 @@ Micro kernel
 ------------
 
 A micro-kernel is one where large parts of the kernel are protected
-from each-other, usually running as services in user space. Because
+from eachother, usually running as services in user space. Because
 significant parts of the kernel are now running in user mode, the
 remaining code that runs in kernel mode is significantly smaller, hence
-micro-kernel term.
+the term micro-kernel.
 
 .. slide:: Micro-kernel
    :level: 2
@@ -220,7 +220,7 @@ micro-kernel term.
 
 In a micro-kernel architecture the kernel contains just enough code
 that allows for message passing between different running
-processes. Practically that means implement the scheduler and an IPC
+processes. Practically that means implementing the scheduler and an IPC
 mechanism in the kernel, as well as basic memory management to setup
 the protection between applications and services.
 
@@ -245,7 +245,7 @@ performance penalty [#minix-vs-linux]_.
 Micro-kernels vs monolithic kernels
 -----------------------------------
 
-Advocates of micro-kernels often suggest that micro-kernel are
+Advocates of micro-kernels often suggest that micro-kernels are
 superior because of the modular design a micro-kernel
 enforces. However, monolithic kernels can also be modular and there
 are several approaches that modern monolithic kernels use toward this
@@ -255,7 +255,7 @@ goal:
    :level: 2
    :inline-contents: True
 
-   * Components can enabled or disabled at compile time
+   * Components can be enabled or disabled at compile time
 
    * Support of loadable kernel modules (at runtime)
 
@@ -269,7 +269,7 @@ There is a class of operating systems that (used to) claim to be
 hybrid kernels, in between monolithic and micro-kernels (e.g. Windows,
 Mac OS X). However, since all of the typical monolithic services run
 in kernel-mode in these operating systems, there is little merit to
-qualify them other then monolithic kernels.
+qualify them other than monolithic kernels.
 
 .. slide:: "Hybrid" kernels
    :level: 2
@@ -683,8 +683,8 @@ maintainers have a -next tree where they accept new features from
 developers or maintainers downstream while even when the merge window
 is closed.
 
-Note that bug fixes are accepted even outside merge window in the
-maintainer's tree from where they are periodically pulled by the
+Note that bug fixes are accepted even outside merge window, in the
+maintainer's tree, from where they are periodically pulled by the
 upstream maintainer regularly, for every release candidate.
 
 
@@ -768,7 +768,7 @@ These are the top level of the Linux source code folders:
   initialization code that runs during boot
 
 * ipc - implementation for various Inter Process Communication system
-  calls such as message queue, semaphores, shared memory
+  calls such as message queues, semaphores, shared memory
 
 * kernel - process management code (including support for kernel
   thread, workqueues), scheduler, tracing, time management, generic
@@ -778,7 +778,7 @@ These are the top level of the Linux source code folders:
   compression and decompression, bitmap manipulation, etc.
 
 * mm - memory management code, for both physical and virtual memory,
-  including the page,  SL*B and CMA allocators, swapping, virtual memory
+  including the page,  SL*B, and CMA allocators, swapping, virtual memory
   mapping, process address space manipulation, etc.
 
 * net - implementation for various network stacks including IPv4 and
@@ -787,7 +787,7 @@ These are the top level of the Linux source code folders:
 
 * samples - various driver samples
 
-* scripts - parts the build system, scripts used for building modules,
+* scripts - parts of the build system, scripts used for building modules,
   kconfig the Linux kernel configurator, as well as various other
   scripts (e.g. checkpatch.pl that checks if a patch is conform with
   the Linux kernel coding style)
@@ -803,7 +803,7 @@ These are the top level of the Linux source code folders:
 * tools - various user space tools for testing or interacting with
   Linux kernel subsystems
 
-* usr - support for embedding an initrd file in the kernel image
+* usr - support embedding an initrd file in the kernel image
 
 * virt - home of the KVM (Kernel Virtual Machine) hypervisor
 
@@ -912,7 +912,7 @@ Device drivers
 
    * Each subsystem has its own specific driver interfaces
 
-   * Many device driver types (TTY, serial, SCSI, fileystem, ethernet,
+   * Many types of device drivers (TTY, serial, SCSI, filesystem, ethernet,
      USB, framebuffer, input, sound, etc.)
 
 The Linux kernel uses a unified device model whose purpose is to
@@ -928,7 +928,7 @@ to the devices it represents in order to make it easier to write
 correct drivers and to reduce code duplication.
 
 Linux supports one of the most diverse set of device drivers type,
-some examples are: TTY, serial, SCSI, fileystem, ethernet, USB,
+some examples are: TTY, serial, SCSI, filesystem, ethernet, USB,
 framebuffer, input, sound, etc.
 
 
@@ -952,7 +952,7 @@ Linux implements the standard Unix process management APIs such as
 fork(), exec(), wait(), as well as standard POSIX threads.
 
 However, Linux processes and threads are implemented particularly
-different than other kernels. There are no internal structures
+differently than other kernels. There are no internal structures
 implementing processes or threads, instead there is a :c:type:`struct
 task_struct` that describe an abstract scheduling unit called task.
 
@@ -1157,7 +1157,7 @@ Linux Security Modules
 
    * Used by several Linux security extensions:
 
-     * Security Enhancened Linux
+     * Security Enhanced Linux
 
      * AppArmor
 
