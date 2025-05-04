@@ -199,7 +199,7 @@ Loading/unloading a kernel module
 
 To load a kernel module, use the :command:`insmod` utility. This utility
 receives as a parameter the path to the :file:`*.ko` file in which the module
-was compiled and linked.  Unloading the module from the kernel is done using
+was compiled and linked. Unloading the module from the kernel is done using
 the :command:`rmmod` command, which receives the module name as a parameter.
 
 .. code-block:: bash
@@ -711,7 +711,7 @@ is populated only with the :code:`printk` messages from the kernel with the
 
 Given that a production kernel (similar to the one we're probably running with)
 contains only release code, our module is among the few that send messages
-prefixed with KERN_DEBUG . In this way, we can easily navigate through the
+prefixed with KERN_DEBUG. In this way, we can easily navigate through the
 :file:`/var/log/debug` information by finding the messages corresponding to a
 debugging session for our module.
 
@@ -822,7 +822,7 @@ And to enable the debug message from line ``1603`` in the :file:`svcsock.c` file
 
 The :file:`/debug/dynamic_debug/control` file is not a regular file. It shows
 the ``dyndbg`` settings on the filters. Writing in it with an echo will change
-these settings (it will not actually make a write). Be aware that the file
+these settings (it will not actually make a writing). Be aware that the file
 contains settings for ``dyndbg`` debugging messages. Do not log in this file.
 
 Dyndbg Options
@@ -869,7 +869,7 @@ Dyndbg Options
 In addition to the above options, a series of flags can be added, removed, or set
 with operators ``+``, ``-`` or ``=``:
 
-   * ``p`` activates the pr_debug() .
+   * ``p`` activates the pr_debug().
    * ``f`` includes the name of the function in the printed message.
    * ``l`` includes the line number in the printed message.
    * ``m`` includes the module name in the printed message.
@@ -1116,9 +1116,9 @@ address at which the oops appeared.
 Determine which instruction has triggered the oops.
 
 .. hint:: Use the :file:`proc/modules` information to get the load address of
-          the kernel module.  Use, on the physical machine, objdump
-          and/or addr2line . Objdump needs debugging support for
-          compilation!  Read the lab's `objdump`_ and `addr2line`_
+          the kernel module. Use, on the physical machine, objdump
+          and/or addr2line. Objdump needs debugging support for
+          compilation! Read the lab's `objdump`_ and `addr2line`_
           sections.
 
 Try to unload the kernel module. Notice that the operation does not
@@ -1238,7 +1238,7 @@ In parallel, use GDB in a new window to view the code based on KDB information.
 When writing to :file:`/proc/hello_kdb_break`, the module will increment the
 :c:data:`kdb_write_address` variable. Enter KDB and set a breakpoint for each
 write access of the :c:data:`kdb_write_address` variable.
-Return to kernel to trigger a write using:
+Return to kernel to trigger a writing using:
 
 .. code-block:: bash
 
