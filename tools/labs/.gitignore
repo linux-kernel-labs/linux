@@ -3,6 +3,7 @@ vmlinux
 zImage
 serial.pts
 rootfs.img
+disk0.img
 disk1.img
 disk2.img
 /*core-image-*.ext4
