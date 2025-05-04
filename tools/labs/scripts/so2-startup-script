@@ -6,6 +6,7 @@ echo "SO2 checker starts ..." > /so2-checker.debug
 ip a a dev eth0 172.213.0.7/24
 ip l set dev eth0 up
 sleep 1
+ip l set dev lo up
 
 modprobe netconsole netconsole=6666@172.213.0.7/eth0,6666@172.213.0.1/
 
@@ -19,7 +20,7 @@ date > /dev/hvc0
 date >> /so2-checker.debug
 
 cd /home/root
-/bin/sh ./run.sh > /dev/hvc0
+/bin/sh ./run.sh > /dev/hvc0 < /dev/null
 
 echo "Testing complete." > /dev/hvc0
 echo "Testing complete." >> /so2-checker.debug
