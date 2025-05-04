@@ -105,7 +105,7 @@ need to configure several CPU registers.
 
 1. First, we will use ``KVM_GET_SREGS`` to get the registers. We use ``struct kvm_regs`` for this task.
 2. We will need to set ``cs.selector`` and ``cs.base`` to 0. We will use ``KVM_SET_SREGS`` to set the registers.
-3. Next we will clear all ``FLAGS`` bits via the ``rflags`` register, this means setting ``rflags`` to 2 since bit 1 must always be to 1. We alo set the ``RIP`` register to 0.
+3. Next we will clear all ``FLAGS`` bits via the ``rflags`` register, this means setting ``rflags`` to 2 since bit 1 must always be to 1. We also set the ``RIP`` register to 0.
 
 Setup long mode
 ---------------
