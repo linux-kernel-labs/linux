@@ -62,3 +62,5 @@ typedef struct vcpu {
 	int fd;
 	struct kvm_run *kvm_run;
 } virtual_cpu;
+
+#endif
